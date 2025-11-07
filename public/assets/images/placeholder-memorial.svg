@@ -1,0 +1,5 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#F9F6F2"/>
+  <circle cx="100" cy="100" r="80" fill="#5A7D4E" opacity="0.2"/>
+  <text x="100" y="110" font-family="Arial, sans-serif" font-size="60" fill="#5A7D4E" text-anchor="middle">🌿</text>
+</svg>

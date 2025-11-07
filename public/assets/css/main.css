@@ -1,0 +1,628 @@
+/**
+ * Athar Tayeb - Main Stylesheet
+ * RTL-ready with dark mode support
+ */
+
+/* CSS Variables - Light Theme */
+:root {
+    --bg: #F9F6F2;
+    --card-bg: #FFFFFF;
+    --muted-bg: #FBF9F6;
+    --primary: #5A7D4E;
+    --primary-hover: #4a6d3e;
+    --accent: #9DB37B;
+    --text: #2B2B2B;
+    --muted-text: #58624B;
+    --border: #E5E5E5;
+    --danger: #C04B4B;
+    --success: #5A7D4E;
+    --warning: #D4A574;
+    --radius: 12px;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --font-ar: "Cairo", "Tajawal", sans-serif;
+    --transition: all 0.3s ease;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg: #1F2E23;
+    --card-bg: #2F3C31;
+    --muted-bg: #253329;
+    --primary: #9DB37B;
+    --primary-hover: #b5c995;
+    --accent: #7A9A5F;
+    --text: #F8F5EE;
+    --muted-text: #C5C9BE;
+    --border: #3D4A3F;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-ar);
+    background-color: var(--bg);
+    color: var(--text);
+    direction: rtl;
+    line-height: 1.7;
+    transition: var(--transition);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
+
+p {
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+/* Navbar Overrides */
+.navbar {
+    background-color: var(--card-bg) !important;
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.navbar-brand {
+    color: var(--primary) !important;
+    font-weight: 700;
+}
+
+.nav-link {
+    color: var(--text) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    transition: var(--transition);
+}
+
+.nav-link:hover {
+    color: var(--primary) !important;
+    background-color: var(--muted-bg);
+    border-radius: 8px;
+}
+
+/* Buttons */
+.btn {
+    border-radius: var(--radius);
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.03);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: scale(1.03);
+}
+
+.btn-outline-secondary {
+    border: 2px solid var(--border);
+    color: var(--text);
+    background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--muted-bg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Cards */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-4px);
+}
+
+.card:hover h5,
+.card:hover p,
+.card:hover .card-title,
+.card:hover .card-text,
+.card:hover .text-muted {
+    color: var(--text);
+    opacity: 1;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: var(--text);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.card-text {
+    color: var(--muted-text);
+}
+
+/* Forms */
+.form-control, .form-select {
+    background-color: var(--card-bg);
+    border: 2px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary);
+    color: var(--text);
+    box-shadow: 0 0 0 0.2rem rgba(90, 125, 78, 0.15);
+}
+
+.form-label {
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+    border-radius: 0 0 var(--radius) var(--radius);
+    margin-bottom: 3rem;
+}
+
+.hero-section h1 {
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero-section p {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto 2rem;
+}
+
+/* Memorial Cards */
+.memorial-card {
+    position: relative;
+    height: 100%;
+}
+
+.memorial-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary);
+    margin: 0 auto 1rem;
+    display: block;
+}
+
+.memorial-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.memorial-date {
+    color: var(--muted-text);
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.memorial-visits {
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Tasbeeh Counters */
+.tasbeeh-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.tasbeeh-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: var(--radius);
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+}
+
+.tasbeeh-card:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-hover);
+}
+
+.tasbeeh-card:active {
+    transform: scale(0.98);
+}
+
+.tasbeeh-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.tasbeeh-count {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.tasbeeh-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Audio Players */
+.audio-player {
+    background-color: var(--muted-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.audio-player audio {
+    width: 100%;
+    height: 40px;
+}
+
+/* Quran Page Display */
+.quran-page-container {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.quran-page-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 1rem;
+}
+
+/* Asma Allah Grid */
+.asma-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.asma-item {
+    background-color: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--primary);
+    transition: var(--transition);
+}
+
+.asma-item:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Share Buttons */
+.share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+}
+
+.share-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    text-align: center;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.share-btn:hover {
+    transform: scale(1.05);
+}
+
+.share-whatsapp {
+    background-color: #25D366;
+    color: white;
+}
+
+.share-facebook {
+    background-color: #1877F2;
+    color: white;
+}
+
+.share-telegram {
+    background-color: #0088cc;
+    color: white;
+}
+
+.share-copy {
+    background-color: var(--accent);
+    color: white;
+}
+
+/* Badges */
+.badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.badge-pending {
+    background-color: var(--warning);
+    color: white;
+}
+
+.badge-approved {
+    background-color: var(--success);
+    color: white;
+}
+
+.badge-rejected {
+    background-color: var(--danger);
+    color: white;
+}
+
+/* Alerts */
+.alert {
+    border-radius: var(--radius);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border: none;
+}
+
+.alert-info {
+    background-color: rgba(90, 125, 78, 0.1);
+    color: var(--primary);
+    border-right: 4px solid var(--primary);
+}
+
+.alert-warning {
+    background-color: rgba(212, 165, 116, 0.1);
+    color: var(--warning);
+    border-right: 4px solid var(--warning);
+}
+
+.alert-success {
+    background-color: rgba(90, 125, 78, 0.1);
+    color: var(--success);
+    border-right: 4px solid var(--success);
+}
+
+.alert-danger {
+    background-color: rgba(192, 75, 75, 0.1);
+    color: var(--danger);
+    border-right: 4px solid var(--danger);
+}
+
+/* Footer */
+.footer {
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border);
+    margin-top: 4rem;
+    transition: var(--transition);
+    color: var(--text);
+}
+
+.footer a {
+    transition: var(--transition);
+    color: var(--muted-text);
+}
+
+.footer a:hover {
+    color: var(--primary) !important;
+}
+
+.footer .text-muted {
+    color: var(--muted-text) !important;
+}
+
+.footer h5, .footer p {
+    color: var(--text);
+}
+
+/* Search Box */
+.search-box {
+    position: relative;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hover);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    margin-top: 0.5rem;
+}
+
+.search-result-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.search-result-item:hover {
+    background-color: var(--muted-bg);
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid var(--border);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+}
+
+.pagination .page-link {
+    background-color: var(--card-bg);
+    border: 2px solid var(--border);
+    color: var(--text);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    transition: var(--transition);
+}
+
+.pagination .page-link:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-section p {
+        font-size: 1rem;
+    }
+    
+    .tasbeeh-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .asma-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .share-buttons {
+        flex-direction: column;
+    }
+    
+    .share-btn {
+        width: 100%;
+    }
+}
+
+/* Utility Classes */
+.text-primary { color: var(--primary) !important; }
+.text-muted { color: var(--muted-text) !important; }
+.bg-muted { background-color: var(--muted-bg) !important; }
+.border-primary { border-color: var(--primary) !important; }
+
+/* Smooth Transitions */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Print Styles */
+@media print {
+    .navbar, .footer, .share-buttons, .tasbeeh-container {
+        display: none;
+    }
+}
