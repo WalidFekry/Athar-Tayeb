@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Insert memorial
                 $stmt = $pdo->prepare("
                     INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 0)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 1)
                 ");
                 
                 $stmt->execute([
