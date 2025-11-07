@@ -81,33 +81,54 @@
   });
 
   // Reset Button for Tasbeeh Counters
-  document
-    .getElementById("resetTasbeeh")
-    .addEventListener("click", function () {
-      document
-        .querySelectorAll(".tasbeeh-card.local-only .tasbeeh-count")
-        .forEach(function (el, index) {
-          if (index < 4) {
-            el.textContent = "0";
-          }
+  // document
+  //   .getElementById("resetTasbeeh")
+  //   .addEventListener("click", function () {
+  //     document
+  //       .querySelectorAll(".tasbeeh-card.local-only .tasbeeh-count")
+  //       .forEach(function (el, index) {
+  //         if (index < 4) {
+  //           el.textContent = "0";
+  //         }
+  //       });
+  //     const allTasbeehCards = document.querySelectorAll(
+  //       ".tasbeeh-card:not(.local-only)"
+  //     );
+  //     allTasbeehCards.forEach(function (card, index) {
+  //       if (index < 4) {
+  //         const localSpan = card.querySelector(".tasbeeh-local");
+  //         if (localSpan) {
+  //           localSpan.textContent = "0";
+  //         }
+  //       }
+  //     });
+  //   });
+
+  document.addEventListener('DOMContentLoaded', function () {
+  const copyBtn = document.getElementById('copyMemorialLinkBtn');
+  const linkInput = document.getElementById('tempMemorialLink');
+
+  if (copyBtn && linkInput) {
+    copyBtn.addEventListener('click', () => {
+      linkInput.select();
+      linkInput.setSelectionRange(0, 99999); // للهواتف
+      try {
+        navigator.clipboard.writeText(linkInput.value).then(() => {
+          alert('تم نسخ الرابط بنجاح!');
         });
-      const allTasbeehCards = document.querySelectorAll(
-        ".tasbeeh-card:not(.local-only)"
-      );
-      allTasbeehCards.forEach(function (card, index) {
-        if (index < 4) {
-          const localSpan = card.querySelector(".tasbeeh-local");
-          if (localSpan) {
-            localSpan.textContent = "0";
-          }
-        }
-      });
+      } catch (err) {
+        // fallback
+        document.execCommand('copy');
+        alert('تم نسخ الرابط!');
+      }
     });
+  }
+});
 
   function incrementTasbeeh(memorialId, field, countElement) {
     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
 
-    fetch("/athar-tayeb/public/api/tasbeeh.php", {
+    fetch(BASEURL + "/api/tasbeeh.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -170,7 +191,8 @@
   }
 
   function performSearch(query) {
-    fetch(`/athar-tayeb/public/api/search.php?q=${encodeURIComponent(query)}`)
+    console.log(BASEURL)
+    fetch(`${BASEURL}/api/search.php?q=${encodeURIComponent(query)}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.success && data.results) {
@@ -199,7 +221,7 @@
 
     let html = "";
     results.forEach((result) => {
-      const url = `/athar-tayeb/public/memorial.php?id=${result.id}`;
+      const url = `${BASEURL}/memorial.php?id=${result.id}`;
       html += `
                 <a href="${url}" class="search-result-item text-decoration-none">
                     <div class="d-flex align-items-center">
@@ -404,3 +426,8 @@
     });
   }
 })();
+
+document.addEventListener("DOMContentLoaded", function () {
+  // كل الكود هنا
+});
+

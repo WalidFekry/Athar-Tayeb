@@ -5,7 +5,7 @@
  */
 
 // Environment
-define('ENV', 'development'); // 'development' or 'production'
+define('ENV', 'production'); // 'development' or 'production'
 define('DEBUG_MODE', ENV === 'development');
 
 // Base URL (update this to your domain)
@@ -58,6 +58,8 @@ define('APP_MAKTBTI_PLUS', 'https://play.google.com/store/apps/details?id=com.ma
 // Developer Info
 define('DEVELOPER_NAME', 'Walid Fekry');
 define('DEVELOPER_URL', 'https://walid-fekry.com');
+// Support Email
+define('SUPPORT_EMAIL', 'walid_fekry@hotmail.com');
 
 // Error Reporting
 if (DEBUG_MODE) {

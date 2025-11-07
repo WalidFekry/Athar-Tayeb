@@ -283,7 +283,7 @@ function generateStructuredData($memorial) {
         "description" => $memorial['quote'] ?? "صفحة تذكارية للمغفور له " . $memorial['name'],
         "mainEntityOfPage" => [
             "@type" => "WebPage",
-            "@id" => BASE_URL . '/memorial/' . $memorial['slug']
+            "@id" => BASE_URL . "/memorial.php?id=" . $memorial['id']
         ]
     ];
     

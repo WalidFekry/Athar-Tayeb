@@ -9,6 +9,7 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/csrf.php';
+require_once __DIR__ . '/../includes/maintenance_check.php';
 
 $errors = [];
 $success = false;
@@ -51,10 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // If no errors, insert into database
         if (empty($errors)) {
             try {
+                // Get auto approval setting
+                $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'auto_approval'");
+                $stmt->execute();
+                $autoApprovalSetting = $stmt->fetchColumn();
+                $autoApproval = ($autoApprovalSetting == '1') ? 1 : 0;
+                
                 // Insert memorial
                 $stmt = $pdo->prepare("
                     INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 1)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
                 ");
                 
                 $stmt->execute([
@@ -64,13 +71,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $death_date ?: null,
                     $gender,
                     $whatsapp ?: null,
-                    $quote ?: null
+                    $quote ?: null,
+                    $autoApproval
                 ]);
                 
                 $memorialId = $pdo->lastInsertId();
                 
-                // Redirect to success page
+                if($autoApproval) {
+                    // Redirect to success page
                 redirect(BASE_URL . '/success.php?id=' . $memorialId);
+                } else {
+                    // Redirect to unpublished page
+                redirect(BASE_URL . '/unpublished.php?id=' . $memorialId);
+                }
+                
                 
             } catch (PDOException $e) {
                 if (DEBUG_MODE) {

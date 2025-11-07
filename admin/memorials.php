@@ -11,8 +11,47 @@ require_once __DIR__ . '/../includes/csrf.php';
 
 requireAdmin();
 
+// Handle edit form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update') {
+    checkCSRF();
+    
+    $memorialId = (int)$_POST['memorial_id'];
+    $name = trim($_POST['name'] ?? '');
+    $fromName = trim($_POST['from_name'] ?? '');
+    $deathDate = trim($_POST['death_date'] ?? '');
+    $gender = trim($_POST['gender'] ?? 'male');
+    $whatsapp = trim($_POST['whatsapp'] ?? '');
+    $quote = trim($_POST['quote'] ?? '');
+    $status = (int)($_POST['status'] ?? 0);
+    $imageStatus = (int)($_POST['image_status'] ?? 0);
+    $quoteStatus = (int)($_POST['quote_status'] ?? 0);
+    
+    if (!empty($name)) {
+        $stmt = $pdo->prepare("
+            UPDATE memorials 
+            SET name = ?, from_name = ?, death_date = ?, gender = ?, whatsapp = ?, 
+                quote = ?, status = ?, image_status = ?, quote_status = ?
+            WHERE id = ?
+        ");
+        $stmt->execute([
+            $name,
+            $fromName ?: null,
+            $deathDate ?: null,
+            $gender,
+            $whatsapp ?: null,
+            $quote ?: null,
+            $status,
+            $imageStatus,
+            $quoteStatus,
+            $memorialId
+        ]);
+        invalidateMemorialCache($memorialId);
+        $success = 'تم تحديث الصفحة بنجاح';
+    }
+}
+
 // Handle actions
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] !== 'update') {
     checkCSRF();
     
     $memorialId = (int)$_POST['memorial_id'];
@@ -57,6 +96,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             invalidateMemorialCache($memorialId);
             $success = 'تم حذف الصفحة بنجاح';
             break;
+    }
+}
+
+// Check if we're in edit mode
+$editMode = isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id']);
+$editMemorial = null;
+
+if ($editMode) {
+    $editId = (int)$_GET['id'];
+    $stmt = $pdo->prepare("SELECT * FROM memorials WHERE id = ?");
+    $stmt->execute([$editId]);
+    $editMemorial = $stmt->fetch();
+    
+    if (!$editMemorial) {
+        $editMode = false;
     }
 }
 
@@ -113,6 +167,107 @@ include __DIR__ . '/dashboard.php'; // Reuse header
     
     <?php if (isset($success)): ?>
         <div class="alert alert-success"><?= e($success) ?></div>
+    <?php endif; ?>
+    
+    <?php if ($editMode && $editMemorial): ?>
+        <!-- Edit Form -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">✏️ تعديل الصفحة التذكارية: <?= e($editMemorial['name']) ?></h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <?php csrfField(); ?>
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="memorial_id" value="<?= $editMemorial['id'] ?>">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">اسم المتوفى <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control" value="<?= e($editMemorial['name']) ?>" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">إهداء من</label>
+                                <input type="text" name="from_name" class="form-control" value="<?= e($editMemorial['from_name'] ?? '') ?>">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">تاريخ الوفاة</label>
+                                <input type="date" name="death_date" class="form-control" value="<?= e($editMemorial['death_date'] ?? '') ?>">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">النوع</label>
+                                <select name="gender" class="form-select">
+                                    <option value="male" <?= $editMemorial['gender'] === 'male' ? 'selected' : '' ?>>ذكر</option>
+                                    <option value="female" <?= $editMemorial['gender'] === 'female' ? 'selected' : '' ?>>أنثى</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">رقم واتساب</label>
+                        <input type="text" name="whatsapp" class="form-control" value="<?= e($editMemorial['whatsapp'] ?? '') ?>">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">الرسالة / الاقتباس</label>
+                        <textarea name="quote" class="form-control" rows="4"><?= e($editMemorial['quote'] ?? '') ?></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">حالة الصفحة</label>
+                                <select name="status" class="form-select">
+                                    <option value="0" <?= $editMemorial['status'] == 0 ? 'selected' : '' ?>>قيد المراجعة</option>
+                                    <option value="1" <?= $editMemorial['status'] == 1 ? 'selected' : '' ?>>منشور</option>
+                                    <option value="2" <?= $editMemorial['status'] == 2 ? 'selected' : '' ?>>مرفوض</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">حالة الصورة</label>
+                                <select name="image_status" class="form-select">
+                                    <option value="0" <?= $editMemorial['image_status'] == 0 ? 'selected' : '' ?>>قيد المراجعة</option>
+                                    <option value="1" <?= $editMemorial['image_status'] == 1 ? 'selected' : '' ?>>موافق عليها</option>
+                                    <option value="2" <?= $editMemorial['image_status'] == 2 ? 'selected' : '' ?>>مرفوضة</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">حالة الرسالة</label>
+                                <select name="quote_status" class="form-select">
+                                    <option value="0" <?= $editMemorial['quote_status'] == 0 ? 'selected' : '' ?>>قيد المراجعة</option>
+                                    <option value="1" <?= $editMemorial['quote_status'] == 1 ? 'selected' : '' ?>>موافق عليها</option>
+                                    <option value="2" <?= $editMemorial['quote_status'] == 2 ? 'selected' : '' ?>>مرفوضة</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">💾 حفظ التعديلات</button>
+                        <a href="<?= ADMIN_URL ?>/memorials.php" class="btn btn-secondary">إلغاء</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     <?php endif; ?>
     
     <!-- Filters -->

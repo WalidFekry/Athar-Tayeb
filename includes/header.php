@@ -46,6 +46,11 @@ $structuredData = $structuredData ?? '';
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg">
+    
+    <!-- Base URL for JavaScript -->
+    <script>
+        const BASEURL = '<?= BASE_URL ?>';
+    </script>
 </head>
 <body>
     <!-- Navigation -->

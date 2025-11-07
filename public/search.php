@@ -8,6 +8,8 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/maintenance_check.php';
+
 
 $query = isset($_GET['q']) ? trim($_GET['q']) : '';
 $results = [];
@@ -16,7 +18,7 @@ if (!empty($query)) {
     // Search in memorials (only published ones)
     $searchTerm = '%' . $query . '%';
     $stmt = $pdo->prepare("
-        SELECT id, name, slug, death_date, image, visits, gender
+        SELECT id, name, death_date, image, visits, gender
         FROM memorials 
         WHERE status = 1 
         AND (name LIKE ? OR from_name LIKE ?)

@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/maintenance_check.php';
 
 // Pagination
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
@@ -21,7 +22,7 @@ $totalPages = ceil($totalMemorials / ITEMS_PER_PAGE);
 
 // Fetch memorials for current page
 $stmt = $pdo->prepare("
-    SELECT id, name, slug, death_date, image, visits, gender, from_name
+    SELECT id, name, death_date, image, visits, gender, from_name
     FROM memorials 
     WHERE status = 1 AND image_status = 1
     ORDER BY created_at DESC

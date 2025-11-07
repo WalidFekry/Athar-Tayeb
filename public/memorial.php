@@ -9,6 +9,8 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/csrf.php';
+require_once __DIR__ . '/../includes/maintenance_check.php';
+
 
 // Get memorial ID
 $memorialId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -22,8 +24,18 @@ $stmt = $pdo->prepare("SELECT * FROM memorials WHERE id = ?");
 $stmt->execute([$memorialId]);
 $memorial = $stmt->fetch();
 
+// Check if memorial exists
 if (!$memorial) {
-    redirect(BASE_URL);
+    // Redirect to 404 page
+    header('Location: ' . BASE_URL . '/404.php');
+    exit;
+}
+
+// Check if memorial is published
+if ($memorial['status'] != 1) {
+    // Redirect to unpublished page
+    header('Location: ' . BASE_URL . '/unpublished.php?id=' . $memorialId);
+    exit;
 }
 
 // Increment visit counter (simple debounce using session)
