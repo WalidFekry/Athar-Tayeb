@@ -257,12 +257,6 @@ if (empty($errors) && isset($_POST['complete_setup'])) {
                     <li>تأكد من أذونات الكتابة للمجلدات المطلوبة</li>
                     <li>احذف ملف <code>setup.php</code> بعد الانتهاء</li>
                 </ol>
-                
-                <p class="mb-0">
-                    <strong>للمزيد من المساعدة:</strong> راجع ملفات 
-                    <a href="README.md">README.md</a> و 
-                    <a href="INSTALL.md">INSTALL.md</a>
-                </p>
             </div>
         </div>
         
