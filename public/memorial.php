@@ -234,7 +234,7 @@ include __DIR__ . '/../includes/header.php';
     <?php if ($memorial['quote'] && $memorial['quote_status'] == 1): ?>
         <div class="card shadow-sm mb-4 border-primary">
             <div class="card-body">
-                <h5 class="card-title text-primary">💬 رسالة من الأهل</h5>
+                <h5 class="card-title text-primary">كلمة من صاحب الإهداء 💬</h5>
                 <p class="card-text" style="white-space: pre-wrap;"><?= e($memorial['quote']) ?></p>
             </div>
         </div>
