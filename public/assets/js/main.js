@@ -79,16 +79,6 @@
       }, 100);
     });
   });
-
-  document.getElementById("resetTasbeeh").addEventListener("click", function () {
-  document.querySelectorAll(".tasbeeh-card .tasbeeh-count").forEach(el => {
-    el.textContent = "0";
-  });
-  document.querySelectorAll(".tasbeeh-card .tasbeeh-local").forEach(el => {
-    el.textContent = "0";
-  });
-});
-
   
   function incrementTasbeeh(memorialId, field, countElement) {
     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
@@ -376,6 +366,56 @@
 })();
 
 document.addEventListener("DOMContentLoaded", function () {
-  // كل الكود هنا
+  // Surah Modals - Check if Bootstrap is available
+  if (typeof bootstrap === "undefined") {
+    console.warn("Bootstrap is not loaded. Modal functionality will not work.");
+    return;
+  }
+
+  // Get modal elements
+  const yaseenModal = document.getElementById("yaseenModal");
+  const fatihaModal = document.getElementById("fatihaModal");
+
+  // Read Yaseen button (on main page)
+  const readYaseenBtn = document.getElementById("readYaseenBtn");
+  if (readYaseenBtn && yaseenModal) {
+    readYaseenBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const modal = new bootstrap.Modal(yaseenModal);
+      modal.show();
+    });
+  }
+
+  // Read Fatiha button (on main page - direct access)
+  const readFatihaDirectBtn = document.getElementById("readFatihaDirectBtn");
+  if (readFatihaDirectBtn && fatihaModal) {
+    readFatihaDirectBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const modal = new bootstrap.Modal(fatihaModal);
+      modal.show();
+    });
+  }
+
+  // Read Fatiha button (inside Yaseen modal) - Use event delegation
+  if (yaseenModal && fatihaModal) {
+    yaseenModal.addEventListener("click", function (e) {
+      // Check if the clicked element is the readFatihaBtn
+      if (e.target && e.target.id === "readFatihaBtn") {
+        e.preventDefault();
+        
+        // Close Yaseen modal
+        const yaseenModalInstance = bootstrap.Modal.getInstance(yaseenModal);
+        if (yaseenModalInstance) {
+          yaseenModalInstance.hide();
+        }
+        
+        // Open Fatiha modal after a short delay to allow Yaseen to close
+        setTimeout(() => {
+          const fatihaModalInstance = new bootstrap.Modal(fatihaModal);
+          fatihaModalInstance.show();
+        }, 300);
+      }
+    });
+  }
 });
 

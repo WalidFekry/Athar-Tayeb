@@ -636,3 +636,192 @@ input::placeholder {
     color: #B0B3AB;
     opacity: 1;
 }
+
+/* Surah Modal Styles */
+.surah-text {
+    font-family: 'Traditional Arabic', 'Amiri', 'Scheherazade', serif;
+    line-height: 2.2;
+}
+
+.surah-verse {
+    font-size: 1.4rem;
+    line-height: 2.5;
+    color: var(--text);
+    padding: 1rem;
+    background-color: var(--muted-bg);
+    border-radius: var(--radius);
+    border-right: 4px solid var(--primary);
+}
+
+.modal-content {
+    border-radius: var(--radius);
+    border: none;
+}
+
+.modal-header {
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
+/* Apps Promotional Section */
+.apps-promo-section {
+    background: linear-gradient(135deg, var(--muted-bg) 0%, var(--card-bg) 100%);
+}
+
+.app-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary);
+}
+
+.app-card.featured {
+    border-color: var(--primary);
+    border-width: 3px;
+}
+
+.featured-badge {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+}
+
+.app-icon-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.app-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.app-icon.plus {
+    background: linear-gradient(135deg, #5A7D4E 0%, #7A9A5F 100%);
+}
+
+.app-card:hover .app-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.app-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.app-description {
+    color: var(--muted-text);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.app-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.feature-badge {
+    background-color: var(--muted-bg);
+    color: var(--primary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+}
+
+.app-platforms {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.platform-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.platform-badge.android {
+    background-color: #3DDC84;
+    color: white;
+}
+
+.platform-badge.ios {
+    background-color: #000000;
+    color: white;
+}
+
+[data-theme="dark"] .platform-badge.ios {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.app-download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.app-download-btn:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .app-card {
+        padding: 1.5rem;
+    }
+    
+    .app-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .app-title {
+        font-size: 1.25rem;
+    }
+    
+    .surah-verse {
+        font-size: 1.2rem;
+        line-height: 2.2;
+    }
+}

@@ -317,7 +317,16 @@ include __DIR__ . '/../includes/header.php';
                         <p class="text-muted small mb-2">قراءة سورة يس تُسهل على المتوفى قبره، وتُخفّف عنه عذاب القبر،
                             وتكون له نورًا يوم القيامة. عن النبي صلى الله عليه وسلم قال: "إن لكل شيء قلبًا، وقلب القرآن
                             يس"، وقراءتها تُعتبر صدقة جارية تُثقل حسنات المتوفى.</p>
-                        <audio controls preload="none" class="w-100">
+                        <div class="d-flex gap-2 mb-2">
+                            <button class="btn btn-primary btn-sm flex-grow-1" id="readYaseenBtn">
+                                📖 قراءة
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm"
+                                onclick="document.getElementById('yaseenAudio').play()">
+                                ▶️ استماع
+                            </button>
+                        </div>
+                        <audio id="yaseenAudio" controls preload="none" class="w-100">
                             <source src="assets/audios/yassin.mp3" type="audio/mpeg">
                         </audio>
                     </div>
@@ -329,7 +338,16 @@ include __DIR__ . '/../includes/header.php';
                         <p class="text-muted small mb-2">سورة الفاتحة سبب في رحمة الله ومغفرته للميت، وتفتح له أبواب
                             الجنة وتُيسر حسابه يوم القيامة. قراءتها والدعاء بها من الأعمال التي تنفع المتوفى، فهي شفاعة
                             له يوم العرض على الله.</p>
-                        <audio controls preload="none" class="w-100">
+                        <div class="d-flex gap-2 mb-2">
+                            <button class="btn btn-primary btn-sm flex-grow-1" id="readFatihaDirectBtn">
+                                📖 قراءة
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm"
+                                onclick="document.getElementById('fatihaAudio').play()">
+                                ▶️ استماع
+                            </button>
+                        </div>
+                        <audio id="fatihaAudio" controls preload="none" class="w-100">
                             <source src="assets/audios/alfatiha.mp3" type="audio/mpeg">
                         </audio>
                     </div>
@@ -364,7 +382,7 @@ include __DIR__ . '/../includes/header.php';
             </div>
         </div>
     </div>
-    
+
     <!-- Tasbeeh Counters -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
@@ -470,67 +488,151 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
-<!-- Share Section -->
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <h4 class="text-center mb-4">شارك الخير وكن سببًا في صدقة جارية 📤</h4>
-        <p class="text-center text-muted mb-4">
-            بمشاركتك هذه الصفحة، تساهم في نشر الخير والدعاء <?= getPronoun($memorial['gender'], 'للمرحوم') ?> <strong><?= htmlspecialchars($memorial['name']) ?></strong>.<br>
-            كل مشاركة هي صدقة جارية لك وله، تزيد من أجر الدعاء وتُذكر الجميع بفضل الدعاء للمتوفى.<br>
-            شارك الرابط مع أصدقائك وعائلتك ليكونوا جزءًا من هذا الأجر العظيم.
-        </p>
+    <!-- Share Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="text-center mb-4">شارك الخير وكن سببًا في صدقة جارية 📤</h4>
+            <p class="text-center text-muted mb-4">
+                بمشاركتك هذه الصفحة، تساهم في نشر الخير والدعاء <?= getPronoun($memorial['gender'], 'للمرحوم') ?>
+                <strong><?= htmlspecialchars($memorial['name']) ?></strong>.<br>
+                كل مشاركة هي صدقة جارية لك وله، تزيد من أجر الدعاء وتُذكر الجميع بفضل الدعاء للمتوفى.<br>
+                شارك الرابط مع أصدقائك وعائلتك ليكونوا جزءًا من هذا الأجر العظيم.
+            </p>
 
-        <div class="text-center mb-3 text-secondary fst-italic">
-            نسأل الله أن يجزيك خير الجزاء على مشاركتك الطيبة ويثقل بها ميزان حسناتك.
-        </div>
+            <div class="text-center mb-3 text-secondary fst-italic">
+                نسأل الله أن يجزيك خير الجزاء على مشاركتك الطيبة ويثقل بها ميزان حسناتك.
+            </div>
 
-        <div class="share-buttons d-flex justify-content-center gap-3 flex-wrap">
-            <a href="https://wa.me/?text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة: ' . $memorialUrl) ?>"
-               target="_blank" rel="noopener" class="share-btn share-whatsapp" aria-label="شارك عبر واتساب">
-                📱 واتساب
-            </a>
+            <div class="share-buttons d-flex justify-content-center gap-3 flex-wrap">
+                <a href="https://wa.me/?text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة: ' . $memorialUrl) ?>"
+                    target="_blank" rel="noopener" class="share-btn share-whatsapp" aria-label="شارك عبر واتساب">
+                    📱 واتساب
+                </a>
 
-            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>"
-               target="_blank" rel="noopener" class="share-btn share-facebook" aria-label="شارك عبر فيسبوك">
-                📘 فيسبوك
-            </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>" target="_blank"
+                    rel="noopener" class="share-btn share-facebook" aria-label="شارك عبر فيسبوك">
+                    📘 فيسبوك
+                </a>
 
-            <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة.') ?>"
-               target="_blank" rel="noopener" class="share-btn share-telegram" aria-label="شارك عبر تيليجرام">
-                ✈️ تيليجرام
-            </a>
+                <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة.') ?>"
+                    target="_blank" rel="noopener" class="share-btn share-telegram" aria-label="شارك عبر تيليجرام">
+                    ✈️ تيليجرام
+                </a>
 
-            <button class="share-btn share-copy copy-link-btn" data-url="<?= e($memorialUrl) ?>" aria-label="نسخ رابط المشاركة">
-                📋 نسخ الرابط
-            </button>
+                <button class="share-btn share-copy copy-link-btn" data-url="<?= e($memorialUrl) ?>"
+                    aria-label="نسخ رابط المشاركة">
+                    📋 نسخ الرابط
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
 
 
     <!-- Apps Section -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5>📱 تطبيق مكتبتي</h5>
-                    <p class="text-muted small">مكتبة إسلامية شاملة</p>
-                    <a href="<?= APP_MAKTBTI ?>" target="_blank" class="btn btn-sm btn-primary">
-                        تحميل التطبيق
-                    </a>
-                </div>
-            </div>
-        </div>
+    <div class="card shadow-sm mb-4 apps-promo-section">
+        <div class="card-body p-4">
+            <h3 class="text-center mb-4 fw-bold"> تطبيقاتنا الإسلامية 📱</h3>
+            <p class="text-center text-muted mb-5">مكتبة إسلامية شاملة في جيبك - متاحة الآن على أندرويد و iOS</p>
 
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5>📱 مكتبتي بلس</h5>
-                    <p class="text-muted small">النسخة المتقدمة</p>
-                    <a href="<?= APP_MAKTBTI_PLUS ?>" target="_blank" class="btn btn-sm btn-primary">
-                        تحميل التطبيق
-                    </a>
+            <div class="row g-4">
+                <!-- Maktbti App -->
+                <div class="col-md-6">
+                    <div class="app-card">
+                        <div class="app-icon-wrapper">
+                            <div class="app-icon">
+                                <img src="<?= BASE_URL ?>/assets/images/maktbti-logo.png" alt="Maktbti Logo"
+                                    height="50">
+                            </div>
+                        </div>
+                        <h4 class="app-title">مكتبتي</h4>
+                        <p class="app-description">مكتبة إسلامية شاملة تحتوي على قصص الأنبياء، أذكار المسلم، رسائل
+                            التفاؤل، والقرآن الكريم الكامل</p>
+                        <div class="app-features mb-3">
+                            <span class="feature-badge">✓ قصص الأنبياء</span>
+                            <span class="feature-badge">✓ أذكار المسلم</span>
+                            <span class="feature-badge">✓ القرآن الكريم</span>
+                        </div>
+                        <div class="app-platforms mb-3">
+                            <span class="platform-badge android">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path
+                                        d="M2.76 3.061a.5.5 0 0 1 .679.2l1.283 2.352A8.94 8.94 0 0 1 8 5a8.94 8.94 0 0 1 3.278.613l1.283-2.352a.5.5 0 1 1 .878.478l-1.252 2.295C14.475 7.266 16 9.477 16 12H0c0-2.523 1.525-4.734 3.813-5.966L2.56 3.74a.5.5 0 0 1 .2-.678Z" />
+                                </svg>
+                                Android
+                            </span>
+                        </div>
+                        <a href="<?= APP_MAKTBTI ?>" target="_blank" class="btn btn-primary w-100 app-download-btn">
+                            <span>تحميل التطبيق</span>
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path
+                                    d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                                <path
+                                    d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Maktbti Plus App -->
+                <div class="col-md-6">
+                    <div class="app-card featured">
+                        <div class="featured-badge">الأكثر شعبية</div>
+                        <div class="app-icon-wrapper">
+                            <div class="app-icon plus">
+                                <img src="<?= BASE_URL ?>/assets/images/maktbti-plus-logo.png" alt="Maktbti Logo"
+                                    height="50">
+                            </div>
+                        </div>
+                        <h4 class="app-title">مكتبتي بلس</h4>
+                        <p class="app-description">النسخة المتقدمة والشاملة - مكتبة إسلامية متكاملة مع مميزات إضافية،
+                            تصميم أنيق، وطريقة استخدام سلسة</p>
+                        <div class="app-features mb-3">
+                            <span class="feature-badge">✓ أذكار وأدعية</span>
+                            <span class="feature-badge">✓ مواقيت الصلاة</span>
+                            <span class="feature-badge">✓ القرآن الكريم</span>
+                        </div>
+                        <div class="app-platforms mb-3">
+                            <span class="platform-badge android">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path
+                                        d="M2.76 3.061a.5.5 0 0 1 .679.2l1.283 2.352A8.94 8.94 0 0 1 8 5a8.94 8.94 0 0 1 3.278.613l1.283-2.352a.5.5 0 1 1 .878.478l-1.252 2.295C14.475 7.266 16 9.477 16 12H0c0-2.523 1.525-4.734 3.813-5.966L2.56 3.74a.5.5 0 0 1 .2-.678Z" />
+                                </svg>
+                                Android
+                            </span>
+                            <span class="platform-badge ios">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path
+                                        d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56.244.729.625 1.924 1.273 2.796.576.984 1.34 1.667 1.659 1.899.319.232 1.219.386 1.843.067.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758.347-.79.505-1.217.473-1.282Z" />
+                                </svg>
+                                iOS
+                            </span>
+                        </div>
+                        <a href="<?= APP_MAKTBTI_PLUS ?>" target="_blank"
+                            class="btn btn-primary w-100 mb-2 app-download-btn d-flex align-items-center justify-content-center gap-2">
+                            <span>تحميل التطبيق</span>
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"
+                                focusable="false">
+                                <path
+                                    d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                                <path
+                                    d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                            </svg>
+                        </a>
+
+                        <a href="<?= APP_MAKTBTI_PLUS_IOS ?>" target="_blank"
+                            class="btn btn-primary w-100 app-download-btn d-flex align-items-center justify-content-center gap-2">
+                            <span>تحميل للآيفون</span>
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"
+                                focusable="false">
+                                <path
+                                    d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                                <path
+                                    d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                            </svg>
+                        </a>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -538,4 +640,5 @@ include __DIR__ . '/../includes/header.php';
 
 </div>
 
+<?php include __DIR__ . '/../includes/yaseen_modal.php'; ?>
 <?php include __DIR__ . '/../includes/footer.php'; ?>
