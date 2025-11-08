@@ -10,6 +10,6 @@ $maintenanceMode = $stmt->fetchColumn();
 
 // If maintenance mode is ON and user is not an admin
 if ($maintenanceMode == '1' && !isAdminLoggedIn()) {
-    header('Location: ' . BASE_URL . '/maintenance.php');
+    header('Location: ' . site_url('maintenance'));
     exit;
 }

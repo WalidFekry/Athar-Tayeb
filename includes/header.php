@@ -56,7 +56,7 @@ $structuredData = $structuredData ?? '';
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="<?= BASE_URL ?>">
+            <a class="navbar-brand d-flex align-items-center" href="<?= site_url('public') ?>">
                 <span class="fs-4 fw-bold text-primary">🌿 <?= SITE_NAME ?></span>
             </a>
             
@@ -67,16 +67,16 @@ $structuredData = $structuredData ?? '';
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= BASE_URL ?>">الرئيسية</a>
+                        <a class="nav-link" href="<?= site_url('public') ?>">الرئيسية</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= BASE_URL ?>/create.php">أنشئ صفحة</a>
+                        <a class="nav-link" href="<?= site_url('create') ?>">أنشئ صفحة</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= BASE_URL ?>/all.php">جميع الصفحات</a>
+                        <a class="nav-link" href="<?= site_url('all') ?>">جميع الصفحات</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= BASE_URL ?>/contact.php">تواصل معنا</a>
+                        <a class="nav-link" href="<?= site_url('contact') ?>">تواصل معنا</a>
                     </li>
                 </ul>
                 
@@ -104,7 +104,7 @@ $structuredData = $structuredData ?? '';
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= BASE_URL ?>/search.php" method="GET">
+                    <form action="<?= site_url('search') ?>" method="GET">
                         <div class="input-group">
                             <input type="text" name="q" class="form-control" placeholder="ابحث عن اسم..." required>
                             <button class="btn btn-primary" type="submit">بحث</button>

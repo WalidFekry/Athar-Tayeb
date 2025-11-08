@@ -1,0 +1,29 @@
+# Robots.txt for Athar Tayeb Memorial Platform
+# Allows search engines to crawl public pages while protecting admin and internal files
+
+User-agent: *
+
+# Disallow admin area
+Disallow: /admin/
+
+# Disallow internal includes and configuration
+Disallow: /includes/
+
+# Disallow logs and SQL files
+Disallow: /logs/
+Disallow: /sql/
+
+# Disallow setup script
+Disallow: /setup.php
+
+# Disallow cache directory
+Disallow: /cache/
+
+# Allow assets and uploads for proper rendering
+Allow: /public/assets/
+Allow: /public/uploads/
+Allow: /assets/
+Allow: /uploads/
+
+# Sitemap location
+Sitemap: http://localhost/Athar-Tayeb-master/sitemap.xml

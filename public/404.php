@@ -48,12 +48,12 @@ include __DIR__ . '/../includes/header.php';
                     
                     <div class="row g-3 mt-4">
                         <div class="col-md-6">
-                            <a href="<?= BASE_URL ?>" class="btn btn-primary w-100">
+                            <a href="<?= site_url('public') ?>" class="btn btn-primary w-100">
                                 🏠 الصفحة الرئيسية
                             </a>
                         </div>
                         <div class="col-md-6">
-                            <a href="<?= BASE_URL ?>/search.php" class="btn btn-outline-primary w-100">
+                            <a href="<?= site_url('search') ?>" class="btn btn-outline-primary w-100">
                                 🔍 البحث
                             </a>
                         </div>
@@ -61,12 +61,12 @@ include __DIR__ . '/../includes/header.php';
                     
                     <div class="row g-3 mt-2">
                         <div class="col-md-6">
-                            <a href="<?= BASE_URL ?>/all.php" class="btn btn-outline-secondary w-100">
+                            <a href="<?= site_url('all') ?>" class="btn btn-outline-secondary w-100">
                                 📋 جميع الصفحات
                             </a>
                         </div>
                         <div class="col-md-6">
-                            <a href="<?= BASE_URL ?>/create.php" class="btn btn-success w-100">
+                            <a href="<?= site_url('create') ?>" class="btn btn-success w-100">
                                 ✨ أنشئ صفحة جديدة
                             </a>
                         </div>
@@ -76,7 +76,7 @@ include __DIR__ . '/../includes/header.php';
             
             <div class="text-center mt-4">
                 <p class="text-muted">
-                    إذا كنت تعتقد أن هذا خطأ، يمكنك <a href="<?= BASE_URL ?>/contact.php">التواصل معنا</a>
+                    إذا كنت تعتقد أن هذا خطأ، يمكنك <a href="<?= site_url('contact') ?>">التواصل معنا</a>
                 </p>
             </div>
             

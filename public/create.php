@@ -79,10 +79,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 if($autoApproval) {
                     // Redirect to success page
-                redirect(BASE_URL . '/success.php?id=' . $memorialId);
+                redirect(site_url('success?id=' . $memorialId));
                 } else {
                     // Redirect to unpublished page
-                redirect(BASE_URL . '/unpublished.php?id=' . $memorialId);
+                redirect(site_url('unpublished?id=' . $memorialId));
                 }
                 
                 

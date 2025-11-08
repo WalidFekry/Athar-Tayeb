@@ -363,7 +363,7 @@ function generateStructuredData($memorial)
         "description" => $memorial['quote'] ?? "صفحة تذكارية للمغفور له " . $memorial['name'],
         "mainEntityOfPage" => [
             "@type" => "WebPage",
-            "@id" => BASE_URL . "/memorial.php?id=" . $memorial['id']
+            "@id" => site_url('m/' . $memorial['id'])
         ]
     ];
 
@@ -486,5 +486,24 @@ function formatArabicCount($num, $singular, $dual, $plural)
     if ($num <= 10)
         return " $numArabic $plural";
     return " $numArabic $plural";
+}
+
+/**
+ * Generate clean URLs without /public/ and .php extension
+ * Converts BASE_URL paths to SEO-friendly format
+ * 
+ * @param string $path The path relative to project root (e.g., 'create', 'm/2', 'all')
+ * @return string The full clean URL
+ */
+function site_url($path = '')
+{
+    // Remove trailing /public from BASE_URL to get project root
+    $root = preg_replace('~/public/?$~', '', BASE_URL);
+    
+    // Ensure proper path formatting
+    $path = ltrim($path, '/');
+    
+    // Return clean URL
+    return rtrim($root, '/') . '/' . $path;
 }
 

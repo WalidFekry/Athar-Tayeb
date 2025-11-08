@@ -42,7 +42,7 @@ include __DIR__ . '/../includes/header.php';
                     صالح يدعو له"</strong>
             </p>
         </div>
-        <a href="<?= BASE_URL ?>/create.php" class="btn btn-light btn-lg px-5 py-3">
+        <a href="<?= site_url('create') ?>" class="btn btn-light btn-lg px-5 py-3">
             أنشئ صفحة تذكارية الآن 💚
         </a>
     </div>
@@ -79,7 +79,7 @@ include __DIR__ . '/../includes/header.php';
     <div class="row mb-5">
         <div class="col-lg-8 mx-auto">
             <div class="search-box">
-                <form action="<?= BASE_URL ?>/search.php" method="GET">
+                <form action="<?= site_url('search') ?>" method="GET">
                     <div class="input-group input-group-lg">
                         <input type="text" name="q" id="searchInput" class="form-control"
                             placeholder="🔍 ابحث عن شخص تحبه لتتذكره بالدعاء..." autocomplete="off">
@@ -115,7 +115,7 @@ include __DIR__ . '/../includes/header.php';
                             <p class="memorial-visits">
                                 👁️ زارها <?= toArabicNumerals($memorial['visits']) ?> شخصاً
                             </p>
-                            <a href="<?= BASE_URL ?>/memorial.php?id=<?= $memorial['id'] ?>" class="btn btn-primary w-100">
+                            <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100">
                                 عرض الصفحة
                             </a>
                         </div>
@@ -125,7 +125,7 @@ include __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="text-center">
-            <a href="<?= BASE_URL ?>/all.php" class="btn btn-outline-primary btn-lg">
+            <a href="<?= site_url('all') ?>" class="btn btn-outline-primary btn-lg">
                 عرض المزيد من الصفحات
             </a>
         </div>

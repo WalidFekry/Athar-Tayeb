@@ -19,10 +19,10 @@
                 <div class="col-md-4">
                     <h6 class="fw-bold mb-3">روابط سريعة</h6>
                     <ul class="list-unstyled">
-                        <li><a href="<?= BASE_URL ?>" class="text-muted text-decoration-none small">الرئيسية</a></li>
-                        <li><a href="<?= BASE_URL ?>/create.php" class="text-muted text-decoration-none small">أنشئ صفحة تذكارية</a></li>
-                        <li><a href="<?= BASE_URL ?>/all.php" class="text-muted text-decoration-none small">جميع الصفحات</a></li>
-                        <li><a href="<?= BASE_URL ?>/contact.php" class="text-muted text-decoration-none small">تواصل معنا</a></li>
+                        <li><a href="<?= site_url('public') ?>" class="text-muted text-decoration-none small">الرئيسية</a></li>
+                        <li><a href="<?= site_url('create') ?>" class="text-muted text-decoration-none small">أنشئ صفحة تذكارية</a></li>
+                        <li><a href="<?= site_url('all') ?>" class="text-muted text-decoration-none small">جميع الصفحات</a></li>
+                        <li><a href="<?= site_url('contact') ?>" class="text-muted text-decoration-none small">تواصل معنا</a></li>
                     </ul>
                 </div>
                 

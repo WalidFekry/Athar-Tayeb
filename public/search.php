@@ -97,7 +97,7 @@ include __DIR__ . '/../includes/header.php';
                                             </small>
                                         </div>
                                         
-                                        <a href="<?= BASE_URL ?>/memorial.php?id=<?= $memorial['id'] ?>" class="btn btn-primary btn-sm w-100 mt-3">
+                                        <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary btn-sm w-100 mt-3">
                                             عرض الصفحة
                                         </a>
                                     </div>
@@ -122,7 +122,7 @@ include __DIR__ . '/../includes/header.php';
             <?php endif; ?>
             
             <div class="text-center mt-4">
-                <a href="<?= BASE_URL ?>/all.php" class="btn btn-outline-primary">
+                <a href="<?= site_url('all') ?>" class="btn btn-outline-primary">
                     عرض جميع الصفحات
                 </a>
             </div>

@@ -59,7 +59,7 @@ include __DIR__ . '/../includes/header.php';
         <p class="text-muted">رقم الصفحة: <strong><?= $memorialId ?></strong></p>
 
         <?php 
-          $memorialLink = BASE_URL . "/memorial.php?id=" . $memorialId; 
+          $memorialLink = site_url('m/' . $memorialId); 
         ?>
     <!-- Memorial Link -->
             <div class="card shadow-sm mb-4">
@@ -88,7 +88,7 @@ include __DIR__ . '/../includes/header.php';
 
                     
                     <div class="mt-5">
-                        <a href="<?= BASE_URL ?>" class="btn btn-primary btn-lg">
+                        <a href="<?= site_url('public') ?>" class="btn btn-primary btn-lg">
                             🏠 العودة للرئيسية
                         </a>
                     </div>
@@ -97,7 +97,7 @@ include __DIR__ . '/../includes/header.php';
             
             <div class="text-center mt-4">
                 <p class="text-muted">
-                    للاستفسارات، يمكنك <a href="<?= BASE_URL ?>/contact.php">التواصل معنا</a>
+                    للاستفسارات، يمكنك <a href="<?= site_url('contact') ?>">التواصل معنا</a>
                 </p>
             </div>
             

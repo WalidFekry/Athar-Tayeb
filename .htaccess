@@ -1,0 +1,130 @@
+# ============================================
+# Athar Tayeb - Apache URL Rewriting Rules
+# Clean URLs and SEO-friendly structure
+# ============================================
+
+# Enable URL rewriting
+RewriteEngine On
+
+# Set the base path for this project
+RewriteBase /Athar-Tayeb-master/
+
+# Disable MultiViews to prevent conflicts with extensionless URLs
+Options -MultiViews
+
+# ============================================
+# 1. Base URL Redirect
+# Redirect root folder to /public
+# ============================================
+RewriteCond %{REQUEST_URI} ^/Athar-Tayeb-master/?$
+RewriteRule ^$ public/ [R=301,L]
+
+# ============================================
+# 2. Skip Rewriting for Existing Files/Directories
+# Allow direct access to actual files and folders
+# ============================================
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# ============================================
+# 3. Preserve Admin Area
+# Admin URLs remain unchanged (no clean URL mapping)
+# ============================================
+RewriteRule ^admin/ - [L]
+
+# ============================================
+# 4. Static Assets and Uploads
+# Map /assets/ and /uploads/ to /public/assets/ and /public/uploads/
+# This removes /public/ from asset URLs
+# ============================================
+RewriteRule ^assets/(.*)$ public/assets/$1 [QSA,L]
+RewriteRule ^uploads/(.*)$ public/uploads/$1 [QSA,L]
+
+# ============================================
+# 5. API Endpoints
+# Map /api/endpoint to /public/api/endpoint.php
+# Example: /api/search -> /public/api/search.php
+# ============================================
+RewriteRule ^api/([a-zA-Z0-9_-]+)/?$ public/api/$1.php [QSA,L]
+
+# ============================================
+# 6. Memorial Short URLs
+# Map /m/{id} to /public/memorial.php?id={id}
+# Example: /m/2 -> /public/memorial.php?id=2
+# ============================================
+RewriteRule ^m/([0-9]+)/?$ public/memorial.php?id=$1 [QSA,L]
+
+# ============================================
+# 7. Public Pages Without .php Extension
+# Map extensionless URLs to .php files in /public/
+# Example: /create -> /public/create.php
+# ============================================
+RewriteRule ^(index|create|all|contact|search|success|unpublished|404|maintenance)/?$ public/$1.php [QSA,L]
+
+# ============================================
+# 8. Canonicalize .php Extensions
+# Redirect URLs with .php to extensionless versions
+# Example: /create.php -> /create
+# ============================================
+RewriteCond %{REQUEST_URI} !^/admin/
+RewriteRule ^([a-zA-Z0-9/_-]+)\.php$ $1 [R=301,L]
+
+# ============================================
+# 9. Fallback Rule
+# If nothing matched above, try serving from /public/
+# This helps with 404 handling and index files
+# ============================================
+RewriteRule ^(.*)$ public/$1 [QSA,L]
+
+# ============================================
+# Security Headers (Optional but Recommended)
+# ============================================
+<IfModule mod_headers.c>
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # XSS Protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ============================================
+# Error Documents (Optional)
+# ============================================
+ErrorDocument 404 /Athar-Tayeb-master/404
+ErrorDocument 500 /Athar-Tayeb-master/404
+
+# ============================================
+# Compression (Optional but Recommended for Performance)
+# ============================================
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# ============================================
+# Browser Caching (Optional but Recommended for Performance)
+# ============================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Images
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    
+    # CSS and JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    
+    # Fonts
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+</IfModule>

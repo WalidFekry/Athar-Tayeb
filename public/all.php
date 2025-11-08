@@ -77,7 +77,7 @@ include __DIR__ . '/../includes/header.php';
                                 👁️ زارها <?= toArabicNumerals($memorial['visits']) ?> شخصاً
                             </p>
                             
-                            <a href="<?= BASE_URL ?>/memorial.php?id=<?= $memorial['id'] ?>" class="btn btn-primary w-100">
+                            <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100">
                                 عرض الصفحة
                             </a>
                         </div>
@@ -120,7 +120,7 @@ include __DIR__ . '/../includes/header.php';
     <?php endif; ?>
     
     <div class="text-center mt-5">
-        <a href="<?= BASE_URL ?>/create.php" class="btn btn-primary btn-lg">
+        <a href="<?= site_url('create') ?>" class="btn btn-primary btn-lg">
              أنشئ صفحة تذكارية 💚
         </a>
     </div>

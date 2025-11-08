@@ -27,14 +27,14 @@ $memorial = $stmt->fetch();
 // Check if memorial exists
 if (!$memorial) {
     // Redirect to 404 page
-    header('Location: ' . BASE_URL . '/404.php');
+    header('Location: ' . site_url('404'));
     exit;
 }
 
 // Check if memorial is published
 if ($memorial['status'] != 1) {
     // Redirect to unpublished page
-    header('Location: ' . BASE_URL . '/unpublished.php?id=' . $memorialId);
+    header('Location: ' . site_url('unpublished?id=' . $memorialId));
     exit;
 }
 
@@ -51,7 +51,7 @@ if (!isset($_SESSION[$visitKey]) || (time() - $_SESSION[$visitKey]) > 300) {
 $pageTitle = 'للمغفور ' . getPronoun($memorial['gender'], 'له') . ' بإذن الله تعالى ' . $memorial['name'] . ' — ' . SITE_NAME;
 $pageDescription = $memorial['quote'] ?? 'صفحة تذكارية للمغفور ' . getPronoun($memorial['gender'], 'له') . ' ' . $memorial['name'];
 $pageImage = $memorial['image'] && $memorial['image_status'] == 1 ? getImageUrl($memorial['image']) : BASE_URL . '/assets/images/placeholder-memorial.png';
-$memorialUrl = BASE_URL . '/memorial.php?id=' . $memorial['id'];
+$memorialUrl = site_url('m/' . $memorial['id']);
 
 // Generate OG tags and structured data
 $ogTags = generateOGTags($pageTitle, $pageDescription, $pageImage, $memorialUrl);
@@ -177,7 +177,7 @@ include __DIR__ . '/../includes/header.php';
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>">الرئيسية</a></li>
+            <li class="breadcrumb-item"><a href="<?= site_url('public') ?>">الرئيسية</a></li>
             <li class="breadcrumb-item"><?= e($memorial['name']) ?></li>
         </ol>
     </nav>
