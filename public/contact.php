@@ -20,7 +20,7 @@ include __DIR__ . '/../includes/header.php';
         <div class="col-lg-8 mx-auto">
 
             <div class="text-center mb-5">
-                <h1>📧 تواصل معنا</h1>
+                <h1> تواصل معنا 📧</h1>
                 <p class="lead text-muted">
                     نسعد بتواصلكم واستفساراتكم
                 </p>
@@ -57,25 +57,55 @@ include __DIR__ . '/../includes/header.php';
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <h4 class="mb-4">تطبيقاتنا</h4>
-                    <p>
-                        تعرف على تطبيقاتنا الإسلامية الأخرى:
-                    </p>
+                    <h4 class="mb-4">تطبيقاتنا الإسلامية</h4>
+                 <p>صُممت خصيصًا لدعمك في طلب العلم، وذكر الله، والدعاء، لتجعل رحلتك الروحية أكثر ثراءً وفائدة.</p>
 
-                    <div class="row g-3">
+                    <div class="row g-4">
+                        <!-- تطبيق مكتبتي -->
                         <div class="col-md-6">
-                            <a href="<?= APP_MAKTBTI ?>" target="_blank" class="btn btn-primary w-100">
-                                📱 تطبيق مكتبتي
-                            </a>
+                            <div class="border rounded p-3 h-100 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5>📱 تطبيق مكتبتي</h5>
+                                    <p>
+                                        هو تطبيق إسلامي مميز يضم قصص الأنبياء بأسلوب بسيط ومشوق، مناسب لكل الأعمار.
+                                        يحتوي على أذكار، أدعية، وميزات كثيرة، ويعمل بدون إنترنت لتكون الفائدة دائمًا في
+                                        متناولك.
+                                    </p>
+                                </div>
+                                <div>
+                                    <a href="<?= APP_MAKTBTI ?>" target="_blank" class="btn btn-primary w-100 mb-2">
+                                        تحميل تطبيق مكتبتي
+                                    </a>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- تطبيق مكتبتي بلس -->
                         <div class="col-md-6">
-                            <a href="<?= APP_MAKTBTI_PLUS ?>" target="_blank" class="btn btn-primary w-100">
-                                📱 مكتبتي بلس
-                            </a>
+                            <div class="border rounded p-3 h-100 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5>📱 مكتبتي بلس</h5>
+                                    <p>
+                                        النسخة المتقدمة من تطبيق مكتبتي، مكتبة شاملة لكل مسلم، مصمم للمسلمين ذاتيا أفضل
+                                        من أي وقت مضى، يحتوي على كل ما يحتاجه المسلم يوميا.
+                                    </p>
+                                </div>
+                                <div>
+                                    <a href="<?= APP_MAKTBTI_PLUS ?>" target="_blank"
+                                        class="btn btn-primary w-100 mb-2">
+                                        تحميل مكتبتي بلس
+                                    </a>
+                                    <a href="<?= APP_MAKTBTI_PLUS_IOS ?>" target="_blank"
+                                        class="btn btn-primary w-100 mb-2">
+                                        تحميل للآيفون
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
 
             <div class="card shadow-sm">
                 <div class="card-body p-4">
@@ -102,13 +132,6 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
             </div>
-
-            <div class="text-center mt-5">
-                <p class="text-muted">
-                    تصميم وتطوير: <a href="<?= DEVELOPER_URL ?>" target="_blank"><?= DEVELOPER_NAME ?></a>
-                </p>
-            </div>
-
         </div>
     </div>
 </div>

@@ -44,7 +44,7 @@ include __DIR__ . '/../includes/header.php';
                 <div class="display-1 mb-3">✅</div>
                 <h1 class="text-success">تم إنشاء الصفحة التذكارية بنجاح!</h1>
                 <p class="lead">
-                    🌸 صفحة <strong><?= e($memorial['name']) ?></strong> جاهزة الآن
+                     صفحة <strong><?= e($memorial['name']) ?></strong> جاهزة الآن 🌸
                 </p>
             </div>
             
@@ -132,14 +132,6 @@ include __DIR__ . '/../includes/header.php';
                             class="share-btn share-telegram"
                         >
                             ✈️ تيليجرام
-                        </a>
-                        
-                        <a 
-                            href="<?= BASE_URL ?>/api/qr.php?url=<?= urlencode($memorialUrl) ?>" 
-                            target="_blank"
-                            class="share-btn share-copy"
-                        >
-                            📷 QR Code
                         </a>
                     </div>
                 </div>

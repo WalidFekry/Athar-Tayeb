@@ -57,13 +57,6 @@ foreach ($directories as $dir) {
     }
 }
 
-// Check .htaccess
-if (!file_exists(__DIR__ . '/.htaccess')) {
-    $warnings[] = '.htaccess file not found. URL rewriting may not work.';
-} else {
-    $success[] = '.htaccess file exists ✓';
-}
-
 // Check config file
 if (!file_exists(__DIR__ . '/includes/config.php')) {
     $errors[] = 'config.php not found in includes/';
@@ -262,7 +255,6 @@ if (empty($errors) && isset($_POST['complete_setup'])) {
                     <li>تأكد من استيراد ملف <code>sql/athartayeb_schema.sql</code> إلى قاعدة البيانات</li>
                     <li>عدّل ملف <code>includes/config.php</code> بإعدادات قاعدة البيانات الصحيحة</li>
                     <li>تأكد من أذونات الكتابة للمجلدات المطلوبة</li>
-                    <li>فعّل mod_rewrite في Apache</li>
                     <li>احذف ملف <code>setup.php</code> بعد الانتهاء</li>
                 </ol>
                 

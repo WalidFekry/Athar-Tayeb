@@ -7,7 +7,7 @@
 // Default values if not set
 $pageTitle = $pageTitle ?? SITE_NAME;
 $pageDescription = $pageDescription ?? SITE_DESCRIPTION;
-$pageImage = $pageImage ?? BASE_URL . '/assets/images/placeholder-memorial.svg';
+$pageImage = $pageImage ?? BASE_URL . '/assets/images/placeholder-memorial.png';
 $pageUrl = $pageUrl ?? BASE_URL . $_SERVER['REQUEST_URI'];
 $ogTags = $ogTags ?? '';
 $structuredData = $structuredData ?? '';

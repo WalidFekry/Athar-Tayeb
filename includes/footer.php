@@ -30,10 +30,10 @@
                 <div class="col-md-4">
                     <h6 class="fw-bold mb-3">تطبيقاتنا</h6>
                     <div class="d-flex flex-column gap-2">
-                        <a href="<?= APP_MAKTBTI ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <a href="<?= APP_MAKTBTI ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
                             📱 تطبيق مكتبتي
                         </a>
-                        <a href="<?= APP_MAKTBTI_PLUS ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <a href="<?= APP_MAKTBTI_PLUS ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
                             📱 مكتبتي بلس
                         </a>
                     </div>

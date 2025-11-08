@@ -61,27 +61,28 @@ include __DIR__ . '/../includes/header.php';
         <?php 
           $memorialLink = BASE_URL . "/memorial.php?id=" . $memorialId; 
         ?>
-
-        <div class="d-flex flex-column align-items-center gap-2">
-            <input 
-                type="text" 
-                readonly 
-                class="form-control text-center" 
-                style="max-width: 400px;" 
-                id="tempMemorialLink" 
-                value="<?= htmlspecialchars($memorialLink) ?>"
-                aria-label="رابط الصفحة التذكارية المؤقت"
-            >
-
-            <button 
-                class="btn btn-outline-secondary"
-                id="copyMemorialLinkBtn"
-                type="button"
-                title="نسخ الرابط"
-            >
-                📋 نسخ رابط الصفحة
-            </button>
-        </div>
+    <!-- Memorial Link -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">🔗رابط الصفحة التذكارية المؤقت</h5>
+                    <div class="input-group mb-3">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            value="<?= e($memorialLink) ?>" 
+                            readonly
+                            id="memorialLink"
+                        >
+                        <button 
+                            class="btn btn-outline-primary copy-link-btn" 
+                            data-url="<?= e($memorialLink) ?>"
+                            type="button"
+                        >
+                            📋 نسخ
+                        </button>
+                    </div>
+                </div>
+            </div>
     </div>
 <?php endif; ?>
 

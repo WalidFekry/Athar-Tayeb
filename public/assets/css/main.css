@@ -32,8 +32,8 @@
     --primary: #9DB37B;
     --primary-hover: #b5c995;
     --accent: #7A9A5F;
-    --text: #F8F5EE;
-    --muted-text: #C5C9BE;
+    --text: #898986;  
+    --muted-text: #A3A497; 
     --border: #3D4A3F;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -625,4 +625,14 @@ textarea.form-control {
     .navbar, .footer, .share-buttons, .tasbeeh-container {
         display: none;
     }
+}
+
+input::placeholder {
+    color: #7A7A7A; 
+    opacity: 1; 
+}
+
+[data-theme="dark"] input::placeholder {
+    color: #B0B3AB;
+    opacity: 1;
 }

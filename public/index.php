@@ -32,7 +32,7 @@ include __DIR__ . '/../includes/header.php';
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
-        <h1>رحلوا عنا، لكن أثرهم الطيب باقٍ في القلب 🕌</h1>
+        <h1> فارقوك؟ لا تنساهم! 🌿</h1>
         <p class="lead">
             أنشئ صفحة تذكارية لأحبائك المتوفين وشاركها مع من تحب ليظل ذكرهم حيًا ودعاؤهم مستمرًا.
         </p>
@@ -138,7 +138,7 @@ include __DIR__ . '/../includes/header.php';
     <!-- Features Section -->
     <div class="row mt-5 g-4">
         <div class="col-12">
-            <h3 class="text-center mb-4">✨ مميزات الصفحة التذكارية</h3>
+            <h3 class="text-center mb-4"> مميزات الصفحة التذكارية ✨</h3>
         </div>
 
         <div class="col-md-4">
@@ -150,7 +150,7 @@ include __DIR__ . '/../includes/header.php';
                 </div>
             </div>
         </div>
-
+        
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center">

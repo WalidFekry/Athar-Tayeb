@@ -80,51 +80,16 @@
     });
   });
 
-  // Reset Button for Tasbeeh Counters
-  // document
-  //   .getElementById("resetTasbeeh")
-  //   .addEventListener("click", function () {
-  //     document
-  //       .querySelectorAll(".tasbeeh-card.local-only .tasbeeh-count")
-  //       .forEach(function (el, index) {
-  //         if (index < 4) {
-  //           el.textContent = "0";
-  //         }
-  //       });
-  //     const allTasbeehCards = document.querySelectorAll(
-  //       ".tasbeeh-card:not(.local-only)"
-  //     );
-  //     allTasbeehCards.forEach(function (card, index) {
-  //       if (index < 4) {
-  //         const localSpan = card.querySelector(".tasbeeh-local");
-  //         if (localSpan) {
-  //           localSpan.textContent = "0";
-  //         }
-  //       }
-  //     });
-  //   });
-
-  document.addEventListener('DOMContentLoaded', function () {
-  const copyBtn = document.getElementById('copyMemorialLinkBtn');
-  const linkInput = document.getElementById('tempMemorialLink');
-
-  if (copyBtn && linkInput) {
-    copyBtn.addEventListener('click', () => {
-      linkInput.select();
-      linkInput.setSelectionRange(0, 99999); // للهواتف
-      try {
-        navigator.clipboard.writeText(linkInput.value).then(() => {
-          alert('تم نسخ الرابط بنجاح!');
-        });
-      } catch (err) {
-        // fallback
-        document.execCommand('copy');
-        alert('تم نسخ الرابط!');
-      }
-    });
-  }
+  document.getElementById("resetTasbeeh").addEventListener("click", function () {
+  document.querySelectorAll(".tasbeeh-card .tasbeeh-count").forEach(el => {
+    el.textContent = "0";
+  });
+  document.querySelectorAll(".tasbeeh-card .tasbeeh-local").forEach(el => {
+    el.textContent = "0";
+  });
 });
 
+  
   function incrementTasbeeh(memorialId, field, countElement) {
     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
 
@@ -191,7 +156,6 @@
   }
 
   function performSearch(query) {
-    console.log(BASEURL)
     fetch(`${BASEURL}/api/search.php?q=${encodeURIComponent(query)}`)
       .then((response) => response.json())
       .then((data) => {
@@ -342,23 +306,7 @@
       notification.remove();
     }, 3000);
   }
-
-  // Ruqyah PDF Toggle
-  const ruqyahToggle = document.getElementById("ruqyahToggle");
-  const ruqyahFrame = document.getElementById("ruqyahFrame");
-
-  if (ruqyahToggle && ruqyahFrame) {
-    ruqyahToggle.addEventListener("click", function () {
-      if (ruqyahFrame.style.display === "none" || !ruqyahFrame.style.display) {
-        ruqyahFrame.style.display = "block";
-        this.textContent = "✖ إغلاق الرقية الشرعية";
-      } else {
-        ruqyahFrame.style.display = "none";
-        this.textContent = "📖 تشغيل الرقية الشرعية";
-      }
-    });
-  }
-
+  
   // Asma Allah "Show More" functionality
   const showMoreBtn = document.getElementById("showMoreAsma");
   const hiddenAsma = document.querySelectorAll(".asma-item.hidden");

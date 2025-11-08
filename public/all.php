@@ -39,7 +39,7 @@ include __DIR__ . '/../includes/header.php';
 <div class="container my-5">
     
     <div class="text-center mb-5">
-        <h1>🤲 جميع الصفحات التذكارية</h1>
+        <h1> جميع الصفحات التذكارية 🤲</h1>
         <p class="lead text-muted">
             <?= toArabicNumerals($totalMemorials) ?> صفحة تذكارية
         </p>
@@ -121,7 +121,7 @@ include __DIR__ . '/../includes/header.php';
     
     <div class="text-center mt-5">
         <a href="<?= BASE_URL ?>/create.php" class="btn btn-primary btn-lg">
-            ✨ أنشئ صفحة تذكارية
+             أنشئ صفحة تذكارية 💚
         </a>
     </div>
     

@@ -38,10 +38,10 @@ if ($memorial['status'] != 1) {
     exit;
 }
 
-// Increment visit counter (simple debounce using session)
+// Increment visit counter (simple debounce using session) and update last_visit
 $visitKey = 'visited_' . $memorialId;
 if (!isset($_SESSION[$visitKey]) || (time() - $_SESSION[$visitKey]) > 300) {
-    $stmt = $pdo->prepare("UPDATE memorials SET visits = visits + 1 WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE memorials SET visits = visits + 1 , last_visit = current_timestamp() WHERE id = ?");
     $stmt->execute([$memorialId]);
     $_SESSION[$visitKey] = time();
     $memorial['visits']++;
@@ -50,7 +50,7 @@ if (!isset($_SESSION[$visitKey]) || (time() - $_SESSION[$visitKey]) > 300) {
 // Generate page metadata
 $pageTitle = 'للمغفور ' . getPronoun($memorial['gender'], 'له') . ' بإذن الله تعالى ' . $memorial['name'] . ' — ' . SITE_NAME;
 $pageDescription = $memorial['quote'] ?? 'صفحة تذكارية للمغفور ' . getPronoun($memorial['gender'], 'له') . ' ' . $memorial['name'];
-$pageImage = $memorial['image'] && $memorial['image_status'] == 1 ? getImageUrl($memorial['image']) : null;
+$pageImage = $memorial['image'] && $memorial['image_status'] == 1 ? getImageUrl($memorial['image']) : BASE_URL . '/assets/images/placeholder-memorial.png';
 $memorialUrl = BASE_URL . '/memorial.php?id=' . $memorial['id'];
 
 // Generate OG tags and structured data
@@ -163,6 +163,9 @@ $asmaAllah = [
     'الصَّبُورُ'
 ];
 
+// Generate prayers for the memorial
+$prayers = getPrayers($memorial['gender'], htmlspecialchars($memorial['name']));
+
 include __DIR__ . '/../includes/header.php';
 ?>
 
@@ -175,7 +178,7 @@ include __DIR__ . '/../includes/header.php';
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= BASE_URL ?>">الرئيسية</a></li>
-            <li class="breadcrumb-item active"><?= e($memorial['name']) ?></li>
+            <li class="breadcrumb-item"><?= e($memorial['name']) ?></li>
         </ol>
     </nav>
 
@@ -190,11 +193,9 @@ include __DIR__ . '/../includes/header.php';
             <?php else: ?>
                 <img src="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg" alt="صورة افتراضية"
                     class="memorial-image mb-3" style="width: 180px; height: 180px;">
-                <?php if ($memorial['image'] && $memorial['image_status'] == 0): ?>
-                    <div class="mb-3">
-                        <span class="badge badge-pending">الصورة قيد المراجعة</span>
-                    </div>
-                <?php endif; ?>
+                <div class="mb-3">
+                    <span class="badge badge-pending">الصورة قيد المراجعة</span>
+                </div>
             <?php endif; ?>
 
             <!-- From Name -->
@@ -215,10 +216,16 @@ include __DIR__ . '/../includes/header.php';
                 </p>
             <?php endif; ?>
 
-            <!-- Visits Counter -->
-            <p class="text-muted">
-                👁️ زار هذه الصفحة <strong><?= toArabicNumerals($memorial['visits']) ?></strong> شخصاً
+            <!-- Visits & Last Visit -->
+            <p class="text-muted mb-0">
+                👁️ زار هذه الصفحة
+                <strong><?= toArabicNumerals($memorial['visits']) ?></strong> شخصاً
+                <?php if ($memorial['last_visit']): ?>
+                    — آخر زيارة:
+                    <strong><?= timeAgoInArabic($memorial['last_visit']) ?></strong>
+                <?php endif; ?>
             </p>
+
 
         </div>
     </div>
@@ -244,42 +251,27 @@ include __DIR__ . '/../includes/header.php';
                 وَمَا تُقَدِّمُوا لِأَنْفُسِكُمْ مِنْ خَيْرٍ تَجِدُوهُ عِنْدَ اللَّهِ
             </h3>
 
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="alert alert-info">
-                        <p class="mb-0">
-                            <strong>🤲 دعاء:</strong><br>
-                            اللهم اغفر <?= getPronoun($memorial['gender'], 'له') ?>
-                            وارحم<?= getPronoun($memorial['gender'], 'له') ?>،
-                            وعاف<?= getPronoun($memorial['gender'], 'عنه') ?> واعف
-                            <?= getPronoun($memorial['gender'], 'عنه') ?>،
-                            وأكرم نزل<?= getPronoun($memorial['gender'], 'له') ?>، ووسع
-                            مدخل<?= getPronoun($memorial['gender'], 'له') ?>،
-                            واغسل<?= getPronoun($memorial['gender'], 'له') ?> بالماء والثلج والبرد،
-                            ونق<?= getPronoun($memorial['gender'], 'له') ?> من الخطايا كما ينقى الثوب الأبيض من الدنس.
-                        </p>
-                    </div>
-                </div>
+            <h5 class="text-center mb-4">
+                نسألكم الدعاء <?= getPronoun($memorial['gender'], 'له') ?> 💚
+            </h5>
 
-                <div class="col-md-6">
-                    <div class="alert alert-info">
-                        <p class="mb-0">
-                            <strong>🤲 دعاء:</strong><br>
-                            اللهم أبدل<?= getPronoun($memorial['gender'], 'له') ?> داراً خيراً من
-                            دار<?= getPronoun($memorial['gender'], 'له') ?>،
-                            وأهلاً خيراً من أهل<?= getPronoun($memorial['gender'], 'له') ?>،
-                            وأدخل<?= getPronoun($memorial['gender'], 'له') ?> الجنة،
-                            وأعذ<?= getPronoun($memorial['gender'], 'له') ?> من عذاب القبر ومن عذاب النار.
-                        </p>
+
+            <!-- Prayers -->
+            <div class="row g-3">
+                <?php foreach ($prayers as $prayer): ?>
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <p class="mb-0"><?= $prayer ?></p>
+                        </div>
                     </div>
-                </div>
+                <?php endforeach; ?>
             </div>
 
             <!-- Audio Dua -->
             <div class="audio-player mt-3">
                 <label class="form-label fw-bold">🎧 استمع للدعاء:</label>
                 <audio controls preload="none">
-                    <source src="https://post.walid-fekry.com/athkar/salaa.mp3" type="audio/mpeg">
+                    <source src="assets/audios/doaa-die.mp3" type="audio/mpeg">
                     متصفحك لا يدعم تشغيل الصوت
                 </audio>
             </div>
@@ -289,14 +281,14 @@ include __DIR__ . '/../includes/header.php';
     <!-- Azkar Section -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h4 class="text-center mb-4">📿 أذكار الصباح والمساء</h4>
+            <h4 class="text-center mb-4"> أذكار الصباح والمساء 📿</h4>
 
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="audio-player">
                         <label class="form-label fw-bold">🌅 أذكار الصباح</label>
                         <audio controls preload="none">
-                            <source src="https://post.walid-fekry.com/athkar/morning.mp3" type="audio/mpeg">
+                            <source src="https://post.walid-fekry.com/athkar/saba7.mp3" type="audio/mpeg">
                         </audio>
                     </div>
                 </div>
@@ -305,7 +297,7 @@ include __DIR__ . '/../includes/header.php';
                     <div class="audio-player">
                         <label class="form-label fw-bold">🌙 أذكار المساء</label>
                         <audio controls preload="none">
-                            <source src="https://post.walid-fekry.com/athkar/evening.mp3" type="audio/mpeg">
+                            <source src="https://post.walid-fekry.com/athkar/msaa.mp3" type="audio/mpeg">
                         </audio>
                     </div>
                 </div>
@@ -316,14 +308,17 @@ include __DIR__ . '/../includes/header.php';
     <!-- Quick Surahs -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h4 class="text-center mb-4">📖 قراءة سريعة</h4>
+            <h4 class="text-center mb-4"> قراءة سريعة 📖</h4>
 
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="audio-player">
                         <label class="form-label fw-bold">سورة يس</label>
-                        <audio controls preload="none">
-                            <source src="https://post.walid-fekry.com/quran/surah/yasin.mp3" type="audio/mpeg">
+                        <p class="text-muted small mb-2">قراءة سورة يس تُسهل على المتوفى قبره، وتُخفّف عنه عذاب القبر،
+                            وتكون له نورًا يوم القيامة. عن النبي صلى الله عليه وسلم قال: "إن لكل شيء قلبًا، وقلب القرآن
+                            يس"، وقراءتها تُعتبر صدقة جارية تُثقل حسنات المتوفى.</p>
+                        <audio controls preload="none" class="w-100">
+                            <source src="assets/audios/yassin.mp3" type="audio/mpeg">
                         </audio>
                     </div>
                 </div>
@@ -331,8 +326,11 @@ include __DIR__ . '/../includes/header.php';
                 <div class="col-md-6">
                     <div class="audio-player">
                         <label class="form-label fw-bold">سورة الفاتحة</label>
-                        <audio controls preload="none">
-                            <source src="https://post.walid-fekry.com/quran/surah/fatiha.mp3" type="audio/mpeg">
+                        <p class="text-muted small mb-2">سورة الفاتحة سبب في رحمة الله ومغفرته للميت، وتفتح له أبواب
+                            الجنة وتُيسر حسابه يوم القيامة. قراءتها والدعاء بها من الأعمال التي تنفع المتوفى، فهي شفاعة
+                            له يوم العرض على الله.</p>
+                        <audio controls preload="none" class="w-100">
+                            <source src="assets/audios/alfatiha.mp3" type="audio/mpeg">
                         </audio>
                     </div>
                 </div>
@@ -340,16 +338,17 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
+
     <!-- Random Quran Page -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h4 class="text-center mb-3">📖 صفحة عشوائية من القرآن الكريم</h4>
+            <h4 class="text-center mb-3"> ورد اليوم من القرآن الكريم📖</h4>
             <p class="text-center text-muted mb-3">
                 وَإِذَا قُرِئَ الْقُرْآنُ فَاسْتَمِعُواْ لَهُ وَأَنصِتُواْ لَعَلَّكُمْ تُرْحَمُونَ
             </p>
             <p class="text-center mb-4">
-                🌿 هب ثواب هذه القراءة للمغفور <?= getPronoun($memorial['gender'], 'له') ?>
-                <strong><?= e($memorial['name']) ?></strong>
+                هب ثواب هذه القراءة للمغفور <?= getPronoun($memorial['gender'], 'له') ?>
+                <strong><?= e($memorial['name']) ?></strong> 🌿
             </p>
 
             <div class="quran-page-container">
@@ -365,30 +364,12 @@ include __DIR__ . '/../includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- Ruqyah PDF -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body text-center">
-            <h4 class="mb-3">🛡️ الرقية الشرعية</h4>
-            <button id="ruqyahToggle" class="btn btn-primary">
-                📖 تشغيل الرقية الشرعية
-            </button>
-
-            <iframe id="ruqyahFrame" src="https://post.walid-fekry.com/pdf/roquia.pdf"
-                style="display: none; width: 100%; height: 600px; border: none; margin-top: 1rem;"
-                title="الرقية الشرعية"></iframe>
-        </div>
-    </div>
-
+    
     <!-- Tasbeeh Counters -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h4 class="text-center mb-4">📿 التسبيح الإلكتروني</h4>
-            <p class="text-center text-muted mb-4 d-flex justify-content-between align-items-center" style="gap: 1rem;">
-                انقر على أي تسبيحة للمشاركة في الأجر
-                <button id="resetTasbeeh" class="btn btn-danger btn-sm">تصـفير العداد</button>
-            </p>
-
+            <h4 class="text-center mb-4"> التسبيح الإلكتروني 📿</h4>
+            <p class="text-center mb-4">انقر على أي تسبيحة للمشاركة في الأجر</p>
             <div class="tasbeeh-container">
                 <div class="tasbeeh-card local-only" data-field="localcounter">
                     <div class="tasbeeh-title">
@@ -469,7 +450,7 @@ include __DIR__ . '/../includes/header.php';
     <!-- Asma Allah Al-Husna -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h4 class="text-center mb-4">✨ أسماء الله الحسنى</h4>
+            <h4 class="text-center mb-4"> أسماء الله الحسنى 📗</h4>
 
             <div class="asma-grid">
                 <?php foreach (array_slice($asmaAllah, 0, 12) as $name): ?>
@@ -489,36 +470,44 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
-    <!-- Share Section -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h4 class="text-center mb-4">📤 شارك هذه الصفحة</h4>
-            <p class="text-center text-muted mb-4">
-                شارك الصفحة ليشارك الآخرون في الأجر والدعاء
-            </p>
+<!-- Share Section -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h4 class="text-center mb-4">شارك الخير وكن سببًا في صدقة جارية 📤</h4>
+        <p class="text-center text-muted mb-4">
+            بمشاركتك هذه الصفحة، تساهم في نشر الخير والدعاء <?= getPronoun($memorial['gender'], 'للمرحوم') ?> <strong><?= htmlspecialchars($memorial['name']) ?></strong>.<br>
+            كل مشاركة هي صدقة جارية لك وله، تزيد من أجر الدعاء وتُذكر الجميع بفضل الدعاء للمتوفى.<br>
+            شارك الرابط مع أصدقائك وعائلتك ليكونوا جزءًا من هذا الأجر العظيم.
+        </p>
 
-            <div class="share-buttons">
-                <a href="https://wa.me/?text=<?= urlencode('صفحة تذكارية: ' . $memorial['name'] . ' - ' . $memorialUrl) ?>"
-                    target="_blank" class="share-btn share-whatsapp">
-                    📱 واتساب
-                </a>
+        <div class="text-center mb-3 text-secondary fst-italic">
+            نسأل الله أن يجزيك خير الجزاء على مشاركتك الطيبة ويثقل بها ميزان حسناتك.
+        </div>
 
-                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>" target="_blank"
-                    class="share-btn share-facebook">
-                    📘 فيسبوك
-                </a>
+        <div class="share-buttons d-flex justify-content-center gap-3 flex-wrap">
+            <a href="https://wa.me/?text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة: ' . $memorialUrl) ?>"
+               target="_blank" rel="noopener" class="share-btn share-whatsapp" aria-label="شارك عبر واتساب">
+                📱 واتساب
+            </a>
 
-                <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode('صفحة تذكارية: ' . $memorial['name']) ?>"
-                    target="_blank" class="share-btn share-telegram">
-                    ✈️ تيليجرام
-                </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>"
+               target="_blank" rel="noopener" class="share-btn share-facebook" aria-label="شارك عبر فيسبوك">
+                📘 فيسبوك
+            </a>
 
-                <button class="share-btn share-copy copy-link-btn" data-url="<?= e($memorialUrl) ?>">
-                    📋 نسخ الرابط
-                </button>
-            </div>
+            <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة.') ?>"
+               target="_blank" rel="noopener" class="share-btn share-telegram" aria-label="شارك عبر تيليجرام">
+                ✈️ تيليجرام
+            </a>
+
+            <button class="share-btn share-copy copy-link-btn" data-url="<?= e($memorialUrl) ?>" aria-label="نسخ رابط المشاركة">
+                📋 نسخ الرابط
+            </button>
         </div>
     </div>
+</div>
+
+
 
     <!-- Apps Section -->
     <div class="row g-3 mb-4">
