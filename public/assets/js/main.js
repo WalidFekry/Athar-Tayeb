@@ -175,7 +175,7 @@
 
     let html = "";
     results.forEach((result) => {
-      const url = `${BASEURL}/memorial.php?id=${result.id}`;
+      const url = `${BASEURL}/m/${result.id}`;
       html += `
                 <a href="${url}" class="search-result-item text-decoration-none">
                     <div class="d-flex align-items-center">

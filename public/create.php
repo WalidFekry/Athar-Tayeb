@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Rate limiting
     if (!checkRateLimit('create_memorial', CREATE_RATE_LIMIT, 3600)) {
-        $errors[] = 'لقد تجاوزت الحد المسموح من الطلبات. يرجى المحاولة لاحقاً.';
+        $errors[] = 'يمكنك إنشاء صفحة تذكارية واحدة فقط كل ساعة. يرجى المحاولة لاحقاً.';
     } else {
         // Validate inputs
         $name = trim($_POST['name'] ?? '');

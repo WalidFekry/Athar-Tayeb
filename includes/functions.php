@@ -499,10 +499,10 @@ function site_url($path = '')
 {
     // Remove trailing /public from BASE_URL to get project root
     $root = preg_replace('~/public/?$~', '', BASE_URL);
-    
+
     // Ensure proper path formatting
     $path = ltrim($path, '/');
-    
+
     // Return clean URL
     return rtrim($root, '/') . '/' . $path;
 }
