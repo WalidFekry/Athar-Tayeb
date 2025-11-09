@@ -15,7 +15,7 @@ $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $offset = ($page - 1) * ITEMS_PER_PAGE;
 
 // Get total count
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM memorials WHERE status = 1 AND image_status = 1");
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM memorials WHERE status = 1");
 $stmt->execute();
 $totalMemorials = $stmt->fetchColumn();
 $totalPages = ceil($totalMemorials / ITEMS_PER_PAGE);
@@ -24,7 +24,7 @@ $totalPages = ceil($totalMemorials / ITEMS_PER_PAGE);
 $stmt = $pdo->prepare("
     SELECT id, name, death_date, image, visits, gender, from_name
     FROM memorials 
-    WHERE status = 1 AND image_status = 1
+    WHERE status = 1 AND (image_status = 1 OR image IS NULL)
     ORDER BY created_at DESC
     LIMIT ? OFFSET ?
 ");

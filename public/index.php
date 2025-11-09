@@ -19,7 +19,7 @@ $pageDescription = 'منصة رقمية لإنشاء صفحات تذكارية �
 $stmt = $pdo->prepare("
     SELECT id, name, death_date, image, visits, gender
     FROM memorials 
-    WHERE status = 1 AND image_status = 1
+    WHERE status = 1 AND (image_status = 1 OR image IS NULL)
     ORDER BY created_at DESC 
     LIMIT 3
 ");
