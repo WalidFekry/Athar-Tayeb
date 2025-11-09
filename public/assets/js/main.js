@@ -83,7 +83,7 @@
   function incrementTasbeeh(memorialId, field, countElement) {
     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
 
-    fetch(BASEURL + "/api/tasbeeh.php", {
+    fetch(BASEURL + "/api/tasbeeh", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -361,6 +361,28 @@
     );
     tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  }
+
+  // Back to Top Button
+  const backToTopBtn = document.getElementById("backToTop");
+
+  if (backToTopBtn) {
+    // Show/hide button on scroll
+    window.addEventListener("scroll", function () {
+      if (window.pageYOffset > 300) {
+        backToTopBtn.classList.add("show");
+      } else {
+        backToTopBtn.classList.remove("show");
+      }
+    });
+
+    // Scroll to top on click
+    backToTopBtn.addEventListener("click", function () {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     });
   }
 })();

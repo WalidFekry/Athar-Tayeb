@@ -188,23 +188,23 @@ include __DIR__ . '/../includes/header.php';
 
             <!-- Image -->
             <?php if ($memorial['image'] && $memorial['image_status'] == 1): ?>
-                <img src="<?= getImageUrl($memorial['image']) ?>" alt="<?= e($memorial['name']) ?>"
-                    class="memorial-image mb-3" style="width: 180px; height: 180px;">
+            <img src="<?= getImageUrl($memorial['image']) ?>" alt="<?= e($memorial['name']) ?>"
+                class="memorial-image mb-3" style="width: 180px; height: 180px;">
             <?php elseif ($memorial['image'] && $memorial['image_status'] == 0): ?>
-                <img src="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg" alt="صورة افتراضية"
-                    class="memorial-image mb-3" style="width: 180px; height: 180px;">
-                <div class="mb-3">
-                    <span class="badge badge-pending">الصورة قيد المراجعة</span>
-                </div>
+            <img src="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg" alt="صورة افتراضية"
+                class="memorial-image mb-3" style="width: 180px; height: 180px;">
+            <div class="mb-3">
+                <span class="badge badge-pending">الصورة قيد المراجعة</span>
+            </div>
             <?php else: ?>
-                <img src="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg" alt="صورة افتراضية"
-                    class="memorial-image mb-3" style="width: 180px; height: 180px;">
+            <img src="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg" alt="صورة افتراضية"
+                class="memorial-image mb-3" style="width: 180px; height: 180px;">
             <?php endif; ?>
 
 
             <!-- From Name -->
             <?php if ($memorial['from_name']): ?>
-                <p class="text-muted mb-2">إهداء من: <strong><?= e($memorial['from_name']) ?></strong></p>
+            <p class="text-muted mb-2">إهداء من: <strong><?= e($memorial['from_name']) ?></strong></p>
             <?php endif; ?>
 
             <!-- Name -->
@@ -215,9 +215,9 @@ include __DIR__ . '/../includes/header.php';
 
             <!-- Death Date -->
             <?php if ($memorial['death_date']): ?>
-                <p class="lead text-muted mb-3">
-                    📅 <?= formatArabicDate($memorial['death_date']) ?>
-                </p>
+            <p class="lead text-muted mb-3">
+                📅 <?= formatArabicDate($memorial['death_date']) ?>
+            </p>
             <?php endif; ?>
 
             <!-- Visits & Last Visit -->
@@ -225,8 +225,8 @@ include __DIR__ . '/../includes/header.php';
                 👁️ زار هذه الصفحة
                 <strong><?= toArabicNumerals($memorial['visits']) ?></strong> شخصاً
                 <?php if ($memorial['last_visit']): ?>
-                    — آخر زيارة:
-                    <strong><?= timeAgoInArabic($memorial['last_visit']) ?></strong>
+                — آخر زيارة:
+                <strong><?= timeAgoInArabic($memorial['last_visit']) ?></strong>
                 <?php endif; ?>
             </p>
 
@@ -236,16 +236,16 @@ include __DIR__ . '/../includes/header.php';
 
     <!-- Owner's Quote/Message -->
     <?php if ($memorial['quote'] && $memorial['quote_status'] == 1): ?>
-        <div class="card shadow-sm mb-4 border-primary">
-            <div class="card-body">
-                <h5 class="card-title text-primary">كلمة من صاحب الإهداء 💬</h5>
-                <p class="card-text" style="white-space: pre-wrap;"><?= e($memorial['quote']) ?></p>
-            </div>
+    <div class="card shadow-sm mb-4 border-primary">
+        <div class="card-body">
+            <h5 class="card-title text-primary">كلمة من صاحب الإهداء 💬</h5>
+            <p class="card-text" style="white-space: pre-wrap;"><?= e($memorial['quote']) ?></p>
         </div>
+    </div>
     <?php elseif ($memorial['quote'] && $memorial['quote_status'] == 0): ?>
-        <div class="alert alert-warning">
-            <strong>الرسالة قيد المراجعة</strong> — ستظهر بعد الموافقة عليها
-        </div>
+    <div class="alert alert-warning">
+        <strong>الرسالة قيد المراجعة</strong> — ستظهر بعد الموافقة عليها
+    </div>
     <?php endif; ?>
 
     <!-- Duas Section -->
@@ -263,21 +263,27 @@ include __DIR__ . '/../includes/header.php';
             <!-- Prayers -->
             <div class="row g-3">
                 <?php foreach ($prayers as $prayer): ?>
-                    <div class="col-md-6">
-                        <div class="alert alert-info">
-                            <p class="mb-0"><?= $prayer ?></p>
-                        </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <p class="mb-0"><?= $prayer ?></p>
                     </div>
+                </div>
                 <?php endforeach; ?>
             </div>
 
             <!-- Audio Dua -->
-            <div class="audio-player mt-3">
-                <label class="form-label fw-bold">🎧 استمع للدعاء:</label>
-                <audio controls preload="none">
-                    <source src="../assets/audios/doaa-die.mp3" type="audio/mpeg">
-                    متصفحك لا يدعم تشغيل الصوت
-                </audio>
+            <div class="audio-dua-section mt-4 p-4 bg-muted rounded">
+                <p class="text-center mb-3 fst-italic" style="line-height: 2; color: var(--muted-text);">
+                    إن المؤمن يحزن على فراق أحبّته، ويشتاق لمن فقد<br>
+                    وأفضل ما يُقدّمه المؤمن للميت: أن يدعو له كما أوصانا حبيبنا محمد صلى الله عليه وسلم
+                </p>
+                <div class="audio-player">
+                    <label class="form-label fw-bold">🎧 استمع للدعاء:</label>
+                    <audio controls preload="none">
+                        <source src="../assets/audios/doaa-die.mp3" type="audio/mpeg">
+                        متصفحك لا يدعم تشغيل الصوت
+                    </audio>
+                </div>
             </div>
         </div>
     </div>
@@ -371,7 +377,9 @@ include __DIR__ . '/../includes/header.php';
             <p class="text-center mb-4">
                 هب ثواب هذه القراءة للمغفور <?= getPronoun($memorial['gender'], 'له') ?>
                 <strong><?= e($memorial['name']) ?></strong> 🌿
+                <span>— لعلها المنجية بإذن الله 💚</span>
             </p>
+
 
             <div class="quran-page-container">
                 <img src="https://post.walid-fekry.com/quran/<?= $randomQuranPage ?>.jpg"
@@ -390,8 +398,11 @@ include __DIR__ . '/../includes/header.php';
     <!-- Tasbeeh Counters -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h4 class="text-center mb-4"> التسبيح الإلكتروني 📿</h4>
-            <p class="text-center mb-4">انقر على أي تسبيحة للمشاركة في الأجر</p>
+            <h4 class="text-center mb-4">التسبيح الإلكتروني 📿</h4>
+            <p class="text-center text-muted">
+                🌱 اللهم هب مثل ثواب هذا العمل إلى روح <strong><?= e($memorial['name']) ?></strong> 🌱
+            </p>
+            <p class="text-center mb-2">انقر على أي تسبيحة للمشاركة في الأجر</p>
             <div class="tasbeeh-container">
                 <div class="tasbeeh-card local-only" data-field="localcounter">
                     <div class="tasbeeh-title">
@@ -472,15 +483,23 @@ include __DIR__ . '/../includes/header.php';
     <!-- Asma Allah Al-Husna -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h4 class="text-center mb-4"> أسماء الله الحسنى 📗</h4>
+            <h4 class="text-center mb-4">أسماء الله الحسنى 📗</h4>
+            <p class="text-center mb-3">
+                كما وردت في القرآن الكريم والسنة
+            </p>
+            <p class="text-center text-muted">
+                فقد روى البخاري ومسلم عن أبي هريرة رضي الله عنه أن النبي ﷺ قال:<br>
+                <em>"إن لله تسعة وتسعين اسماً، مائة إلا واحداً، من أحصاها دخل الجنة."</em>
+            </p>
+
 
             <div class="asma-grid">
                 <?php foreach (array_slice($asmaAllah, 0, 12) as $name): ?>
-                    <div class="asma-item"><?= $name ?></div>
+                <div class="asma-item"><?= $name ?></div>
                 <?php endforeach; ?>
 
                 <?php foreach (array_slice($asmaAllah, 12) as $name): ?>
-                    <div class="asma-item hidden" style="display: none;"><?= $name ?></div>
+                <div class="asma-item hidden" style="display: none;"><?= $name ?></div>
                 <?php endforeach; ?>
             </div>
 
@@ -531,7 +550,28 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
-
+    <!-- Create Your Own Memorial CTA Section -->
+    <div class="card shadow-sm mb-4 memorial-cta-section">
+        <div class="card-body text-center p-5">
+            <h3 class="mb-4 fw-bold">عاوز تعمل نفس الصفحة التذكارية دي لحد عزيز فقدته؟</h3>
+            <p class="lead mb-4">
+                الموضوع مجاني وسهل ودايم علطول 💚
+            </p>
+            <div class="mb-4">
+                <a href="<?= site_url('create.php') ?>" class="btn btn-primary btn-lg px-5 py-3">
+                    أنشئ صفحة تذكارية الآن 🌿
+                </a>
+            </div>
+            <hr class="my-4">
+            <p class="text-muted mb-3">
+                هدفنا هو فحص كل معلومة موجودة على الموقع بعناية فائقة، وتجنب أي افتراضات مشكوك فيها،<br>
+                ونحن مستعدون لقبول أي تعديل على أي محتوى قد يكون نتيجة لخطأ غير مقصود أو جهل.
+            </p>
+            <a href="<?= site_url('contact.php') ?>" class="btn btn-outline-primary">
+                تواصل معنا 📧
+            </a>
+        </div>
+    </div>
 
     <!-- Apps Section -->
     <div class="card shadow-sm mb-4 apps-promo-section">

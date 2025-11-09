@@ -116,7 +116,7 @@ include __DIR__ . '/../includes/header.php';
 <div class="container my-5">
     <div class="row">
         <div class="col-lg-8 mx-auto">
-            
+
             <!-- Page Header -->
             <div class="text-center mb-5">
                 <h1> أنشئ صفحة تذكارية 🌿</h1>
@@ -124,7 +124,7 @@ include __DIR__ . '/../includes/header.php';
                     صفحتك ستبقى دائماً، والأجر يستمر بإذن الله
                 </p>
             </div>
-            
+
             <!-- Info Alert -->
             <div class="alert alert-info">
                 <h5 class="alert-heading"> يُرجى العلم ⚠️</h5>
@@ -133,120 +133,87 @@ include __DIR__ . '/../includes/header.php';
                     ستتمكن من مشاركة الرابط فوراً، لكن الصورة والرسالة ستظهر بعد الموافقة عليها.
                 </p>
             </div>
-            
+
             <!-- Errors Display -->
             <?php if (!empty($errors)): ?>
-                <div class="alert alert-danger">
-                    <h5 class="alert-heading">حدثت أخطاء:</h5>
-                    <ul class="mb-0">
-                        <?php foreach ($errors as $error): ?>
-                            <li><?= e($error) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
+            <div class="alert alert-danger">
+                <h5 class="alert-heading">حدثت أخطاء:</h5>
+                <ul class="mb-0">
+                    <?php foreach ($errors as $error): ?>
+                    <li><?= e($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
             <?php endif; ?>
-            
+
             <!-- Create Form -->
             <div class="card shadow-sm">
                 <div class="card-body p-4">
                     <form method="POST" enctype="multipart/form-data" data-validate>
                         <?php csrfField(); ?>
-                        
+
                         <!-- From Name -->
                         <div class="mb-4">
                             <label for="from_name" class="form-label">
                                 إهداء من (اختياري)
                             </label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="from_name" 
-                                name="from_name"
-                                placeholder="مثال: عائلة السيد"
-                                value="<?= e($_POST['from_name'] ?? '') ?>"
-                            >
+                            <input type="text" class="form-control" id="from_name" name="from_name"
+                                placeholder="مثال: عائلة الإمبابي" value="<?= e($_POST['from_name'] ?? '') ?>">
                             <small class="form-text text-muted">
                                 يمكنك كتابة اسمك أو اسم العائلة
                             </small>
                         </div>
-                        
+
                         <!-- Name (Required) -->
                         <div class="mb-4">
                             <label for="name" class="form-label">
                                 اسم المتوفى <span class="text-danger">*</span>
                             </label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="name" 
-                                name="name"
-                                placeholder="الاسم الكامل"
-                                required
-                                value="<?= e($_POST['name'] ?? '') ?>"
-                            >
+                            <input type="text" class="form-control" id="name" name="name" placeholder="الاسم الكامل"
+                                required value="<?= e($_POST['name'] ?? '') ?>">
                         </div>
-                        
+
                         <!-- Image Upload -->
                         <div class="mb-4">
                             <label for="imageInput" class="form-label">
                                 رفع صورة المتوفى (اختياري)
                             </label>
-                            <input 
-                                type="file" 
-                                class="form-control" 
-                                id="imageInput" 
-                                name="image"
-                                accept=".jpg,.jpeg,.png"
-                            >
+                            <input type="file" class="form-control" id="imageInput" name="image"
+                                accept=".jpg,.jpeg,.png">
                             <small class="form-text text-muted">
                                 الحد الأقصى: 2 ميجابايت | الصيغ المسموحة: JPG, PNG
                             </small>
                             <div id="imagePreview" class="mt-3 text-center"></div>
                         </div>
-                        
+
                         <!-- Death Date - Three Separate Fields -->
                         <div class="mb-4">
                             <label class="form-label">
                                 يوم الذكرى (تاريخ الوفاة) - اختياري
                             </label>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <input type="text" id="death_date_picker" class="form-control"
+                                        placeholder="اضغط هنا لاختيار التاريخ 📅" readonly>
+                                </div>
+                            </div>
                             <div class="row g-2">
                                 <div class="col-4">
-                                    <input 
-                                        type="number" 
-                                        class="form-control text-center" 
-                                        id="death_day" 
-                                        name="death_day"
-                                        placeholder="اليوم"
-                                        min="1"
-                                        max="31"
-                                        value="<?= e($_POST['death_day'] ?? '') ?>"
-                                    >
+                                    <input type="number" class="form-control text-center" id="death_day"
+                                        name="death_day" placeholder="اليوم" min="1" max="31"
+                                        value="<?= e($_POST['death_day'] ?? '') ?>">
                                     <small class="form-text text-muted d-block text-center mt-1">اليوم</small>
                                 </div>
                                 <div class="col-4">
-                                    <input 
-                                        type="number" 
-                                        class="form-control text-center" 
-                                        id="death_month" 
-                                        name="death_month"
-                                        placeholder="الشهر"
-                                        min="1"
-                                        max="12"
-                                        value="<?= e($_POST['death_month'] ?? '') ?>"
-                                    >
+                                    <input type="number" class="form-control text-center" id="death_month"
+                                        name="death_month" placeholder="الشهر" min="1" max="12"
+                                        value="<?= e($_POST['death_month'] ?? '') ?>">
                                     <small class="form-text text-muted d-block text-center mt-1">الشهر</small>
                                 </div>
                                 <div class="col-4">
-                                    <input 
-                                        type="number" 
-                                        class="form-control text-center" 
-                                        id="death_year" 
-                                        name="death_year"
-                                        placeholder="السنة"
-                                        min="1900"
-                                        max="<?= date('Y') ?>"
-                                        value="<?= e($_POST['death_year'] ?? '') ?>"
-                                    >
+                                    <input type="number" class="form-control text-center" id="death_year"
+                                        name="death_year" placeholder="السنة" min="1900" max="<?= date('Y') ?>"
+                                        value="<?= e($_POST['death_year'] ?? '') ?>">
                                     <small class="form-text text-muted d-block text-center mt-1">السنة</small>
                                 </div>
                             </div>
@@ -254,7 +221,7 @@ include __DIR__ . '/../includes/header.php';
                                 مثال: اليوم: 19، الشهر: 8، السنة: 1999
                             </small>
                         </div>
-                        
+
                         <!-- Gender -->
                         <div class="mb-4">
                             <label for="gender" class="form-label">
@@ -272,62 +239,125 @@ include __DIR__ . '/../includes/header.php';
                                 لتخصيص الأدعية والضمائر بشكل صحيح
                             </small>
                         </div>
-                        
+
                         <!-- WhatsApp -->
                         <div class="mb-4">
                             <label for="whatsapp" class="form-label">
                                 رقم واتساب للتواصل (اختياري)
                             </label>
-                            <input 
-                                type="tel" 
-                                class="form-control" 
-                                id="whatsapp" 
-                                name="whatsapp"
-                                placeholder="+20 123 456 7890"
-                                value="<?= e($_POST['whatsapp'] ?? '') ?>"
-                            >
+                            <input type="tel" class="form-control" id="whatsapp" name="whatsapp"
+                                placeholder="+20 123 456 7890" value="<?= e($_POST['whatsapp'] ?? '') ?>">
                             <small class="form-text text-muted">
                                 لنتمكن من التواصل معك في حال وجود أي استفسار بخصوص الصفحة
                             </small>
                         </div>
-                        
+
                         <!-- Quote/Message -->
                         <div class="mb-4">
                             <label for="quote" class="form-label">
                                 اقتباس أو رسالة قصيرة (اختياري)
                             </label>
-                            <textarea 
-                                class="form-control" 
-                                id="quote" 
-                                name="quote"
-                                rows="4"
-                                placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..."
-                            ><?= e($_POST['quote'] ?? '') ?></textarea>
+                            <textarea class="form-control" id="quote" name="quote" rows="4"
+                                placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..."><?= e($_POST['quote'] ?? '') ?></textarea>
                             <small class="form-text text-muted">
                                 سوف تظهر هذه الرسالة في الصفحة التذكارية وستخضع للمراجعة قبل النشر
                             </small>
                         </div>
-                        
+
                         <!-- Submit Button -->
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                 إنشاء الصفحة التذكارية 💚
+                                إنشاء الصفحة التذكارية 💚
                             </button>
                         </div>
-                        
+
                     </form>
                 </div>
             </div>
-            
+
             <!-- Additional Info -->
             <div class="mt-4 text-center">
                 <p class="text-muted">
                     بإنشائك للصفحة، فإنك توافق على أن المحتوى المقدم يتوافق مع الشريعة الإسلامية
                 </p>
             </div>
-            
+
         </div>
     </div>
 </div>
+
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+
+<script>
+// Initialize Flatpickr for date picker
+(function() {
+    const datePickerInput = document.getElementById('death_date_picker');
+    const deathDayInput = document.getElementById('death_day');
+    const deathMonthInput = document.getElementById('death_month');
+    const deathYearInput = document.getElementById('death_year');
+
+    if (datePickerInput) {
+        const fp = flatpickr(datePickerInput, {
+            dateFormat: "Y-m-d",
+            locale: "ar",
+            disableMobile: false,
+            maxDate: "today",
+            minDate: "1900-01-01",
+            allowInput: false,
+            clickOpens: true,
+            onChange: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length > 0) {
+                    const date = selectedDates[0];
+                    const day = date.getDate();
+                    const month = date.getMonth() + 1;
+                    const year = date.getFullYear();
+
+                    if (deathDayInput) deathDayInput.value = day;
+                    if (deathMonthInput) deathMonthInput.value = month;
+                    if (deathYearInput) deathYearInput.value = year;
+
+                    // Visual feedback
+                    [deathDayInput, deathMonthInput, deathYearInput].forEach(function(input) {
+                        if (input) {
+                            input.style.backgroundColor = 'var(--muted-bg)';
+                            input.style.transition = 'background-color 0.3s ease';
+                            setTimeout(function() {
+                                input.style.backgroundColor = '';
+                            }, 800);
+                        }
+                    });
+                }
+            },
+            onReady: function(selectedDates, dateStr, instance) {
+                // Ensure mobile compatibility
+                instance.calendarContainer.style.touchAction = 'manipulation';
+            }
+        });
+
+        // Also open on input click
+        datePickerInput.addEventListener('click', function(e) {
+            e.preventDefault();
+            fp.open();
+        });
+
+        // Populate picker if fields already have values
+        if (deathYearInput && deathMonthInput && deathDayInput) {
+            const year = deathYearInput.value;
+            const month = deathMonthInput.value;
+            const day = deathDayInput.value;
+
+            if (year && month && day) {
+                const dateStr = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                fp.setDate(dateStr, false);
+            }
+        }
+    }
+})();
+</script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -877,3 +877,227 @@ input[type="number"]::-webkit-outer-spin-button {
         padding: 0.75rem 0.5rem;
     }
 }
+
+/* ========================================
+   Back to Top Button
+   ======================================== */
+
+#backToTop {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#backToTop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#backToTop:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+#backToTop:active {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    #backToTop {
+        bottom: 20px;
+        left: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+}
+
+/* ========================================
+   Memorial CTA Section
+   ======================================== */
+
+.memorial-cta-section {
+    background: linear-gradient(135deg, var(--muted-bg) 0%, var(--card-bg) 100%);
+    border: 2px solid var(--border);
+}
+
+.memorial-cta-section h3 {
+    color: var(--text);
+    font-size: 1.75rem;
+}
+
+.memorial-cta-section .lead {
+    color: var(--muted-text);
+    font-size: 1.25rem;
+}
+
+.memorial-cta-section hr {
+    border-color: var(--border);
+    opacity: 0.5;
+}
+
+.memorial-cta-section .btn-lg {
+    font-size: 1.2rem;
+    box-shadow: var(--shadow);
+}
+
+.memorial-cta-section .btn-lg:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-hover);
+}
+
+@media (max-width: 768px) {
+    .memorial-cta-section {
+        padding: 2rem 1rem !important;
+    }
+    
+    .memorial-cta-section h3 {
+        font-size: 1.4rem;
+    }
+    
+    .memorial-cta-section .lead {
+        font-size: 1.1rem;
+    }
+}
+
+/* ========================================
+   Flatpickr Date Picker Customization
+   ======================================== */
+
+/* Flatpickr calendar styling to match site theme */
+.flatpickr-calendar {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hover);
+    font-family: var(--font-ar);
+}
+
+.flatpickr-months {
+    background: var(--primary);
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.flatpickr-current-month {
+    color: white;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+    fill: white;
+}
+
+.flatpickr-prev-month:hover,
+.flatpickr-next-month:hover {
+    fill: var(--accent);
+}
+
+.flatpickr-weekday {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.flatpickr-day {
+    color: var(--text);
+    border-radius: 8px;
+}
+
+.flatpickr-day:hover {
+    background: var(--muted-bg);
+    border-color: var(--primary);
+}
+
+.flatpickr-day.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.flatpickr-day.today {
+    border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.flatpickr-day.today:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Dark mode support for Flatpickr */
+[data-theme="dark"] .flatpickr-calendar {
+    background: var(--card-bg);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .flatpickr-months {
+    background: var(--primary);
+}
+
+[data-theme="dark"] .flatpickr-day {
+    color: var(--text);
+}
+
+[data-theme="dark"] .flatpickr-day:hover {
+    background: var(--muted-bg);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .flatpickr-calendar {
+        font-size: 1rem;
+        width: 100% !important;
+        max-width: 340px;
+    }
+    
+    .flatpickr-day {
+        height: 40px;
+        line-height: 40px;
+        max-width: 40px;
+    }
+    
+    .flatpickr-months {
+        padding: 10px;
+    }
+}
+
+/* Ensure proper touch targets on mobile */
+.flatpickr-day {
+    min-height: 38px;
+    min-width: 38px;
+    touch-action: manipulation;
+}
+
+/* Date picker input styling */
+#death_date_picker {
+    cursor: pointer;
+    background-color: var(--card-bg);
+    border: 2px solid var(--border);
+    color: var(--text);
+}
+
+#death_date_picker:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(90, 125, 78, 0.15);
+}
+
+/* Ensure z-index doesn't conflict */
+.flatpickr-calendar.open {
+    z-index: 9999;
+}
