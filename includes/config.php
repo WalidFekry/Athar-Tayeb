@@ -9,7 +9,7 @@ define('ENV', 'production'); // 'development' or 'production'
 define('DEBUG_MODE', ENV === 'development');
 
 // Base URL (update this to your domain)
-define('BASE_URL', 'http://localhost/public');
+define('BASE_URL', 'http://localhost');
 define('ADMIN_URL', 'http://localhost/admin');
 
 // Database Configuration

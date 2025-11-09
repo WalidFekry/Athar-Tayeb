@@ -11,7 +11,6 @@
 - 📿 عدادات تسبيح إلكترونية تفاعلية
 - 📖 صفحة قرآن عشوائية مع الصوت
 - 🕌 أذكار الصباح والمساء
-- 🛡️ الرقية الشرعية
 - ✨ أسماء الله الحسنى
 - 📤 أزرار مشاركة على وسائل التواصل
 
@@ -27,12 +26,14 @@
 
 ```
 athar-tayeb/
-├── public/                 # Web root
+├── public/                # Web root
 │   ├── index.php          # Home page
 │   ├── create.php         # Create memorial
 │   ├── success.php        # Success page
+│   ├── 404.php            # 404 page
+│   ├── unpublished.php    # Unpublished memorial
+│   ├── maintenance.php    # Maintenance page
 │   ├── memorial.php       # Memorial view (by ID)
-│   ├── memorial/view.php  # SEO-friendly view (by slug)
 │   ├── search.php         # Search page
 │   ├── all.php            # All memorials listing
 │   ├── contact.php        # Contact page
@@ -58,8 +59,7 @@ athar-tayeb/
 │   └── athartayeb_schema.sql
 ├── .htaccess             # Apache rewrite rules
 ├── README.md
-├── INSTALL.md
-└── QUICKSTART.md
+└── LICENSE
 ```
 
 ## ✨ الميزات الرئيسية
@@ -96,8 +96,6 @@ athar-tayeb/
 
 ## 🚀 التثبيت السريع
 
-راجع ملف [INSTALL.md](INSTALL.md) للتعليمات التفصيلية.
-
 ```bash
 # 1. استيراد قاعدة البيانات
 mysql -u root -p < sql/athartayeb_schema.sql
@@ -120,7 +118,7 @@ chmod 755 public/uploads/memorials
 ## 📝 بيانات الدخول الافتراضية
 
 **لوحة التحكم:**
-- الرابط: `http://yoursite.com/admin/login.php`
+- الرابط: `https://athar.walid-fekry.com/admin/login.php`
 - اسم المستخدم: `admin`
 - كلمة المرور: `admin123`
 
@@ -146,7 +144,7 @@ chmod 755 public/uploads/memorials
 ```php
 define('SITE_NAME', 'أثر طيب');
 define('SITE_TAGLINE', 'لكي يبقى الأثر طيبًا بعد الرحيل 🌿');
-define('BASE_URL', 'http://yoursite.com/public');
+define('BASE_URL', 'https://athar.walid-fekry.com');
 ```
 
 ## 📊 قاعدة البيانات
@@ -181,17 +179,6 @@ define('BASE_URL', 'http://yoursite.com/public');
 ## 📄 الترخيص
 
 هذا المشروع مجاني للاستخدام الشخصي والتجاري.
-
-## 👨‍💻 المطور
-
-**Walid Fekry**
-- الموقع: [https://walid-fekry.com](https://walid-fekry.com)
-
-## 📞 الدعم
-
-للدعم والاستفسارات:
-- البريد الإلكتروني: support@athartayeb.com
-- WhatsApp: +20 123 456 7890
 
 ---
 
