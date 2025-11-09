@@ -271,7 +271,7 @@ include __DIR__ . '/../includes/header.php';
             <div class="audio-player mt-3">
                 <label class="form-label fw-bold">🎧 استمع للدعاء:</label>
                 <audio controls preload="none">
-                    <source src="assets/audios/doaa-die.mp3" type="audio/mpeg">
+                    <source src="../assets/audios/doaa-die.mp3" type="audio/mpeg">
                     متصفحك لا يدعم تشغيل الصوت
                 </audio>
             </div>
@@ -327,7 +327,7 @@ include __DIR__ . '/../includes/header.php';
                             </button>
                         </div>
                         <audio id="yaseenAudio" controls preload="none" class="w-100">
-                            <source src="assets/audios/yassin.mp3" type="audio/mpeg">
+                            <source src="../assets/audios/yassin.mp3" type="audio/mpeg">
                         </audio>
                     </div>
                 </div>
@@ -348,7 +348,7 @@ include __DIR__ . '/../includes/header.php';
                             </button>
                         </div>
                         <audio id="fatihaAudio" controls preload="none" class="w-100">
-                            <source src="assets/audios/alfatiha.mp3" type="audio/mpeg">
+                            <source src="../assets/audios/alfatiha.mp3" type="audio/mpeg">
                         </audio>
                     </div>
                 </div>
