@@ -36,7 +36,7 @@ define('CACHE_ENABLED', true);
 define('CACHE_TTL', 3600); // 1 hour
 
 // Rate Limiting
-define('TASBEEH_RATE_LIMIT', 60); // max clicks per minute per field
+define('TASBEEH_RATE_LIMIT', 100); // max clicks per minute per field
 define('CREATE_RATE_LIMIT', 5); // max creates per hour per IP
 
 // Session Settings
