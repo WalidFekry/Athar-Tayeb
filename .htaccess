@@ -7,7 +7,7 @@
 RewriteEngine On
 
 # Set the base path for this project
-RewriteBase /Athar-Tayeb-master/
+RewriteBase /
 
 # Disable MultiViews to prevent conflicts with extensionless URLs
 Options -MultiViews
@@ -16,8 +16,7 @@ Options -MultiViews
 # 1. Base URL Redirect
 # Redirect root folder to /public
 # ============================================
-RewriteCond %{REQUEST_URI} ^/Athar-Tayeb-master/?$
-RewriteRule ^$ public/ [R=301,L]
+RewriteRule ^$ public/ [L]
 
 # ============================================
 # 2. Skip Rewriting for Existing Files/Directories
@@ -97,8 +96,8 @@ RewriteRule ^(.*)$ public/$1 [QSA,L]
 # ============================================
 # Error Documents (Optional)
 # ============================================
-ErrorDocument 404 /Athar-Tayeb-master/404
-ErrorDocument 500 /Athar-Tayeb-master/404
+ErrorDocument 404 /404
+ErrorDocument 500 /404
 
 # ============================================
 # Compression (Optional but Recommended for Performance)

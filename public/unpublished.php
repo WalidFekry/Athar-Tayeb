@@ -88,7 +88,7 @@ include __DIR__ . '/../includes/header.php';
 
                     
                     <div class="mt-5">
-                        <a href="<?= site_url('public') ?>" class="btn btn-primary btn-lg">
+                        <a href="<?= site_url('') ?>" class="btn btn-primary btn-lg">
                             🏠 العودة للرئيسية
                         </a>
                     </div>

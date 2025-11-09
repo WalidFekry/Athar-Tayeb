@@ -152,7 +152,7 @@ include __DIR__ . '/../includes/header.php';
             
             <!-- Back to Home -->
             <div class="text-center mt-4">
-                <a href="<?= site_url('public') ?>" class="btn btn-outline-primary">
+                <a href="<?= site_url('') ?>" class="btn btn-outline-primary">
                     🏠 العودة للرئيسية
                 </a>
             </div>

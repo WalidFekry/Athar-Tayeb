@@ -9,8 +9,8 @@ define('ENV', 'production'); // 'development' or 'production'
 define('DEBUG_MODE', ENV === 'development');
 
 // Base URL (update this to your domain)
-define('BASE_URL', 'http://localhost/Athar-Tayeb-master/public');
-define('ADMIN_URL', 'http://localhost/Athar-Tayeb-master/admin');
+define('BASE_URL', 'http://localhost/public');
+define('ADMIN_URL', 'http://localhost/admin');
 
 // Database Configuration
 define('DB_HOST', 'localhost');

@@ -177,7 +177,7 @@ include __DIR__ . '/../includes/header.php';
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="<?= site_url('public') ?>">الرئيسية</a></li>
+            <li class="breadcrumb-item"><a href="<?= site_url('') ?>">الرئيسية</a></li>
             <li class="breadcrumb-item"><?= e($memorial['name']) ?></li>
         </ol>
     </nav>

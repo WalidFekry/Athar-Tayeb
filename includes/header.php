@@ -56,7 +56,7 @@ $structuredData = $structuredData ?? '';
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="<?= site_url('public') ?>">
+            <a class="navbar-brand d-flex align-items-center" href="<?= site_url('') ?>">
                 <span class="fs-4 fw-bold text-primary">🌿 <?= SITE_NAME ?></span>
             </a>
             
@@ -67,7 +67,7 @@ $structuredData = $structuredData ?? '';
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= site_url('public') ?>">الرئيسية</a>
+                        <a class="nav-link" href="<?= site_url('') ?>">الرئيسية</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= site_url('create') ?>">أنشئ صفحة</a>

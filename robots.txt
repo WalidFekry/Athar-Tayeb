@@ -24,6 +24,3 @@ Allow: /public/assets/
 Allow: /public/uploads/
 Allow: /assets/
 Allow: /uploads/
-
-# Sitemap location
-Sitemap: http://localhost/Athar-Tayeb-master/sitemap.xml

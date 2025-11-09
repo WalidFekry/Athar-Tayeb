@@ -48,7 +48,7 @@ include __DIR__ . '/../includes/header.php';
                     
                     <div class="row g-3 mt-4">
                         <div class="col-md-6">
-                            <a href="<?= site_url('public') ?>" class="btn btn-primary w-100">
+                            <a href="<?= site_url('') ?>" class="btn btn-primary w-100">
                                 🏠 الصفحة الرئيسية
                             </a>
                         </div>
