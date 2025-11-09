@@ -118,12 +118,12 @@ include __DIR__ . '/../includes/header.php';
         <div class="col-lg-8 mx-auto">
 
             <!-- Page Header -->
-            <div class="text-center mb-5">
+            <header class="text-center mb-5">
                 <h1> أنشئ صفحة تذكارية 🌿</h1>
                 <p class="lead text-muted">
                     صفحتك ستبقى دائماً، والأجر يستمر بإذن الله
                 </p>
-            </div>
+            </header>
 
             <!-- Info Alert -->
             <div class="alert alert-info">
@@ -136,7 +136,7 @@ include __DIR__ . '/../includes/header.php';
 
             <!-- Errors Display -->
             <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger">
+            <div class="alert alert-danger" role="alert" aria-live="assertive">
                 <h5 class="alert-heading">حدثت أخطاء:</h5>
                 <ul class="mb-0">
                     <?php foreach ($errors as $error): ?>
@@ -155,11 +155,11 @@ include __DIR__ . '/../includes/header.php';
                         <!-- From Name -->
                         <div class="mb-4">
                             <label for="from_name" class="form-label">
-                                إهداء من (اختياري)
+                                اسم منشئ الصفحة - اختياري
                             </label>
                             <input type="text" class="form-control" id="from_name" name="from_name"
-                                placeholder="مثال: عائلة الإمبابي" value="<?= e($_POST['from_name'] ?? '') ?>">
-                            <small class="form-text text-muted">
+                                placeholder="مثال: عائلة الإمبابي" value="<?= e($_POST['from_name'] ?? '') ?>" aria-describedby="from_name_help">
+                            <small id="from_name_help" class="form-text text-muted">
                                 يمكنك كتابة اسمك أو اسم العائلة
                             </small>
                         </div>
@@ -167,67 +167,71 @@ include __DIR__ . '/../includes/header.php';
                         <!-- Name (Required) -->
                         <div class="mb-4">
                             <label for="name" class="form-label">
-                                اسم المتوفى <span class="text-danger">*</span>
+                                اسم المتوفى <span class="text-danger" aria-label="حقل إجباري">*</span>
                             </label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="الاسم الكامل"
-                                required value="<?= e($_POST['name'] ?? '') ?>">
+                                required aria-required="true" value="<?= e($_POST['name'] ?? '') ?>">
                         </div>
 
                         <!-- Image Upload -->
                         <div class="mb-4">
                             <label for="imageInput" class="form-label">
-                                رفع صورة المتوفى (اختياري)
+                                صورة المتوفى - اختياري
                             </label>
                             <input type="file" class="form-control" id="imageInput" name="image"
-                                accept=".jpg,.jpeg,.png">
-                            <small class="form-text text-muted">
+                                accept=".jpg,.jpeg,.png" aria-describedby="image_help">
+                            <small id="image_help" class="form-text text-muted">
                                 الحد الأقصى: 2 ميجابايت | الصيغ المسموحة: JPG, PNG
                             </small>
-                            <div id="imagePreview" class="mt-3 text-center"></div>
+                            <div id="imagePreview" class="mt-3 text-center" role="img" aria-live="polite"></div>
                         </div>
 
                         <!-- Death Date - Three Separate Fields -->
-                        <div class="mb-4">
-                            <label class="form-label">
+                        <fieldset class="mb-4">
+                            <legend class="form-label">
                                 يوم الذكرى (تاريخ الوفاة) - اختياري
-                            </label>
+                            </legend>
                             <div class="mb-3">
+                                <label for="death_date_picker" class="visually-hidden">اختر تاريخ الوفاة</label>
                                 <div class="input-group">
                                     <input type="text" id="death_date_picker" class="form-control"
-                                        placeholder="اضغط هنا لاختيار التاريخ 📅" readonly>
+                                        placeholder="اضغط هنا لاختيار التاريخ 📅" readonly aria-label="حقل اختيار تاريخ الوفاة">
                                 </div>
                             </div>
                             <div class="row g-2">
                                 <div class="col-4">
+                                    <label for="death_day" class="visually-hidden">اليوم</label>
                                     <input type="number" class="form-control text-center" id="death_day"
                                         name="death_day" placeholder="اليوم" min="1" max="31"
-                                        value="<?= e($_POST['death_day'] ?? '') ?>">
-                                    <small class="form-text text-muted d-block text-center mt-1">اليوم</small>
+                                        value="<?= e($_POST['death_day'] ?? '') ?>" aria-label="يوم الوفاة">
+                                    <small class="form-text text-muted d-block text-center mt-1" aria-hidden="true">اليوم</small>
                                 </div>
                                 <div class="col-4">
+                                    <label for="death_month" class="visually-hidden">الشهر</label>
                                     <input type="number" class="form-control text-center" id="death_month"
                                         name="death_month" placeholder="الشهر" min="1" max="12"
-                                        value="<?= e($_POST['death_month'] ?? '') ?>">
-                                    <small class="form-text text-muted d-block text-center mt-1">الشهر</small>
+                                        value="<?= e($_POST['death_month'] ?? '') ?>" aria-label="شهر الوفاة">
+                                    <small class="form-text text-muted d-block text-center mt-1" aria-hidden="true">الشهر</small>
                                 </div>
                                 <div class="col-4">
+                                    <label for="death_year" class="visually-hidden">السنة</label>
                                     <input type="number" class="form-control text-center" id="death_year"
                                         name="death_year" placeholder="السنة" min="1900" max="<?= date('Y') ?>"
-                                        value="<?= e($_POST['death_year'] ?? '') ?>">
-                                    <small class="form-text text-muted d-block text-center mt-1">السنة</small>
+                                        value="<?= e($_POST['death_year'] ?? '') ?>" aria-label="سنة الوفاة">
+                                    <small class="form-text text-muted d-block text-center mt-1" aria-hidden="true">السنة</small>
                                 </div>
                             </div>
-                            <small class="form-text text-muted d-block mt-2">
+                            <small class="form-text text-muted d-block mt-2" id="date_help">
                                 مثال: اليوم: 19، الشهر: 8، السنة: 1999
                             </small>
-                        </div>
+                        </fieldset>
 
                         <!-- Gender -->
                         <div class="mb-4">
                             <label for="gender" class="form-label">
-                                نوع المتوفى
+                                الجنس <span class="text-danger" aria-label="حقل إجباري">*</span>
                             </label>
-                            <select class="form-select" id="gender" name="gender">
+                            <select class="form-select" id="gender" name="gender" required aria-required="true" aria-describedby="gender_help">
                                 <option value="male" <?= ($_POST['gender'] ?? 'male') === 'male' ? 'selected' : '' ?>>
                                     ذكر
                                 </option>
@@ -235,7 +239,7 @@ include __DIR__ . '/../includes/header.php';
                                     أنثى
                                 </option>
                             </select>
-                            <small class="form-text text-muted">
+                            <small id="gender_help" class="form-text text-muted">
                                 لتخصيص الأدعية والضمائر بشكل صحيح
                             </small>
                         </div>
@@ -243,11 +247,11 @@ include __DIR__ . '/../includes/header.php';
                         <!-- WhatsApp -->
                         <div class="mb-4">
                             <label for="whatsapp" class="form-label">
-                                رقم واتساب للتواصل (اختياري)
+                                رقم الواتساب - اختياري
                             </label>
                             <input type="tel" class="form-control" id="whatsapp" name="whatsapp"
-                                placeholder="+20 123 456 7890" value="<?= e($_POST['whatsapp'] ?? '') ?>">
-                            <small class="form-text text-muted">
+                                placeholder="+20 123 456 7890" value="<?= e($_POST['whatsapp'] ?? '') ?>" aria-describedby="whatsapp_help">
+                            <small id="whatsapp_help" class="form-text text-muted">
                                 لنتمكن من التواصل معك في حال وجود أي استفسار بخصوص الصفحة
                             </small>
                         </div>
@@ -255,11 +259,11 @@ include __DIR__ . '/../includes/header.php';
                         <!-- Quote/Message -->
                         <div class="mb-4">
                             <label for="quote" class="form-label">
-                                اقتباس أو رسالة قصيرة (اختياري)
+                                رسالة أو دعاء - اختياري
                             </label>
                             <textarea class="form-control" id="quote" name="quote" rows="4"
-                                placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..."><?= e($_POST['quote'] ?? '') ?></textarea>
-                            <small class="form-text text-muted">
+                                placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..." aria-describedby="quote_help"><?= e($_POST['quote'] ?? '') ?></textarea>
+                            <small id="quote_help" class="form-text text-muted">
                                 سوف تظهر هذه الرسالة في الصفحة التذكارية وستخضع للمراجعة قبل النشر
                             </small>
                         </div>

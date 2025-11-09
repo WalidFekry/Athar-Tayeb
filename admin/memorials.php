@@ -158,8 +158,28 @@ $stmt->execute($params);
 $memorials = $stmt->fetchAll();
 
 $pageTitle = 'إدارة الصفحات التذكارية';
-include __DIR__ . '/dashboard.php'; // Reuse header
 ?>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $pageTitle ?> — <?= SITE_NAME ?></title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/main.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/admin.css">
+</head>
+<body>
+    
+    <!-- Admin Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="<?= ADMIN_URL ?>/dashboard.php">🌿 <?= SITE_NAME ?> — الإدارة</a>
+            <a href="<?= ADMIN_URL ?>/dashboard.php" class="btn btn-sm btn-light">← العودة للوحة التحكم</a>
+        </div>
+    </nav>
+
 
 <div class="container my-5">
     

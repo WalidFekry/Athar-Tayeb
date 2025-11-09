@@ -54,14 +54,17 @@ $structuredData = $structuredData ?? '';
     </script>
 </head>
 <body>
+    <!-- Skip to main content link for keyboard users -->
+    <a href="#main-content" class="skip-link visually-hidden-focusable">انتقل إلى المحتوى الرئيسي</a>
+    
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top" role="navigation" aria-label="القائمة الرئيسية">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="<?= site_url('') ?>">
                 <span class="fs-4 fw-bold text-primary">🌿 <?= SITE_NAME ?></span>
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="فتح قائمة التنقل">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
@@ -83,13 +86,13 @@ $structuredData = $structuredData ?? '';
                 
                 <div class="d-flex align-items-center">
                     <!-- Theme Toggle -->
-                    <button id="themeToggle" class="btn btn-outline-secondary btn-sm me-2" aria-label="تبديل الوضع الليلي">
-                        <span class="theme-icon">🌙</span>
+                    <button id="themeToggle" class="btn btn-outline-secondary btn-sm me-2" aria-label="تبديل بين الوضع الليلي والنهاري" aria-pressed="false">
+                        <span class="theme-icon" aria-hidden="true">🌙</span>
                     </button>
                     
                     <!-- Search Icon (Mobile) -->
-                    <button class="btn btn-outline-primary btn-sm d-lg-none" data-bs-toggle="modal" data-bs-target="#searchModal">
-                        🔍
+                    <button class="btn btn-outline-primary btn-sm d-lg-none" data-bs-toggle="modal" data-bs-target="#searchModal" aria-label="فتح نافذة البحث">
+                        <span aria-hidden="true">🔍</span>
                     </button>
                 </div>
             </div>
@@ -97,17 +100,18 @@ $structuredData = $structuredData ?? '';
     </nav>
     
     <!-- Search Modal (for mobile) -->
-    <div class="modal fade" id="searchModal" tabindex="-1">
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">البحث عن متوفى</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="searchModalLabel">البحث عن متوفى</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق نافذة البحث"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= site_url('search') ?>" method="GET">
+                    <form action="<?= site_url('search') ?>" method="GET" role="search">
                         <div class="input-group">
-                            <input type="text" name="q" class="form-control" placeholder="ابحث عن اسم..." required>
+                            <label for="mobileSearchInput" class="visually-hidden">ابحث عن اسم المتوفى</label>
+                            <input type="text" id="mobileSearchInput" name="q" class="form-control" placeholder="ابحث عن اسم..." required aria-required="true">
                             <button class="btn btn-primary" type="submit">بحث</button>
                         </div>
                     </form>
@@ -116,4 +120,4 @@ $structuredData = $structuredData ?? '';
         </div>
     </div>
     
-    <main>
+    <main id="main-content" role="main">

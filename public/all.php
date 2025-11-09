@@ -38,12 +38,12 @@ include __DIR__ . '/../includes/header.php';
 
 <div class="container my-5">
     
-    <div class="text-center mb-5">
+    <header class="text-center mb-5">
         <h1> جميع الصفحات التذكارية 🤲</h1>
         <p class="lead text-muted">
             <?= toArabicNumerals($totalMemorials) ?> صفحة تذكارية
         </p>
-    </div>
+    </header>
     
     <?php if (count($memorials) > 0): ?>
         
@@ -65,7 +65,7 @@ include __DIR__ . '/../includes/header.php';
                                 </p>
                             <?php endif; ?>
                             
-                            <h5 class="memorial-name"><?= e($memorial['name']) ?></h5>
+                            <h2 class="memorial-name h5"><?= e($memorial['name']) ?></h2>
                             
                             <?php if ($memorial['death_date']): ?>
                                 <p class="memorial-date">
@@ -77,7 +77,7 @@ include __DIR__ . '/../includes/header.php';
                                 👁️ زارها <?= toArabicNumerals($memorial['visits']) ?> شخصاً
                             </p>
                             
-                            <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100">
+                            <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100" aria-label="عرض الصفحة التذكارية للمرحوم <?= e($memorial['name']) ?>">
                                 عرض الصفحة
                             </a>
                         </div>
@@ -99,7 +99,7 @@ include __DIR__ . '/../includes/header.php';
                     
                     <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
                         <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-                            <a class="page-link" href="?page=<?= $i ?>"><?= toArabicNumerals($i) ?></a>
+                            <a class="page-link" href="?page=<?= $i ?>" aria-label="الصفحة <?= toArabicNumerals($i) ?>" <?= $i === $page ? 'aria-current="page"' : '' ?>><?= toArabicNumerals($i) ?></a>
                         </li>
                     <?php endfor; ?>
                     
@@ -120,7 +120,7 @@ include __DIR__ . '/../includes/header.php';
     <?php endif; ?>
     
     <div class="text-center mt-5">
-        <a href="<?= site_url('create') ?>" class="btn btn-primary btn-lg">
+        <a href="<?= site_url('create') ?>" class="btn btn-primary btn-lg" aria-label="انتقل إلى صفحة إنشاء صفحة تذكارية جديدة">
              أنشئ صفحة تذكارية 💚
         </a>
     </div>

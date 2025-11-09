@@ -1,0 +1,390 @@
+/**
+ * Admin Panel Styles
+ * Ensures proper visibility and styling for admin interface
+ */
+
+/* Admin Navbar - Override main.css conflicts */
+.navbar-dark {
+    background-color: #5a7d4e !important;
+}
+
+.navbar-dark .navbar-brand {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.navbar-dark .navbar-brand:hover,
+.navbar-dark .navbar-brand:focus {
+    color: #f0f0f0 !important;
+}
+
+.navbar-dark .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-dark .nav-link:hover,
+.navbar-dark .nav-link:focus {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.navbar-dark .nav-link.active {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.navbar-dark .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
+}
+
+.navbar-dark .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Badge in navbar */
+.navbar-dark .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.25rem;
+    vertical-align: middle;
+}
+
+.navbar-dark .badge.bg-warning {
+    background-color: #E65100 !important;
+    color: white !important;
+}
+
+/* Button in navbar */
+.navbar-dark .btn-light {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #5a7d4e;
+    font-weight: 600;
+}
+
+.navbar-dark .btn-light:hover {
+    background-color: #f0f0f0;
+    border-color: #f0f0f0;
+    color: #4a6d3e;
+}
+
+/* Admin body background */
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Card headers with bg-primary */
+.card-header.bg-primary {
+    background-color: #5a7d4e !important;
+    color: white !important;
+}
+
+.card-header.bg-primary h5,
+.card-header.bg-primary h6 {
+    color: white !important;
+    margin-bottom: 0;
+}
+
+/* Ensure text visibility in cards */
+.card {
+    background-color: white;
+    border: 1px solid #dee2e6;
+}
+
+.card-body {
+    color: #212529;
+}
+
+/* Table styling */
+.table {
+    color: #212529;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+/* Badge contrast improvements */
+.badge.bg-success {
+    background-color: #2E7D32 !important;
+    color: white !important;
+}
+
+.badge.bg-warning {
+    background-color: #E65100 !important;
+    color: white !important;
+}
+
+.badge.bg-danger {
+    background-color: #C62828 !important;
+    color: white !important;
+}
+
+.badge.bg-info {
+    background-color: #0277BD !important;
+    color: white !important;
+}
+
+/* Button group styling */
+.btn-group-sm .btn {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Form styling */
+.form-label {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid #ced4da;
+    color: #212529;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #5a7d4e;
+    box-shadow: 0 0 0 0.2rem rgba(90, 125, 78, 0.25);
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 6px;
+    border: none;
+}
+
+.alert-success {
+    background-color: rgba(46, 125, 50, 0.1);
+    color: #2E7D32;
+    border-right: 4px solid #2E7D32;
+}
+
+.alert-danger {
+    background-color: rgba(198, 40, 40, 0.1);
+    color: #C62828;
+    border-right: 4px solid #C62828;
+}
+
+.alert-warning {
+    background-color: rgba(230, 81, 0, 0.1);
+    color: #E65100;
+    border-right: 4px solid #E65100;
+}
+
+.alert-info {
+    background-color: rgba(2, 119, 189, 0.1);
+    color: #0277BD;
+    border-right: 4px solid #0277BD;
+}
+
+/* Statistics cards */
+.card.text-center h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+/* Quick action cards */
+a.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #dee2e6;
+}
+
+a.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+}
+
+a.card .card-body {
+    color: #212529;
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: #5a7d4e;
+    border: 1px solid #dee2e6;
+}
+
+.pagination .page-link:hover {
+    background-color: #5a7d4e;
+    border-color: #5a7d4e;
+    color: white;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #5a7d4e;
+    border-color: #5a7d4e;
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-dark .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .navbar-dark .nav-link {
+        padding: 0.75rem 1rem;
+    }
+    
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+    }
+}
+
+/* Ensure proper text color inheritance */
+h1, h2, h3, h4, h5, h6,
+p, span, td, th, label {
+    color: inherit;
+}
+
+/* Override any theme-based color issues */
+[data-theme="dark"] body {
+    background-color: #f8f9fa !important;
+}
+
+[data-theme="dark"] .card {
+    background-color: white !important;
+    color: #212529 !important;
+}
+
+[data-theme="dark"] .navbar-dark {
+    background-color: #5a7d4e !important;
+}
+
+[data-theme="dark"] .navbar-dark .nav-link,
+[data-theme="dark"] .navbar-dark .navbar-brand {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Fix for edit form card */
+.card-header.bg-warning {
+    background-color: #E65100 !important;
+    color: white !important;
+}
+
+.card-header.bg-warning h5 {
+    color: white !important;
+}
+
+/* Image preview in moderation */
+.card-img-top {
+    max-height: 300px;
+    object-fit: cover;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Ensure buttons are visible */
+.btn {
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #5a7d4e;
+    border-color: #5a7d4e;
+    color: white;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #4a6d3e;
+    border-color: #4a6d3e;
+    color: white;
+}
+
+.btn-success {
+    background-color: #2E7D32;
+    border-color: #2E7D32;
+    color: white;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+    background-color: #1B5E20;
+    border-color: #1B5E20;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #C62828;
+    border-color: #C62828;
+    color: white;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+    background-color: #B71C1C;
+    border-color: #B71C1C;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #E65100;
+    border-color: #E65100;
+    color: white;
+}
+
+.btn-warning:hover,
+.btn-warning:focus {
+    background-color: #D84315;
+    border-color: #D84315;
+    color: white;
+}
+
+.btn-info {
+    background-color: #0277BD;
+    border-color: #0277BD;
+    color: white;
+}
+
+.btn-info:hover,
+.btn-info:focus {
+    background-color: #01579B;
+    border-color: #01579B;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: #5a6268;
+    border-color: #5a6268;
+    color: white;
+}
+
+.btn-light {
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+    color: #212529;
+}
+
+.btn-light:hover,
+.btn-light:focus {
+    background-color: #e2e6ea;
+    border-color: #dae0e5;
+    color: #212529;
+}

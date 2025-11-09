@@ -24,10 +24,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         invalidateMemorialCache($memorialId);
         $success = 'تمت الموافقة على الصورة';
     } elseif ($action === 'reject') {
-        $stmt = $pdo->prepare("UPDATE memorials SET image_status = 2 WHERE id = ?");
+        // Get memorial to delete image file
+        $stmt = $pdo->prepare("SELECT image FROM memorials WHERE id = ?");
         $stmt->execute([$memorialId]);
+        $memorial = $stmt->fetch();
+        
+        if ($memorial && $memorial['image']) {
+            // Delete original image
+            $imagePath = UPLOAD_PATH . '/' . $memorial['image'];
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+            
+            // Delete thumbnail if exists
+            $ext = pathinfo($memorial['image'], PATHINFO_EXTENSION);
+            $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $imagePath);
+            if (file_exists($thumbPath)) {
+                unlink($thumbPath);
+            }
+            
+            // Update database: set image to NULL and status to rejected
+            $stmt = $pdo->prepare("UPDATE memorials SET image = NULL, image_status = 2 WHERE id = ?");
+            $stmt->execute([$memorialId]);
+        } else {
+            // No image to delete, just update status
+            $stmt = $pdo->prepare("UPDATE memorials SET image_status = 2 WHERE id = ?");
+            $stmt->execute([$memorialId]);
+        }
+        
         invalidateMemorialCache($memorialId);
-        $success = 'تم رفض الصورة';
+        $success = 'تم رفض الصورة وحذفها من الخادم';
     }
 }
 
@@ -49,6 +75,7 @@ $pendingImages = $stmt->fetchAll();
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/main.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/admin.css">
 </head>
 <body>
     

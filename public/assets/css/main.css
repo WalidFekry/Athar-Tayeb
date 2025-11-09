@@ -46,6 +46,48 @@
     --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.6);
 }
 
+/* Accessibility Styles */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary);
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+    z-index: 10000;
+    font-weight: 600;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+*:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.btn:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(90, 125, 78, 0.5);
+}
+
 /* Base Styles */
 * {
     margin: 0;
@@ -430,12 +472,13 @@ textarea.form-control {
 .badge {
     padding: 0.4rem 0.8rem;
     border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.85rem;
+    font-weight: 700;
+    font-size: 0.9rem;
 }
 
+/* Improved contrast for badges - WCAG AA compliant */
 .badge-pending {
-    background-color: var(--warning);
+    background-color: #B8860B;
     color: white;
 }
 
@@ -445,8 +488,47 @@ textarea.form-control {
 }
 
 .badge-rejected {
-    background-color: var(--danger);
+    background-color: #B71C1C;
     color: white;
+}
+
+/* Bootstrap badge overrides for better contrast */
+.bg-primary {
+    background-color: var(--primary) !important;
+    color: white !important;
+}
+
+.bg-success {
+    background-color: #2E7D32 !important;
+    color: white !important;
+}
+
+.bg-info {
+    background-color: #0277BD !important;
+    color: white !important;
+}
+
+.bg-warning {
+    background-color: #E65100 !important;
+    color: white !important;
+}
+
+.bg-danger {
+    background-color: #C62828 !important;
+    color: white !important;
+}
+
+/* Dark mode badge adjustments */
+[data-theme="dark"] .bg-success {
+    background-color: #388E3C !important;
+}
+
+[data-theme="dark"] .bg-info {
+    background-color: #0288D1 !important;
+}
+
+[data-theme="dark"] .bg-warning {
+    background-color: #F57C00 !important;
 }
 
 /* Alerts */

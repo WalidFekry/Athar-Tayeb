@@ -13,6 +13,7 @@
   // Apply saved theme
   document.documentElement.setAttribute("data-theme", currentTheme);
   updateThemeIcon(currentTheme);
+  updateThemeARIA(currentTheme);
 
   if (themeToggle) {
     themeToggle.addEventListener("click", function () {
@@ -22,6 +23,7 @@
       document.documentElement.setAttribute("data-theme", newTheme);
       localStorage.setItem("theme", newTheme);
       updateThemeIcon(newTheme);
+      updateThemeARIA(newTheme);
     });
   }
 
@@ -29,6 +31,13 @@
     const icon = document.querySelector(".theme-icon");
     if (icon) {
       icon.textContent = theme === "dark" ? "☀️" : "🌙";
+    }
+  }
+
+  function updateThemeARIA(theme) {
+    if (themeToggle) {
+      themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+      themeToggle.setAttribute("aria-label", theme === "dark" ? "التبديل إلى الوضع النهاري" : "التبديل إلى الوضع الليلي");
     }
   }
 

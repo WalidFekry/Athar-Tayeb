@@ -59,6 +59,8 @@ $structuredData = generateStructuredData($memorial);
 
 // Random Quran page (1-604)
 $randomQuranPage = rand(1, 604);
+// Pad with leading zeros
+$randomQuranPageMp3 = str_pad($randomQuranPage, 3, "0", STR_PAD_LEFT);
 
 // Asma Allah Al-Husna (99 names)
 $asmaAllah = [
@@ -387,7 +389,7 @@ include __DIR__ . '/../includes/header.php';
 
                 <div class="audio-player mt-3">
                     <audio controls preload="none">
-                        <source src="https://post.walid-fekry.com/quran/mp3/<?= $randomQuranPage ?>.mp3"
+                        <source src="https://post.walid-fekry.com/quran/mp3/<?= $randomQuranPageMp3 ?>.mp3"
                             type="audio/mpeg">
                     </audio>
                 </div>
