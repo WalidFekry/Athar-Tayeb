@@ -44,7 +44,7 @@ define('SESSION_LIFETIME', 7200); // 2 hours
 define('SESSION_NAME', 'athartayeb_session');
 
 // Pagination
-define('ITEMS_PER_PAGE', 12);
+define('ITEMS_PER_PAGE', 15);
 
 // Site Information
 define('SITE_NAME', 'أثر طيب');

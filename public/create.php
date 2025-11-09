@@ -25,7 +25,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validate inputs
         $name = trim($_POST['name'] ?? '');
         $from_name = trim($_POST['from_name'] ?? '');
-        $death_date = trim($_POST['death_date'] ?? '');
+        
+        // Process death date from three separate fields
+        $death_day = trim($_POST['death_day'] ?? '');
+        $death_month = trim($_POST['death_month'] ?? '');
+        $death_year = trim($_POST['death_year'] ?? '');
+        $death_date = '';
+        
+        // Combine date fields if all are provided
+        if (!empty($death_year) && !empty($death_month) && !empty($death_day)) {
+            $death_date = sprintf('%04d-%02d-%02d', $death_year, $death_month, $death_day);
+        }
+        
         $gender = trim($_POST['gender'] ?? 'male');
         $whatsapp = trim($_POST['whatsapp'] ?? '');
         $quote = trim($_POST['quote'] ?? '');
@@ -193,18 +204,55 @@ include __DIR__ . '/../includes/header.php';
                             <div id="imagePreview" class="mt-3 text-center"></div>
                         </div>
                         
-                        <!-- Death Date -->
+                        <!-- Death Date - Three Separate Fields -->
                         <div class="mb-4">
-                            <label for="death_date" class="form-label">
+                            <label class="form-label">
                                 يوم الذكرى (تاريخ الوفاة) - اختياري
                             </label>
-                            <input 
-                                type="date" 
-                                class="form-control" 
-                                id="death_date" 
-                                name="death_date"
-                                value="<?= e($_POST['death_date'] ?? '') ?>"
-                            >
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <input 
+                                        type="number" 
+                                        class="form-control text-center" 
+                                        id="death_day" 
+                                        name="death_day"
+                                        placeholder="اليوم"
+                                        min="1"
+                                        max="31"
+                                        value="<?= e($_POST['death_day'] ?? '') ?>"
+                                    >
+                                    <small class="form-text text-muted d-block text-center mt-1">اليوم</small>
+                                </div>
+                                <div class="col-4">
+                                    <input 
+                                        type="number" 
+                                        class="form-control text-center" 
+                                        id="death_month" 
+                                        name="death_month"
+                                        placeholder="الشهر"
+                                        min="1"
+                                        max="12"
+                                        value="<?= e($_POST['death_month'] ?? '') ?>"
+                                    >
+                                    <small class="form-text text-muted d-block text-center mt-1">الشهر</small>
+                                </div>
+                                <div class="col-4">
+                                    <input 
+                                        type="number" 
+                                        class="form-control text-center" 
+                                        id="death_year" 
+                                        name="death_year"
+                                        placeholder="السنة"
+                                        min="1900"
+                                        max="<?= date('Y') ?>"
+                                        value="<?= e($_POST['death_year'] ?? '') ?>"
+                                    >
+                                    <small class="form-text text-muted d-block text-center mt-1">السنة</small>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted d-block mt-2">
+                                مثال: اليوم: 19، الشهر: 8، السنة: 1999
+                            </small>
                         </div>
                         
                         <!-- Gender -->

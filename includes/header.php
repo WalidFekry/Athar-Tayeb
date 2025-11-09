@@ -40,6 +40,7 @@ $structuredData = $structuredData ?? '';
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/main.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/footer-styles.css">
     
     <!-- Structured Data -->
     <?= $structuredData ?>

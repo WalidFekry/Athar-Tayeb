@@ -204,7 +204,7 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
             <div class="card-body">
                 <h5 class="mb-3">⚙️ الإجراءات</h5>
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="<?= BASE_URL ?>/memorial.php?id=<?= $memorial['id'] ?>" 
+                    <a href="<?= BASE_URL ?>/m/<?= $memorial['id'] ?>" 
                        target="_blank" 
                        class="btn btn-primary">
                         👁️ عرض الصفحة

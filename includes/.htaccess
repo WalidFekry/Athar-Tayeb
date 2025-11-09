@@ -1,0 +1,4 @@
+# Deny direct access to includes directory
+<Files "*">
+    Require all denied
+</Files>

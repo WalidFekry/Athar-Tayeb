@@ -10,6 +10,7 @@
     --muted-bg: #FBF9F6;
     --primary: #5A7D4E;
     --primary-hover: #4a6d3e;
+    --secondary: #7A9A5F;
     --accent: #9DB37B;
     --text: #2B2B2B;
     --muted-text: #58624B;
@@ -17,6 +18,7 @@
     --danger: #C04B4B;
     --success: #5A7D4E;
     --warning: #D4A574;
+    --info: #6B9AC4;
     --radius: 12px;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
@@ -26,17 +28,22 @@
 
 /* Dark Theme */
 [data-theme="dark"] {
-    --bg: #1F2E23;
-    --card-bg: #2F3C31;
-    --muted-bg: #253329;
+    --bg: #1A1F1C;
+    --card-bg: #252B27;
+    --muted-bg: #1F2521;
     --primary: #9DB37B;
     --primary-hover: #b5c995;
-    --accent: #7A9A5F;
-    --text: #898986;  
-    --muted-text: #A3A497; 
-    --border: #3D4A3F;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --secondary: #7A9A5F;
+    --accent: #6B8A57;
+    --text: #E0E0E0;  
+    --muted-text: #B0B3AB; 
+    --border: #3A4139;
+    --danger: #E57373;
+    --success: #81C784;
+    --warning: #FFB74D;
+    --info: #64B5F6;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.6);
 }
 
 /* Base Styles */
@@ -823,5 +830,50 @@ input::placeholder {
     .surah-verse {
         font-size: 1.2rem;
         line-height: 2.2;
+    }
+}
+
+/* ========================================
+   Date Input Fields (Create Page)
+   ======================================== */
+
+#death_day, #death_month, #death_year {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.85rem 0.5rem;
+}
+
+#death_day:focus, #death_month:focus, #death_year:focus {
+    transform: scale(1.02);
+    transition: var(--transition);
+}
+
+/* Remove spinner arrows for number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+}
+
+/* Date fields container animation */
+.row.g-2 {
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    #death_day, #death_month, #death_year {
+        font-size: 1rem;
+        padding: 0.75rem 0.5rem;
     }
 }

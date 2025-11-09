@@ -4,18 +4,19 @@
  * Safely initializes sessions with security settings
  */
 
+// Session security configuration
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_only_cookies', 1);
+ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.use_strict_mode', 1);
+
+// Enable secure cookies if HTTPS is available
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+    ini_set('session.cookie_secure', 1);
+}
+
 // Only start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
-    // Configure session settings BEFORE session_start()
-    ini_set('session.cookie_httponly', 1);
-    ini_set('session.use_only_cookies', 1);
-    ini_set('session.cookie_samesite', 'Lax');
-    
-    // Use secure cookies if HTTPS
-    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-        ini_set('session.cookie_secure', 1);
-    }
-    
     // Set session name and lifetime
     session_name(SESSION_NAME);
     ini_set('session.gc_maxlifetime', SESSION_LIFETIME);
