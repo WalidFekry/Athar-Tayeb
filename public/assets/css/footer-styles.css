@@ -99,7 +99,7 @@
     justify-content: center;
     gap: 0.6rem;
     padding: 0.7rem 1.25rem;
-    background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     color: white;
     border-radius: 8px;
     text-decoration: none;
@@ -135,6 +135,10 @@
     transform: translateX(4px);
 }
 
+.github-btn-text {
+    color: white;
+}
+
 .developer-link {
     transition: var(--transition);
     position: relative;
@@ -153,6 +157,43 @@
 
 .developer-link:hover::after {
     width: 100%;
+}
+
+/* Developer Page Link */
+.developer-page-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, #6a9d5f 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(90, 125, 78, 0.3);
+}
+
+.developer-page-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(90, 125, 78, 0.4);
+    color: white;
+}
+
+.developer-link-icon {
+    font-size: 1.25rem;
+    animation: wave 2s ease-in-out infinite;
+}
+
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(15deg); }
+    75% { transform: rotate(-15deg); }
+}
+
+.developer-link-text {
+    color: white;
 }
 
 /* Responsive */

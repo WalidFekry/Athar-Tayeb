@@ -295,6 +295,21 @@ include __DIR__ . '/../includes/header.php';
         <div class="card-body">
             <h4 class="text-center mb-4"> أذكار الصباح والمساء 📿</h4>
 
+            <!-- Azkar Reading Buttons -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <button class="btn btn-primary w-100 py-3 azkar-read-btn" data-azkar-image="<?= BASE_URL ?>/assets/images/azkar-alsabah.webp" data-azkar-title="أذكار الصباح">
+                         قراءة أذكار الصباح
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-primary w-100 py-3 azkar-read-btn" data-azkar-image="<?= BASE_URL ?>/assets/images/azkar-almasaa.webp" data-azkar-title="أذكار المساء">
+                         قراءة أذكار المساء
+                    </button>
+                </div>
+            </div>
+
+            <!-- Azkar Audio Players -->
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="audio-player">
@@ -575,6 +590,42 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
+    <!-- Quran Radio Section -->
+    <div class="card shadow-sm mb-4 quran-radio-section">
+        <div class="card-body text-center p-4">
+            <div class="radio-icon-wrapper mb-4">
+                <div class="radio-icon">
+                    📻
+                </div>
+            </div>
+            <h3 class="mb-3 fw-bold">إذاعة القرآن الكريم</h3>
+            <p class="text-muted mb-4">
+                استمع إلى البث المباشر للقرآن الكريم على مدار الساعة
+            </p>
+            
+            <div class="radio-controls">
+                <audio id="quranRadio" preload="none">
+                    <source src="https://stream.radiojar.com/8s5u5tpdtwzuv" type="audio/mpeg">
+                    متصفحك لا يدعم تشغيل الصوت
+                </audio>
+                
+                <div class="d-flex justify-content-center align-items-center gap-3">
+                    <button id="playRadioBtn" class="btn btn-primary btn-lg px-5 py-3">
+                        ▶️ تشغيل
+                    </button>
+                    <button id="pauseRadioBtn" class="btn btn-outline-primary btn-lg px-5 py-3" style="display: none;">
+                        ⏸️ إيقاف مؤقت
+                    </button>
+                </div>
+                
+                <div class="volume-control mt-4">
+                    <label for="radioVolume" class="form-label fw-bold">🔊 مستوى الصوت</label>
+                    <input type="range" class="form-range" id="radioVolume" min="0" max="100" value="70">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Apps Section -->
     <div class="card shadow-sm mb-4 apps-promo-section">
         <div class="card-body p-4">
@@ -684,6 +735,21 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
+</div>
+
+<!-- Azkar Image Modal -->
+<div class="modal fade" id="azkarModal" tabindex="-1" aria-labelledby="azkarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="azkarModalLabel">أذكار</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body p-3">
+                <img id="azkarModalImage" src="" alt="أذكار" class="azkar-image">
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php include __DIR__ . '/../includes/yaseen_modal.php'; ?>

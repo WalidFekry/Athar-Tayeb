@@ -1183,3 +1183,98 @@ input[type="number"]::-webkit-outer-spin-button {
 .flatpickr-calendar.open {
     z-index: 9999;
 }
+
+/* ========================================
+   Azkar Modal Styles
+   ======================================== */
+
+#azkarModal .modal-body {
+    background-color: var(--muted-bg);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+#azkarModal .modal-content {
+    border-radius: var(--radius);
+    border: 2px solid var(--primary);
+}
+
+.azkar-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    cursor: zoom-in;
+    transition: var(--transition);
+}
+
+.azkar-image:hover {
+    opacity: 0.95;
+}
+
+.azkar-image.zoomed {
+    cursor: zoom-out;
+    transform: scale(1.5);
+    transform-origin: center;
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    #azkarModal .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    #azkarModal .modal-body {
+        max-height: 70vh;
+    }
+}
+
+/* ========================================
+   Quran Radio Section Styles
+   ======================================== */
+
+.quran-radio-section {
+    background: linear-gradient(135deg, var(--muted-bg) 0%, var(--card-bg) 100%);
+    border: 2px solid var(--border);
+}
+
+.radio-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.radio-icon {
+    font-size: 4rem;
+    animation: radioWave 2s ease-in-out infinite;
+}
+
+@keyframes radioWave {
+    0%, 100% { 
+        transform: scale(1); 
+    }
+    50% { 
+        transform: scale(1.1); 
+    }
+}
+
+.volume-control {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.form-range {
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .radio-icon {
+        font-size: 3rem;
+    }
+    
+    #playRadioBtn, 
+    #pauseRadioBtn {
+        width: 100%;
+    }
+}

@@ -448,5 +448,63 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
+
+  // Azkar Modal Functionality
+  const azkarButtons = document.querySelectorAll('.azkar-read-btn');
+  const azkarModalElement = document.getElementById('azkarModal');
+  const azkarModalImage = document.getElementById('azkarModalImage');
+  const azkarModalLabel = document.getElementById('azkarModalLabel');
+  
+  if (azkarButtons.length > 0 && azkarModalElement) {
+    const azkarModal = new bootstrap.Modal(azkarModalElement);
+    
+    azkarButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const imageUrl = this.getAttribute('data-azkar-image');
+        const title = this.getAttribute('data-azkar-title');
+        
+        azkarModalImage.src = imageUrl;
+        azkarModalLabel.textContent = title;
+        azkarModal.show();
+      });
+    });
+    
+    // Zoom functionality
+    azkarModalImage.addEventListener('click', function() {
+      this.classList.toggle('zoomed');
+    });
+    
+    // Reset zoom when modal closes
+    azkarModalElement.addEventListener('hidden.bs.modal', function() {
+      azkarModalImage.classList.remove('zoomed');
+    });
+  }
+  
+  // Quran Radio Functionality
+  const quranRadio = document.getElementById('quranRadio');
+  const playBtn = document.getElementById('playRadioBtn');
+  const pauseBtn = document.getElementById('pauseRadioBtn');
+  const volumeControl = document.getElementById('radioVolume');
+  
+  if (quranRadio && playBtn && pauseBtn && volumeControl) {
+    // Set initial volume
+    quranRadio.volume = volumeControl.value / 100;
+    
+    playBtn.addEventListener('click', function() {
+      quranRadio.play();
+      playBtn.style.display = 'none';
+      pauseBtn.style.display = 'inline-block';
+    });
+    
+    pauseBtn.addEventListener('click', function() {
+      quranRadio.pause();
+      pauseBtn.style.display = 'none';
+      playBtn.style.display = 'inline-block';
+    });
+    
+    volumeControl.addEventListener('input', function() {
+      quranRadio.volume = this.value / 100;
+    });
+  }
 });
 
