@@ -1201,6 +1201,8 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .azkar-image {
     width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
     height: auto;
     display: block;
     margin: 0 auto;
