@@ -105,9 +105,7 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                             <tr>
                                 <th>حالة الصورة:</th>
                                 <td>
-                                    <?php if (!$memorial['image']): ?>
-                                        <span class="text-muted">لا توجد صورة</span>
-                                    <?php elseif ($memorial['image_status'] == 1): ?>
+                                    <?php if ($memorial['image_status'] == 1): ?>
                                         <span class="badge bg-success">موافق عليها</span>
                                     <?php elseif ($memorial['image_status'] == 2): ?>
                                         <span class="badge bg-danger">مرفوضة</span>

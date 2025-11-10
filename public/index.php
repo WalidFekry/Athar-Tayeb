@@ -15,7 +15,7 @@ require_once __DIR__ . '/../includes/maintenance_check.php';
 $pageTitle = SITE_NAME . ' — ' . SITE_TAGLINE;
 $pageDescription = 'منصة رقمية لإنشاء صفحات تذكارية للمتوفين. شارك الرحمة والحسنات في ذكرى من أحببت. صدقة جارية تبقى بعد الرحيل.';
 
-// Fetch latest approved memorials
+// Fetch latest approved memorials (by creation date)
 $stmt = $pdo->prepare("
     SELECT id, name, death_date, image, visits, gender
     FROM memorials 
@@ -25,6 +25,17 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute();
 $latestMemorials = $stmt->fetchAll();
+
+// Fetch most recently visited memorials (by last_visit)
+$stmt = $pdo->prepare("
+    SELECT id, name, death_date, image, visits, gender
+    FROM memorials 
+    WHERE status = 1 AND (image_status = 1 OR image IS NULL) AND last_visit IS NOT NULL
+    ORDER BY last_visit DESC 
+    LIMIT 3
+");
+$stmt->execute();
+$recentlyVisitedMemorials = $stmt->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -101,8 +112,14 @@ include __DIR__ . '/../includes/header.php';
             </div>
         </div>
 
+        <!-- Group 1: Most Recently Created Pages -->
         <?php if (count($latestMemorials) > 0): ?>
-            <div class="row g-4 mb-4">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h3 class="h5 text-center text-muted mb-3">أحدث الصفحات المضافة</h3>
+                </div>
+            </div>
+            <div class="row g-4 mb-5">
                 <?php foreach ($latestMemorials as $memorial): ?>
                     <div class="col-md-6 col-lg-4">
                         <div class="card memorial-card h-100">
@@ -126,7 +143,43 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 <?php endforeach; ?>
             </div>
+        <?php endif; ?>
 
+        <!-- Group 2: Most Recently Visited Pages -->
+        <?php if (count($recentlyVisitedMemorials) > 0): ?>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h3 class="h5 text-center text-muted mb-3">صفحات تمت زيارتها مؤخراً</h3>
+                </div>
+            </div>
+            <div class="row g-4 mb-4">
+                <?php foreach ($recentlyVisitedMemorials as $memorial): ?>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card memorial-card h-100">
+                            <div class="card-body text-center">
+                                <img src="<?= getImageUrl($memorial['image'], true) ?>" alt="<?= e($memorial['name']) ?>"
+                                    class="memorial-image" loading="lazy">
+                                <h5 class="memorial-name"><?= e($memorial['name']) ?></h5>
+                                <?php if ($memorial['death_date']): ?>
+                                    <p class="memorial-date">
+                                        📅 <?= formatArabicDate($memorial['death_date']) ?>
+                                    </p>
+                                <?php endif; ?>
+                                <p class="memorial-visits">
+                                    👁️ زارها <?= toArabicNumerals($memorial['visits']) ?> شخصاً
+                                </p>
+                                <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100" aria-label="عرض الصفحة التذكارية للمرحوم <?= e($memorial['name']) ?>">
+                                    عرض الصفحة
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- View More Button -->
+        <?php if (count($latestMemorials) > 0 || count($recentlyVisitedMemorials) > 0): ?>
             <div class="text-center">
                 <a href="<?= site_url('all') ?>" class="btn btn-outline-primary btn-lg" aria-label="انتقل إلى صفحة جميع الصفحات التذكارية">
                     عرض المزيد من الصفحات
