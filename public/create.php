@@ -17,39 +17,47 @@ $success = false;
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     checkCSRF();
-    
-    // Rate limiting
-    if (!checkRateLimit('create_memorial', CREATE_RATE_LIMIT, 3600)) {
-        $errors[] = 'يمكنك إنشاء صفحة تذكارية واحدة فقط كل ساعة. يرجى المحاولة لاحقاً.';
-    } else {
-        // Validate inputs
-        $name = trim($_POST['name'] ?? '');
-        $from_name = trim($_POST['from_name'] ?? '');
-        
-        // Process death date from three separate fields
-        $death_day = trim($_POST['death_day'] ?? '');
-        $death_month = trim($_POST['death_month'] ?? '');
-        $death_year = trim($_POST['death_year'] ?? '');
-        $death_date = '';
-        
-        // Combine date fields if all are provided
-        if (!empty($death_year) && !empty($death_month) && !empty($death_day)) {
-            $death_date = sprintf('%04d-%02d-%02d', $death_year, $death_month, $death_day);
+
+    // Validate inputs first
+    $name = trim($_POST['name'] ?? '');
+    $from_name = trim($_POST['from_name'] ?? '');
+
+    $death_day = trim($_POST['death_day'] ?? '');
+    $death_month = trim($_POST['death_month'] ?? '');
+    $death_year = trim($_POST['death_year'] ?? '');
+    $death_date = '';
+
+    if (!empty($death_year) && !empty($death_month) && !empty($death_day)) {
+        $death_date = sprintf('%04d-%02d-%02d', $death_year, $death_month, $death_day);
+    }
+
+    $gender = trim($_POST['gender'] ?? 'male');
+    $whatsapp = trim($_POST['whatsapp'] ?? '');
+    $quote = trim($_POST['quote'] ?? '');
+
+    $errors = [];
+
+    if (empty($name)) {
+        $errors[] = 'اسم المتوفى مطلوب';
+    }
+
+    if (!empty($quote) && mb_strlen($quote) > 300) {
+        $errors[] = 'الرسالة أو الدعاء يجب ألا تتجاوز 300 حرف';
+    }
+
+    if (!in_array($gender, ['male', 'female'])) {
+        $gender = 'male';
+    }
+
+    // Check rate limiting
+    if (empty($errors)) {
+        if (!checkRateLimit('create_memorial', CREATE_RATE_LIMIT, 3600)) {
+            $errors[] = 'يمكنك إنشاء صفحة تذكارية واحدة فقط كل ساعة. يرجى المحاولة لاحقاً.';
         }
-        
-        $gender = trim($_POST['gender'] ?? 'male');
-        $whatsapp = trim($_POST['whatsapp'] ?? '');
-        $quote = trim($_POST['quote'] ?? '');
-        
-        if (empty($name)) {
-            $errors[] = 'اسم المتوفى مطلوب';
-        }
-        
-        if (!in_array($gender, ['male', 'female'])) {
-            $gender = 'male';
-        }
-        
-        // Process image upload
+    }
+
+    // Process image upload if no errors so far
+    if (empty($errors)) {
         $imageName = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
             $uploadResult = processUploadedImage($_FILES['image'], 0);
@@ -59,52 +67,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = $uploadResult['error'];
             }
         }
-        
-        // If no errors, insert into database
-        if (empty($errors)) {
-            try {
-                // Get auto approval setting
-                $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'auto_approval'");
-                $stmt->execute();
-                $autoApprovalSetting = $stmt->fetchColumn();
-                $autoApproval = ($autoApprovalSetting == '1') ? 1 : 0;
-                
-                // Insert memorial
-                $stmt = $pdo->prepare("
-                    INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
-                ");
-                
-                $stmt->execute([
-                    $name,
-                    $from_name ?: null,
-                    $imageName,
-                    $death_date ?: null,
-                    $gender,
-                    $whatsapp ?: null,
-                    $quote ?: null,
-                    $autoApproval
-                ]);
-                
-                $memorialId = $pdo->lastInsertId();
-                
-                if($autoApproval) {
-                    // Redirect to success page
+    }
+
+    if (empty($errors)) {
+        try {
+            $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'auto_approval'");
+            $stmt->execute();
+            $autoApprovalSetting = $stmt->fetchColumn();
+            $autoApproval = ($autoApprovalSetting == '1') ? 1 : 0;
+
+            $stmt = $pdo->prepare("
+                INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
+            ");
+
+            $stmt->execute([
+                $name,
+                $from_name ?: null,
+                $imageName,
+                $death_date ?: null,
+                $gender,
+                $whatsapp ?: null,
+                $quote ?: null,
+                $autoApproval
+            ]);
+
+            $memorialId = $pdo->lastInsertId();
+
+            if($autoApproval) {
                 redirect(site_url('success?id=' . $memorialId));
-                } else {
-                    // Redirect to unpublished page
+            } else {
                 redirect(site_url('unpublished?id=' . $memorialId));
-                }
-                
-                
-            } catch (PDOException $e) {
-                if (DEBUG_MODE) {
-                    $errors[] = 'خطأ في قاعدة البيانات: ' . $e->getMessage();
-                }
+            }
+
+        } catch (PDOException $e) {
+            if (DEBUG_MODE) {
+                $errors[] = 'خطأ في قاعدة البيانات: ' . $e->getMessage();
             }
         }
     }
 }
+
 
 // Page metadata
 $pageTitle = 'أنشئ صفحة تذكارية — ' . SITE_NAME;
@@ -261,11 +264,16 @@ include __DIR__ . '/../includes/header.php';
                             <label for="quote" class="form-label">
                                 رسالة أو دعاء - اختياري
                             </label>
-                            <textarea class="form-control" id="quote" name="quote" rows="4"
-                                placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..." aria-describedby="quote_help"><?= e($_POST['quote'] ?? '') ?></textarea>
-                            <small id="quote_help" class="form-text text-muted">
-                                سوف تظهر هذه الرسالة في الصفحة التذكارية وستخضع للمراجعة قبل النشر
-                            </small>
+                            <textarea class="form-control" id="quote" name="quote" rows="4" maxlength="301"
+                                placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..." aria-describedby="quote_help quote_counter"><?= e($_POST['quote'] ?? '') ?></textarea>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small id="quote_help" class="form-text text-muted">
+                                    سوف تظهر هذه الرسالة في الصفحة التذكارية وستخضع للمراجعة قبل النشر
+                                </small>
+                                <small id="quote_counter" class="form-text" aria-live="polite">
+                                    <span id="quote_current">0</span>/300
+                                </small>
+                            </div>
                         </div>
 
                         <!-- Submit Button -->
@@ -361,6 +369,51 @@ include __DIR__ . '/../includes/header.php';
             }
         }
     }
+})();
+
+// Character counter for quote textarea
+(function() {
+    const quoteTextarea = document.getElementById('quote');
+    const quoteCurrentSpan = document.getElementById('quote_current');
+    const quoteCounter = document.getElementById('quote_counter');
+    const form = quoteTextarea ? quoteTextarea.closest('form') : null;
+    const MAX_LENGTH = 300;
+
+    if (!quoteTextarea || !quoteCurrentSpan || !quoteCounter) {
+        return;
+    }
+
+    // Function to update character count
+    function updateCharCount() {
+        const currentLength = quoteTextarea.value.length;
+        quoteCurrentSpan.textContent = currentLength;
+
+        // Change color based on character count
+        if (currentLength > MAX_LENGTH) {
+            // Exceeded limit - red border and red counter
+            quoteTextarea.style.borderColor = '#dc3545';
+            quoteTextarea.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+            quoteCounter.style.color = '#dc3545';
+            quoteCounter.style.fontWeight = 'bold';
+        } else if (currentLength >= MAX_LENGTH - 20) {
+            // Approaching limit - warning color
+            quoteTextarea.style.borderColor = '#ffc107';
+            quoteTextarea.style.boxShadow = '';
+            quoteCounter.style.color = '#ffc107';
+            quoteCounter.style.fontWeight = 'bold';
+        } else {
+            // Normal state
+            quoteTextarea.style.borderColor = '';
+            quoteTextarea.style.boxShadow = '';
+            quoteCounter.style.color = '#6c757d';
+            quoteCounter.style.fontWeight = 'normal';
+        }
+    }
+
+    // Update count on input
+    quoteTextarea.addEventListener('input', updateCharCount);
+    quoteTextarea.addEventListener('keyup', updateCharCount);
+    quoteTextarea.addEventListener('change', updateCharCount);
 })();
 </script>
 

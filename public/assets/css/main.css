@@ -1414,3 +1414,27 @@ input[type="number"]::-webkit-outer-spin-button {
     background-color: rgba(90, 125, 78, 0.1);
     border-radius: 8px;
 }
+
+/* Additional styles for character counter */
+#quote_counter {
+    font-size: 0.875rem;
+    transition: color 0.3s ease, font-weight 0.3s ease;
+    white-space: nowrap;
+}
+
+#quote.form-control {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Ensure the counter is visible on mobile */
+@media (max-width: 576px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    #quote_counter {
+        margin-top: 0.5rem;
+        align-self: flex-end;
+    }
+}
