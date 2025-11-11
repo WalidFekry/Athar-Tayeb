@@ -388,3 +388,10 @@ p, span, td, th, label {
     border-color: #dae0e5;
     color: #212529;
 }
+
+.card-img-top {
+    width: 100%;
+    height: 250px; 
+    object-fit: contain;
+    background-color: #f8f9fa; 
+}
