@@ -59,16 +59,20 @@ include __DIR__ . '/../includes/header.php';
                 <ul class="mb-0">
                     <li>
                         <strong>الصورة:</strong> 
-                        <?php if ($memorial['image']): ?>
+                        <?php if ($memorial['image'] && $memorial['image_status'] == 0): ?>
                             <span class="badge badge-pending">قيد المراجعة</span>
+                            <?php elseif ($memorial['image'] && $memorial['image_status'] == 1): ?>
+                            <span class="badge badge-pending">تم المراجعة</span>
                         <?php else: ?>
                             <span class="text-muted">لم يتم رفع صورة</span>
                         <?php endif; ?>
                     </li>
                     <li>
                         <strong>الرسالة:</strong> 
-                        <?php if ($memorial['quote']): ?>
+                        <?php if ($memorial['quote'] && $memorial['quote_status'] == 0): ?>
                             <span class="badge badge-pending">قيد المراجعة</span>
+                            <?php elseif ($memorial['quote'] && $memorial['quote_status'] == 1): ?>
+                            <span class="badge badge-pending">تم المراجعة</span>
                         <?php else: ?>
                             <span class="text-muted">لم يتم إضافة رسالة</span>
                         <?php endif; ?>

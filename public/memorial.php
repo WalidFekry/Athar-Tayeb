@@ -186,21 +186,28 @@ include __DIR__ . '/../includes/header.php';
 
     <!-- Memorial Header -->
     <div class="card shadow-sm mb-4">
-        <div class="card-body text-center py-5">
+        <div class="card-body text-center py-5 position-relative">
+
+            <!-- Creation Date -->
+            <div class="memorial-creation-date">
+                <small class="text-muted">
+                    تاريخ انشاء الصفحة: <strong><?= formatArabicDate($memorial['created_at'], 'short') ?></strong>
+                </small>
+            </div>
 
             <!-- Image -->
             <?php if ($memorial['image'] && $memorial['image_status'] == 1): ?>
             <img src="<?= getImageUrl($memorial['image']) ?>" alt="<?= e($memorial['name']) ?>"
-                class="memorial-image mb-3" style="width: 180px; height: 180px;">
+                class="memorial-image mb-3" style="width: 180px; height: 180px; object-fit: contain;">
             <?php elseif ($memorial['image'] && $memorial['image_status'] == 0): ?>
             <img src="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg" alt="صورة افتراضية"
-                class="memorial-image mb-3" style="width: 180px; height: 180px;">
+                class="memorial-image mb-3" style="width: 180px; height: 180px; object-fit: contain;">
             <div class="mb-3">
                 <span class="badge badge-pending">الصورة قيد المراجعة</span>
             </div>
             <?php else: ?>
             <img src="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg" alt="صورة افتراضية"
-                class="memorial-image mb-3" style="width: 180px; height: 180px;">
+                class="memorial-image mb-3" style="width: 180px; height: 180px; object-fit: contain;">
             <?php endif; ?>
 
 
@@ -622,6 +629,43 @@ include __DIR__ . '/../includes/header.php';
                     <label for="radioVolume" class="form-label fw-bold">🔊 مستوى الصوت</label>
                     <input type="range" class="form-range" id="radioVolume" min="0" max="100" value="70">
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ruqyah Section -->
+    <div class="card shadow-sm mb-4 ruqyah-section">
+        <div class="card-body text-center p-4">
+            <div class="ruqyah-icon-wrapper mb-4">
+                <div class="ruqyah-icon">
+                    🕌
+                </div>
+            </div>
+            <h3 class="mb-3 fw-bold">الاستماع للرقية الشرعية</h3>
+            <p class="text-muted mb-4">
+                استمع إلى الرقية الشرعية من القرآن والسنة للحفظ والشفاء بإذن الله — تذكيراً وطمأنينة لقلوب الزائرين
+            </p>
+            
+            <div class="ruqyah-audio-list">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                <div class="ruqyah-audio-item mb-0">
+                    <div class="d-flex align-items-center justify-content-between p-1 bg-muted rounded">
+                        <div class="ruqyah-info">
+                            <h5 class="mb-0 fw-bold">رقية شرعية <?= $i ?></h5>
+                        </div>
+                        <div class="ruqyah-controls">
+                            <button class="btn btn-primary ruqyah-play-btn" data-audio-id="ruqyah<?= $i ?>" data-audio-src="https://post.walid-fekry.com/audios/roqia/<?= $i ?>.mp3">
+                                <span class="play-icon">▶️</span>
+                                <span class="pause-icon" style="display: none;">⏸️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <audio id="ruqyah<?= $i ?>" preload="none">
+                        <source src="https://post.walid-fekry.com/audios/roqia/<?= $i ?>.mp3" type="audio/mpeg">
+                        متصفحك لا يدعم تشغيل الصوت
+                    </audio>
+                </div>
+                <?php endfor; ?>
             </div>
         </div>
     </div>

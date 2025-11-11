@@ -28,9 +28,13 @@ $latestMemorials = $stmt->fetchAll();
 
 // Fetch most recently visited memorials (by last_visit)
 $stmt = $pdo->prepare("
-    SELECT id, name, death_date, image, visits, gender
+    SELECT id, name, death_date, image, visits, gender, created_at,
+           tasbeeh_allahu, tasbeeh_lailaha, tasbeeh_alham, tasbeeh_subhan
     FROM memorials 
-    WHERE status = 1 AND (image_status = 1 OR image IS NULL) AND last_visit IS NOT NULL
+    WHERE status = 1 
+      AND (image_status = 1 OR image IS NULL)
+      AND last_visit IS NOT NULL
+      AND DATE(created_at) != CURDATE()
     ORDER BY last_visit DESC 
     LIMIT 3
 ");
@@ -154,6 +158,10 @@ include __DIR__ . '/../includes/header.php';
             </div>
             <div class="row g-4 mb-4">
                 <?php foreach ($recentlyVisitedMemorials as $memorial): ?>
+                    <?php 
+                        $totalTasbeeh = $memorial['tasbeeh_allahu'] + $memorial['tasbeeh_lailaha'] + 
+                                       $memorial['tasbeeh_alham'] + $memorial['tasbeeh_subhan'];
+                    ?>
                     <div class="col-md-6 col-lg-4">
                         <div class="card memorial-card h-100">
                             <div class="card-body text-center">
@@ -165,8 +173,14 @@ include __DIR__ . '/../includes/header.php';
                                         📅 <?= formatArabicDate($memorial['death_date']) ?>
                                     </p>
                                 <?php endif; ?>
+                                <p class="memorial-date text-muted small">
+                                    🗓️ أُنشئت: <?= formatArabicDate($memorial['created_at'], 'short') ?>
+                                </p>
                                 <p class="memorial-visits">
                                     👁️ زارها <?= toArabicNumerals($memorial['visits']) ?> شخصاً
+                                </p>
+                                <p class="memorial-tasbeeh text-success small fw-bold">
+                                    📿 إجمالي التسبيح: <?= toArabicNumerals(number_format($totalTasbeeh)) ?>
                                 </p>
                                 <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100" aria-label="عرض الصفحة التذكارية للمرحوم <?= e($memorial['name']) ?>">
                                     عرض الصفحة

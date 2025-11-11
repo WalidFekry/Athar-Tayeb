@@ -506,5 +506,63 @@ document.addEventListener("DOMContentLoaded", function () {
       quranRadio.volume = this.value / 100;
     });
   }
+  
+  // Ruqyah Audio Players Functionality
+  const ruqyahPlayButtons = document.querySelectorAll('.ruqyah-play-btn');
+  let currentPlayingRuqyah = null;
+  
+  ruqyahPlayButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const audioId = this.getAttribute('data-audio-id');
+      const audioElement = document.getElementById(audioId);
+      const playIcon = this.querySelector('.play-icon');
+      const pauseIcon = this.querySelector('.pause-icon');
+      
+      if (!audioElement) return;
+      
+      // If this audio is currently playing, pause it
+      if (currentPlayingRuqyah === audioElement && !audioElement.paused) {
+        audioElement.pause();
+        playIcon.style.display = 'inline';
+        pauseIcon.style.display = 'none';
+        this.classList.remove('playing');
+        currentPlayingRuqyah = null;
+      } else {
+        // Pause any currently playing audio
+        if (currentPlayingRuqyah && !currentPlayingRuqyah.paused) {
+          currentPlayingRuqyah.pause();
+          // Reset the previous button's icons
+          const prevButton = document.querySelector(`[data-audio-id="${currentPlayingRuqyah.id}"]`);
+          if (prevButton) {
+            prevButton.querySelector('.play-icon').style.display = 'inline';
+            prevButton.querySelector('.pause-icon').style.display = 'none';
+            prevButton.classList.remove('playing');
+          }
+        }
+        
+        // Play the new audio
+        audioElement.play();
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'inline';
+        this.classList.add('playing');
+        currentPlayingRuqyah = audioElement;
+      }
+    });
+  });
+  
+  // Handle audio ended event to reset button state
+  document.querySelectorAll('.ruqyah-audio-item audio').forEach(audio => {
+    audio.addEventListener('ended', function() {
+      const button = document.querySelector(`[data-audio-id="${this.id}"]`);
+      if (button) {
+        button.querySelector('.play-icon').style.display = 'inline';
+        button.querySelector('.pause-icon').style.display = 'none';
+        button.classList.remove('playing');
+      }
+      if (currentPlayingRuqyah === this) {
+        currentPlayingRuqyah = null;
+      }
+    });
+  });
 });
 
