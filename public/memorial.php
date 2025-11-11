@@ -198,16 +198,16 @@ include __DIR__ . '/../includes/header.php';
             <!-- Image -->
             <?php if ($memorial['image'] && $memorial['image_status'] == 1): ?>
             <img src="<?= getImageUrl($memorial['image']) ?>" alt="<?= e($memorial['name']) ?>"
-                class="memorial-image mb-3" style="width: 180px; height: 180px; object-fit: contain;">
+                class="memorial-image mb-3">
             <?php elseif ($memorial['image'] && $memorial['image_status'] == 0): ?>
             <img src="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg" alt="صورة افتراضية"
-                class="memorial-image mb-3" style="width: 180px; height: 180px; object-fit: contain;">
+                class="memorial-image mb-3">
             <div class="mb-3">
                 <span class="badge badge-pending">الصورة قيد المراجعة</span>
             </div>
             <?php else: ?>
             <img src="<?= BASE_URL ?>/assets/images/placeholder-memorial.svg" alt="صورة افتراضية"
-                class="memorial-image mb-3" style="width: 180px; height: 180px; object-fit: contain;">
+                class="memorial-image mb-3">
             <?php endif; ?>
 
 
