@@ -109,6 +109,8 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                                         <span class="badge bg-success">موافق عليها</span>
                                     <?php elseif ($memorial['image_status'] == 2): ?>
                                         <span class="badge bg-danger">مرفوضة</span>
+                                    <?php elseif (!$memorial['image'] && $memorial['image_status'] == 0): ?>
+                                        <span class="badge bg-danger">لا توجد صورة</span>
                                     <?php else: ?>
                                         <span class="badge bg-warning">قيد المراجعة</span>
                                     <?php endif; ?>

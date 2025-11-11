@@ -13,6 +13,29 @@ require_once __DIR__ . '/../includes/maintenance_check.php';
 
 $memorialId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
+if (!$memorialId) {
+    redirect(BASE_URL);
+}
+
+// Fetch memorial
+$stmt = $pdo->prepare("SELECT * FROM memorials WHERE id = ?");
+$stmt->execute([$memorialId]);
+$memorial = $stmt->fetch();
+
+// Check if memorial exists
+if (!$memorial) {
+    // Redirect to 404 page
+    header('Location: ' . site_url('404'));
+    exit;
+}
+
+// Check if memorial is published
+if ($memorial['status'] == 1) {
+    // Redirect to the published memorial page
+    header('Location: ' . site_url('m/' . $memorialId));
+    exit;
+}
+
 $pageTitle = 'الصفحة قيد المراجعة — ' . SITE_NAME;
 $pageDescription = 'هذه الصفحة التذكارية قيد المراجعة من قبل الإدارة';
 

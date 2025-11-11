@@ -83,7 +83,7 @@ RewriteRule ^m/([0-9]+)/?$ public/memorial.php?id=$1 [QSA,L]
 # Map extensionless URLs to .php files in /public/
 # Example: /create -> /public/create.php
 # ============================================
-RewriteRule ^(index|create|all|contact|search|success|unpublished|404|maintenance|developer)/?$ public/$1.php [QSA,L]
+RewriteRule ^(index|create|all|contact|search|success|unpublished|404|maintenance|developer|memorial)/?$ public/$1.php [QSA,L]
 
 # ============================================
 # 8. Canonicalize .php Extensions
