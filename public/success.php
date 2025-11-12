@@ -111,32 +111,28 @@ include __DIR__ . '/../includes/header.php';
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h5 class="card-title">📤 شارك الصفحة</h5>
-                    <p class="text-muted">شارك الصفحة مع الأهل والأصدقاء ليشاركوا في الأجر</p>
+                    <p class="text-muted">شارك الصفحة مع الأهل والأصدقاء ليشاركوا في الأجر والدعاء لـ <strong><?= e($memorial['name']) ?></strong> 💚</p>
                     
-                    <div class="share-buttons">
-                        <a 
-                            href="https://wa.me/?text=<?= urlencode('صفحة تذكارية: ' . $memorial['name'] . ' - ' . $memorialUrl) ?>" 
-                            target="_blank"
-                            class="share-btn share-whatsapp"
-                        >
-                            📱 واتساب
-                        </a>
-                        
-                        <a 
-                            href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>" 
-                            target="_blank"
-                            class="share-btn share-facebook"
-                        >
-                            📘 فيسبوك
-                        </a>
-                        
-                        <a 
-                            href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode('صفحة تذكارية: ' . $memorial['name']) ?>" 
-                            target="_blank"
-                            class="share-btn share-telegram"
-                        >
-                            ✈️ تيليجرام
-                        </a>
+                    <div class="share-buttons d-flex justify-content-center gap-3 flex-wrap">
+                <a href="https://wa.me/?text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة: ' . $memorialUrl) ?>"
+                    target="_blank" rel="noopener" class="share-btn share-whatsapp" aria-label="شارك عبر واتساب">
+                    📱 واتساب
+                </a>
+
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>" target="_blank"
+                    rel="noopener" class="share-btn share-facebook" aria-label="شارك عبر فيسبوك">
+                    📘 فيسبوك
+                </a>
+
+                <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة.') ?>"
+                    target="_blank" rel="noopener" class="share-btn share-telegram" aria-label="شارك عبر تيليجرام">
+                    ✈️ تيليجرام
+                </a>
+                
+                <button class="share-btn share-copy copy-link-btn" data-url="<?= e($memorialUrl) ?>"
+                    aria-label="نسخ رابط المشاركة">
+                    📋 نسخ الرابط
+                </button>
                     </div>
                 </div>
             </div>
