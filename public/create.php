@@ -37,6 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $errors = [];
 
+    if (!empty($from_name) && mb_strlen($from_name) > 30) {
+        $errors[] = 'اسم منشئ الصفحة يجب ألا يتجاوز 30 حرف';
+    }
+
     if (empty($name)) {
         $errors[] = 'اسم المتوفى مطلوب';
     } elseif (mb_strlen($name) > 30) {
@@ -171,7 +175,7 @@ include __DIR__ . '/../includes/header.php';
                                 اسم منشئ الصفحة - اختياري
                             </label>
                             <input type="text" class="form-control" id="from_name" name="from_name"
-                                placeholder="مثال: عائلة الإمبابي" maxlength="30" aria-activedescendant=""value="<?= e($_POST['from_name'] ?? '') ?>" aria-describedby="from_name_help">
+                                placeholder="مثال: عائلة الإمبابي" maxlength="31" aria-activedescendant=""value="<?= e($_POST['from_name'] ?? '') ?>" aria-describedby="from_name_help">
                             <small id="from_name_help" class="form-text text-muted">
                                 يمكنك كتابة اسمك أو اسم العائلة
                             </small>
@@ -183,7 +187,7 @@ include __DIR__ . '/../includes/header.php';
                                 اسم المتوفى <span class="text-danger" aria-label="حقل إجباري">*</span>
                             </label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="الاسم الكامل"
-                                required aria-required="true" maxlength="30" value="<?= e($_POST['name'] ?? '') ?>">
+                                required aria-required="true" maxlength="31" value="<?= e($_POST['name'] ?? '') ?>">
                         </div>
 
                         <!-- Image Upload -->
@@ -279,9 +283,6 @@ include __DIR__ . '/../includes/header.php';
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <small id="quote_help" class="form-text text-muted">
                                     سوف تظهر هذه الرسالة في الصفحة التذكارية وستخضع للمراجعة قبل النشر
-                                </small>
-                                <small id="quote_counter" class="form-text" aria-live="polite">
-                                    <span id="quote_current">0</span>/300
                                 </small>
                             </div>
                         </div>
@@ -381,49 +382,58 @@ include __DIR__ . '/../includes/header.php';
     }
 })();
 
-// Character counter for quote textarea
+// Character counter for quote, name, and from_name
 (function() {
-    const quoteTextarea = document.getElementById('quote');
-    const quoteCurrentSpan = document.getElementById('quote_current');
-    const quoteCounter = document.getElementById('quote_counter');
-    const form = quoteTextarea ? quoteTextarea.closest('form') : null;
-    const MAX_LENGTH = 300;
+    const fields = [
+        { id: 'quote', max: 300 },
+        { id: 'name', max: 30 },
+        { id: 'from_name', max: 30 }
+    ];
 
-    if (!quoteTextarea || !quoteCurrentSpan || !quoteCounter) {
-        return;
-    }
+    fields.forEach(field => {
+        const input = document.getElementById(field.id);
+        if (!input) return;
 
-    // Function to update character count
-    function updateCharCount() {
-        const currentLength = quoteTextarea.value.length;
-        quoteCurrentSpan.textContent = currentLength;
+        // Create counter container
+        const counter = document.createElement('small');
+        counter.className = 'form-text text-muted d-block text-end mt-1';
+        counter.innerHTML = `<span id="${field.id}_current">0</span>/${field.max}`;
+        input.insertAdjacentElement('afterend', counter);
 
-        // Change color based on character count
-        if (currentLength > MAX_LENGTH) {
-            // Exceeded limit - red border and red counter
-            quoteTextarea.style.borderColor = '#dc3545';
-            quoteTextarea.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
-            quoteCounter.style.color = '#dc3545';
-            quoteCounter.style.fontWeight = 'bold';
-        } else if (currentLength >= MAX_LENGTH - 20) {
-            // Approaching limit - warning color
-            quoteTextarea.style.borderColor = '#ffc107';
-            quoteTextarea.style.boxShadow = '';
-            quoteCounter.style.color = '#ffc107';
-            quoteCounter.style.fontWeight = 'bold';
-        } else {
-            // Normal state
-            quoteTextarea.style.borderColor = '';
-            quoteTextarea.style.boxShadow = '';
-            quoteCounter.style.color = '#6c757d';
-            quoteCounter.style.fontWeight = 'normal';
+        const currentSpan = document.getElementById(`${field.id}_current`);
+        const MAX_LENGTH = field.max;
+
+        // Function to update character count
+        function updateCharCount() {
+            const currentLength = input.value.length;
+            currentSpan.textContent = currentLength;
+
+            if (currentLength > MAX_LENGTH) {
+                input.style.borderColor = '#dc3545';
+                input.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+                counter.style.color = '#dc3545';
+                counter.style.fontWeight = 'bold';
+            } else if (currentLength >= MAX_LENGTH - 5) {
+                input.style.borderColor = '#ffc107';
+                input.style.boxShadow = '';
+                counter.style.color = '#ffc107';
+                counter.style.fontWeight = 'bold';
+            } else {
+                input.style.borderColor = '';
+                input.style.boxShadow = '';
+                counter.style.color = '#6c757d';
+                counter.style.fontWeight = 'normal';
+            }
         }
-    }
 
-    // Update count on input
-    quoteTextarea.addEventListener('input', updateCharCount);
-    quoteTextarea.addEventListener('keyup', updateCharCount);
-    quoteTextarea.addEventListener('change', updateCharCount);
+        // Events
+        input.addEventListener('input', updateCharCount);
+        input.addEventListener('keyup', updateCharCount);
+        input.addEventListener('change', updateCharCount);
+
+        // Initialize
+        updateCharCount();
+    });
 })();
 </script>
 
