@@ -39,6 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($name)) {
         $errors[] = 'اسم المتوفى مطلوب';
+    } elseif (mb_strlen($name) > 30) {
+        $errors[] = 'اسم المتوفى يجب ألا يتجاوز 30 حرف';
     }
 
     if (!empty($quote) && mb_strlen($quote) > 300) {
@@ -71,14 +73,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         try {
+            // Get auto approval setting for pages
             $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'auto_approval'");
             $stmt->execute();
             $autoApprovalSetting = $stmt->fetchColumn();
             $autoApproval = ($autoApprovalSetting == '1') ? 1 : 0;
 
+            // Get auto approval setting for messages
+            $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'auto_approve_messages'");
+            $stmt->execute();
+            $autoApproveMessagesSetting = $stmt->fetchColumn();
+            $autoApproveMessages = ($autoApproveMessagesSetting == '1') ? 1 : 0;
+
             $stmt = $pdo->prepare("
                 INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
             ");
 
             $stmt->execute([
@@ -89,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $gender,
                 $whatsapp ?: null,
                 $quote ?: null,
+                $autoApproveMessages,
                 $autoApproval
             ]);
 
@@ -161,7 +171,7 @@ include __DIR__ . '/../includes/header.php';
                                 اسم منشئ الصفحة - اختياري
                             </label>
                             <input type="text" class="form-control" id="from_name" name="from_name"
-                                placeholder="مثال: عائلة الإمبابي" value="<?= e($_POST['from_name'] ?? '') ?>" aria-describedby="from_name_help">
+                                placeholder="مثال: عائلة الإمبابي" maxlength="30" aria-activedescendant=""value="<?= e($_POST['from_name'] ?? '') ?>" aria-describedby="from_name_help">
                             <small id="from_name_help" class="form-text text-muted">
                                 يمكنك كتابة اسمك أو اسم العائلة
                             </small>
@@ -173,7 +183,7 @@ include __DIR__ . '/../includes/header.php';
                                 اسم المتوفى <span class="text-danger" aria-label="حقل إجباري">*</span>
                             </label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="الاسم الكامل"
-                                required aria-required="true" value="<?= e($_POST['name'] ?? '') ?>">
+                                required aria-required="true" maxlength="30" value="<?= e($_POST['name'] ?? '') ?>">
                         </div>
 
                         <!-- Image Upload -->

@@ -12,14 +12,68 @@ require_once __DIR__ . '/../includes/csrf.php';
 requireAdmin();
 
 $success = '';
+$cleanupResult = '';
+
+// Handle cleanup action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cleanup') {
+    checkCSRF();
+
+    $days = (int) ($_POST['cleanup_days'] ?? 30);
+    if ($days < 1)
+        $days = 30;
+
+    $cutoffDate = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+
+    // Find inactive pages
+    $stmt = $pdo->prepare("SELECT id, name, image FROM memorials WHERE last_visit < ? OR last_visit IS NULL");
+    $stmt->execute([$cutoffDate]);
+    $inactivePages = $stmt->fetchAll();
+
+    $totalFound = count($inactivePages);
+    $deletedCount = 0;
+    $failedCount = 0;
+
+    foreach ($inactivePages as $page) {
+        try {
+            // Delete image file if exists
+            if ($page['image']) {
+                $imagePath = __DIR__ . '/../public/uploads/memorials/' . $page['image'];
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+                // Delete thumbnail if exists
+                $ext = pathinfo($page['image'], PATHINFO_EXTENSION);
+                $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $imagePath);
+                if (file_exists($thumbPath)) {
+                    unlink($thumbPath);
+                }
+            }
+
+            // Delete record
+            $deleteStmt = $pdo->prepare("DELETE FROM memorials WHERE id = ?");
+            $deleteStmt->execute([$page['id']]);
+            $deletedCount++;
+
+        } catch (Exception $e) {
+            $failedCount++;
+        }
+    }
+
+    $cleanupResult = [
+        'total' => $totalFound,
+        'deleted' => $deletedCount,
+        'failed' => $failedCount
+    ];
+}
 
 // Handle settings update
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!isset($_POST['action']) || $_POST['action'] !== 'cleanup')) {
     checkCSRF();
 
     $settings = [
         'auto_approval' => isset($_POST['auto_approval']) && $_POST['auto_approval'] === '1' ? '1' : '0',
-        'maintenance_mode' => isset($_POST['maintenance_mode']) && $_POST['maintenance_mode'] === '1' ? '1' : '0'
+        'maintenance_mode' => isset($_POST['maintenance_mode']) && $_POST['maintenance_mode'] === '1' ? '1' : '0',
+        'auto_approve_messages' => isset($_POST['auto_approve_messages']) && $_POST['auto_approve_messages'] === '1' ? '1' : '0'
     ];
 
     foreach ($settings as $key => $value) {
@@ -37,6 +91,7 @@ $settingsData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
 $autoApproval = isset($settingsData['auto_approval']) ? (int) $settingsData['auto_approval'] : 0;
 $maintenanceMode = isset($settingsData['maintenance_mode']) ? (int) $settingsData['maintenance_mode'] : 0;
+$autoApproveMessages = isset($settingsData['auto_approve_messages']) ? (int) $settingsData['auto_approve_messages'] : 0;
 
 
 // Get statistics
@@ -80,6 +135,19 @@ $totalTasbeeh = $stmt->fetchColumn();
             <div class="alert alert-success"><?= e($success) ?></div>
         <?php endif; ?>
 
+        <?php if ($cleanupResult): ?>
+            <div class="alert alert-info">
+                <h5 class="alert-heading">🧹 نتائج التنظيف</h5>
+                <ul class="mb-0">
+                    <li><strong>إجمالي الصفحات الموجودة:</strong> <?= $cleanupResult['total'] ?></li>
+                    <li><strong>تم حذفها بنجاح:</strong> <?= $cleanupResult['deleted'] ?></li>
+                    <?php if ($cleanupResult['failed'] > 0): ?>
+                        <li><strong>فشل في الحذف:</strong> <?= $cleanupResult['failed'] ?></li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
         <!-- Statistics -->
         <div class="row g-4 mb-4">
             <div class="col-md-4">
@@ -118,14 +186,22 @@ $totalTasbeeh = $stmt->fetchColumn();
             <div class="card-body">
                 <form method="POST">
                     <?php csrfField(); ?>
-                    
+
                     <div class="mb-3 form-check form-switch">
                         <input type="checkbox" class="form-check-input" id="auto_approval" name="auto_approval"
                             value="1" <?= $autoApproval === 1 ? 'checked' : '' ?>>
                         <label class="form-check-label" for="auto_approval">السماح بالموافقة التلقائية على الصفحات
                             الجديدة</label>
                     </div>
-                    
+
+                    <div class="mb-3 form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="auto_approve_messages"
+                            name="auto_approve_messages" value="1" <?= $autoApproveMessages === 1 ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="auto_approve_messages">
+                            السماح بالموافقة التلقائية على الرسائل الجديدة
+                        </label>
+                    </div>
+
                     <div class="mb-3 form-check form-switch">
                         <input type="checkbox" class="form-check-input" id="maintenance_mode" name="maintenance_mode"
                             value="1" <?= $maintenanceMode === 1 ? 'checked' : '' ?>>
@@ -134,7 +210,41 @@ $totalTasbeeh = $stmt->fetchColumn();
                         </label>
                     </div>
 
+
+
                     <button type="submit" class="btn btn-primary">حفظ الإعدادات</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Inactive Pages Cleaner -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">🧹 تنظيف الصفحات غير النشطة</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    احذف الصفحات التي لم تتم زيارتها منذ فترة طويلة لتوفير مساحة التخزين.
+                </p>
+
+                <form method="POST"
+                    onsubmit="return confirm('هل أنت متأكد من حذف الصفحات غير النشطة؟ هذا الإجراء لا يمكن التراجع عنه.')">
+                    <?php csrfField(); ?>
+                    <input type="hidden" name="action" value="cleanup">
+
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label for="cleanup_days" class="form-label">عدد الأيام</label>
+                            <input type="number" class="form-control" id="cleanup_days" name="cleanup_days" value="30"
+                                min="1" max="365" required>
+                            <small class="form-text text-muted">احذف الصفحات التي لم تتم زيارتها منذ X يومًا</small>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-broom"></i> تنظيف الآن
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>

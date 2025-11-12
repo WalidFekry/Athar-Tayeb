@@ -117,6 +117,7 @@ if ($editMode) {
 // Filters
 $filter = $_GET['filter'] ?? 'all';
 $search = $_GET['search'] ?? '';
+$idSearch = $_GET['id_search'] ?? '';
 
 // Build query
 $where = [];
@@ -134,6 +135,11 @@ if (!empty($search)) {
     $where[] = '(name LIKE ? OR from_name LIKE ?)';
     $params[] = '%' . $search . '%';
     $params[] = '%' . $search . '%';
+}
+
+if (!empty($idSearch) && is_numeric($idSearch)) {
+    $where[] = 'id = ?';
+    $params[] = (int)$idSearch;
 }
 
 $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -294,8 +300,9 @@ $pageTitle = 'إدارة الصفحات التذكارية';
     <div class="card mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3">
-                <div class="col-md-4">
-                    <select name="filter" class="form-select">
+                <div class="col-md-3">
+                    <label for="filter" class="form-label">الحالة</label>
+                    <select name="filter" id="filter" class="form-select">
                         <option value="all" <?= $filter === 'all' ? 'selected' : '' ?>>الكل</option>
                         <option value="pending" <?= $filter === 'pending' ? 'selected' : '' ?>>قيد المراجعة</option>
                         <option value="published" <?= $filter === 'published' ? 'selected' : '' ?>>منشور</option>
@@ -303,11 +310,17 @@ $pageTitle = 'إدارة الصفحات التذكارية';
                     </select>
                 </div>
                 
-                <div class="col-md-6">
-                    <input type="text" name="search" class="form-control" placeholder="بحث بالاسم..." value="<?= e($search) ?>">
+                <div class="col-md-3">
+                    <label for="id_search" class="form-label">بحث برقم الصفحة</label>
+                    <input type="number" name="id_search" id="id_search" class="form-control" placeholder="رقم الصفحة" value="<?= e($idSearch) ?>" min="1">
                 </div>
                 
-                <div class="col-md-2">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">بحث بالاسم</label>
+                    <input type="text" name="search" id="search" class="form-control" placeholder="بحث بالاسم..." value="<?= e($search) ?>">
+                </div>
+                
+                <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">بحث</button>
                 </div>
             </form>
@@ -388,7 +401,7 @@ $pageTitle = 'إدارة الصفحات التذكارية';
                         <ul class="pagination justify-content-center">
                             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                                 <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-                                    <a class="page-link" href="?page=<?= $i ?>&filter=<?= $filter ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                                    <a class="page-link" href="?page=<?= $i ?>&filter=<?= $filter ?>&search=<?= urlencode($search) ?>&id_search=<?= urlencode($idSearch) ?>"><?= $i ?></a>
                                 </li>
                             <?php endfor; ?>
                         </ul>

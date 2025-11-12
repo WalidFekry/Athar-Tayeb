@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 09, 2025 at 11:57 AM
+-- Generation Time: Nov 12, 2025 at 03:21 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.27
 
@@ -89,7 +89,8 @@ CREATE TABLE `settings` (
 
 INSERT INTO `settings` (`id`, `setting_key`, `setting_value`, `created_at`, `updated_at`) VALUES
 (22, 'auto_approval', '1', '2025-11-07 12:01:14', '2025-11-07 12:12:08'),
-(47, 'maintenance_mode', '0', '2025-11-07 13:21:27', '2025-11-07 13:35:04');
+(47, 'maintenance_mode', '0', '2025-11-07 13:21:27', '2025-11-07 13:35:04'),
+(60, 'auto_approve_messages', '0', '2025-11-12 15:00:42', '2025-11-12 15:20:39');
 
 --
 -- Indexes for dumped tables
@@ -141,7 +142,7 @@ ALTER TABLE `memorials`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
