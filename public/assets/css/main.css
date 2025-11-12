@@ -1321,32 +1321,19 @@ input[type="number"]::-webkit-outer-spin-button {
     }
 }
 
-.ruqyah-audio-list {
-    max-width: 600px;
+.ruqyah-player {
+    max-width: 400px;
     margin: 0 auto;
 }
 
-.ruqyah-audio-item {
-    transition: var(--transition);
-}
-
-.ruqyah-audio-item:hover {
-    transform: translateX(-5px);
-}
-
-.ruqyah-info h5 {
-    color: var(--text);
-    font-size: 1.1rem;
-}
-
 .ruqyah-play-btn {
-    min-width: 60px;
-    height: 50px;
+    min-width: 80px;
+    height: 60px;
     border-radius: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     transition: var(--transition);
     box-shadow: var(--shadow);
 }
@@ -1364,16 +1351,6 @@ input[type="number"]::-webkit-outer-spin-button {
 @media (max-width: 768px) {
     .ruqyah-icon {
         font-size: 3rem;
-    }
-    
-    .ruqyah-audio-item .d-flex {
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
-    }
-    
-    .ruqyah-play-btn {
-        width: 100%;
     }
 }
 

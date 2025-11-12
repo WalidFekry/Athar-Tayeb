@@ -36,8 +36,16 @@
 
   function updateThemeARIA(theme) {
     if (themeToggle) {
-      themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
-      themeToggle.setAttribute("aria-label", theme === "dark" ? "التبديل إلى الوضع النهاري" : "التبديل إلى الوضع الليلي");
+      themeToggle.setAttribute(
+        "aria-pressed",
+        theme === "dark" ? "true" : "false"
+      );
+      themeToggle.setAttribute(
+        "aria-label",
+        theme === "dark"
+          ? "التبديل إلى الوضع النهاري"
+          : "التبديل إلى الوضع الليلي"
+      );
     }
   }
 
@@ -88,7 +96,7 @@
       }, 100);
     });
   });
-  
+
   function incrementTasbeeh(memorialId, field, countElement) {
     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
 
@@ -305,7 +313,7 @@
       notification.remove();
     }, 3000);
   }
-  
+
   // Asma Allah "Show More" functionality
   const showMoreBtn = document.getElementById("showMoreAsma");
   const hiddenAsma = document.querySelectorAll(".asma-item.hidden");
@@ -433,13 +441,13 @@ document.addEventListener("DOMContentLoaded", function () {
       // Check if the clicked element is the readFatihaBtn
       if (e.target && e.target.id === "readFatihaBtn") {
         e.preventDefault();
-        
+
         // Close Yaseen modal
         const yaseenModalInstance = bootstrap.Modal.getInstance(yaseenModal);
         if (yaseenModalInstance) {
           yaseenModalInstance.hide();
         }
-        
+
         // Open Fatiha modal after a short delay to allow Yaseen to close
         setTimeout(() => {
           const fatihaModalInstance = new bootstrap.Modal(fatihaModal);
@@ -450,119 +458,107 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Azkar Modal Functionality
-  const azkarButtons = document.querySelectorAll('.azkar-read-btn');
-  const azkarModalElement = document.getElementById('azkarModal');
-  const azkarModalImage = document.getElementById('azkarModalImage');
-  const azkarModalLabel = document.getElementById('azkarModalLabel');
-  
+  const azkarButtons = document.querySelectorAll(".azkar-read-btn");
+  const azkarModalElement = document.getElementById("azkarModal");
+  const azkarModalImage = document.getElementById("azkarModalImage");
+  const azkarModalLabel = document.getElementById("azkarModalLabel");
+
   if (azkarButtons.length > 0 && azkarModalElement) {
     const azkarModal = new bootstrap.Modal(azkarModalElement);
-    
-    azkarButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const imageUrl = this.getAttribute('data-azkar-image');
-        const title = this.getAttribute('data-azkar-title');
-        
+
+    azkarButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const imageUrl = this.getAttribute("data-azkar-image");
+        const title = this.getAttribute("data-azkar-title");
+
         azkarModalImage.src = imageUrl;
         azkarModalLabel.textContent = title;
         azkarModal.show();
       });
     });
-    
+
     // Zoom functionality
-    azkarModalImage.addEventListener('click', function() {
-      this.classList.toggle('zoomed');
+    azkarModalImage.addEventListener("click", function () {
+      this.classList.toggle("zoomed");
     });
-    
+
     // Reset zoom when modal closes
-    azkarModalElement.addEventListener('hidden.bs.modal', function() {
-      azkarModalImage.classList.remove('zoomed');
+    azkarModalElement.addEventListener("hidden.bs.modal", function () {
+      azkarModalImage.classList.remove("zoomed");
     });
   }
-  
+
   // Quran Radio Functionality
-  const quranRadio = document.getElementById('quranRadio');
-  const playBtn = document.getElementById('playRadioBtn');
-  const pauseBtn = document.getElementById('pauseRadioBtn');
-  const volumeControl = document.getElementById('radioVolume');
-  
+  const quranRadio = document.getElementById("quranRadio");
+  const playBtn = document.getElementById("playRadioBtn");
+  const pauseBtn = document.getElementById("pauseRadioBtn");
+  const volumeControl = document.getElementById("radioVolume");
+
   if (quranRadio && playBtn && pauseBtn && volumeControl) {
     // Set initial volume
     quranRadio.volume = volumeControl.value / 100;
-    
-    playBtn.addEventListener('click', function() {
+
+    playBtn.addEventListener("click", function () {
       quranRadio.play();
-      playBtn.style.display = 'none';
-      pauseBtn.style.display = 'inline-block';
+      playBtn.style.display = "none";
+      pauseBtn.style.display = "inline-block";
     });
-    
-    pauseBtn.addEventListener('click', function() {
+
+    pauseBtn.addEventListener("click", function () {
       quranRadio.pause();
-      pauseBtn.style.display = 'none';
-      playBtn.style.display = 'inline-block';
+      pauseBtn.style.display = "none";
+      playBtn.style.display = "inline-block";
     });
-    
-    volumeControl.addEventListener('input', function() {
+
+    volumeControl.addEventListener("input", function () {
       quranRadio.volume = this.value / 100;
     });
   }
-  
-  // Ruqyah Audio Players Functionality
-  const ruqyahPlayButtons = document.querySelectorAll('.ruqyah-play-btn');
-  let currentPlayingRuqyah = null;
-  
-  ruqyahPlayButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const audioId = this.getAttribute('data-audio-id');
-      const audioElement = document.getElementById(audioId);
-      const playIcon = this.querySelector('.play-icon');
-      const pauseIcon = this.querySelector('.pause-icon');
-      
-      if (!audioElement) return;
-      
-      // If this audio is currently playing, pause it
-      if (currentPlayingRuqyah === audioElement && !audioElement.paused) {
-        audioElement.pause();
-        playIcon.style.display = 'inline';
-        pauseIcon.style.display = 'none';
-        this.classList.remove('playing');
-        currentPlayingRuqyah = null;
-      } else {
-        // Pause any currently playing audio
-        if (currentPlayingRuqyah && !currentPlayingRuqyah.paused) {
-          currentPlayingRuqyah.pause();
-          // Reset the previous button's icons
-          const prevButton = document.querySelector(`[data-audio-id="${currentPlayingRuqyah.id}"]`);
-          if (prevButton) {
-            prevButton.querySelector('.play-icon').style.display = 'inline';
-            prevButton.querySelector('.pause-icon').style.display = 'none';
-            prevButton.classList.remove('playing');
-          }
-        }
-        
-        // Play the new audio
-        audioElement.play();
-        playIcon.style.display = 'none';
-        pauseIcon.style.display = 'inline';
-        this.classList.add('playing');
-        currentPlayingRuqyah = audioElement;
+
+  // Ruqyah Single Audio Player with Random Track
+  const roqiaPlayBtn = document.querySelector(".ruqyah-play-btn");
+  const audioElement = document.getElementById("ruqyahAudio");
+  const playIcon = roqiaPlayBtn.querySelector(".play-icon");
+  const pauseIcon = roqiaPlayBtn.querySelector(".pause-icon");
+
+  let currentTrack = null;
+  const tracks = [
+    "https://post.walid-fekry.com/audios/roqia/1.mp3",
+    "https://post.walid-fekry.com/audios/roqia/2.mp3",
+    "https://post.walid-fekry.com/audios/roqia/3.mp3",
+    "https://post.walid-fekry.com/audios/roqia/4.mp3",
+    "https://post.walid-fekry.com/audios/roqia/5.mp3",
+  ];
+
+  function getRandomTrack() {
+    const index = Math.floor(Math.random() * tracks.length);
+    return tracks[index];
+  }
+
+  roqiaPlayBtn.addEventListener("click", () => {
+    if (!audioElement.paused) {
+      // pause
+      audioElement.pause();
+      playIcon.style.display = "inline";
+      pauseIcon.style.display = "none";
+      roqiaPlayBtn.classList.remove("playing");
+    } else {
+      // choose random if not playing or ended
+      if (!currentTrack || audioElement.ended) {
+        const randomSrc = getRandomTrack();
+        currentTrack = randomSrc;
+        audioElement.src = randomSrc;
       }
-    });
+      audioElement.play();
+      playIcon.style.display = "none";
+      pauseIcon.style.display = "inline";
+      roqiaPlayBtn.classList.add("playing");
+    }
   });
-  
-  // Handle audio ended event to reset button state
-  document.querySelectorAll('.ruqyah-audio-item audio').forEach(audio => {
-    audio.addEventListener('ended', function() {
-      const button = document.querySelector(`[data-audio-id="${this.id}"]`);
-      if (button) {
-        button.querySelector('.play-icon').style.display = 'inline';
-        button.querySelector('.pause-icon').style.display = 'none';
-        button.classList.remove('playing');
-      }
-      if (currentPlayingRuqyah === this) {
-        currentPlayingRuqyah = null;
-      }
-    });
+
+  audioElement.addEventListener("ended", () => {
+    playIcon.style.display = "inline";
+    pauseIcon.style.display = "none";
+    roqiaPlayBtn.classList.remove("playing");
   });
 });
-

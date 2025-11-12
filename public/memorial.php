@@ -642,39 +642,26 @@ include __DIR__ . '/../includes/header.php';
     <div class="card shadow-sm mb-4 ruqyah-section">
         <div class="card-body text-center p-4">
             <div class="ruqyah-icon-wrapper mb-4">
-                <div class="ruqyah-icon">
-                    🕌
-                </div>
+                <div class="ruqyah-icon">🕌</div>
             </div>
             <h3 class="mb-3 fw-bold">الاستماع للرقية الشرعية</h3>
             <p class="text-muted mb-4">
                 استمع إلى الرقية الشرعية من القرآن والسنة للحفظ والشفاء بإذن الله — تذكيراً وطمأنينة لقلوب الزائرين
             </p>
 
-            <div class="ruqyah-audio-list">
-                <?php for ($i = 1; $i <= 5; $i++): ?>
-                    <div class="ruqyah-audio-item mb-0">
-                        <div class="d-flex align-items-center justify-content-between p-1 bg-muted rounded">
-                            <div class="ruqyah-info">
-                                <h5 class="mb-0 fw-bold">رقية شرعية <?= $i ?></h5>
-                            </div>
-                            <div class="ruqyah-controls">
-                                <button class="btn btn-primary ruqyah-play-btn" data-audio-id="ruqyah<?= $i ?>"
-                                    data-audio-src="https://post.walid-fekry.com/audios/roqia/<?= $i ?>.mp3">
-                                    <span class="play-icon">▶️</span>
-                                    <span class="pause-icon" style="display: none;">⏸️</span>
-                                </button>
-                            </div>
-                        </div>
-                        <audio id="ruqyah<?= $i ?>" preload="none">
-                            <source src="https://post.walid-fekry.com/audios/roqia/<?= $i ?>.mp3" type="audio/mpeg">
-                            متصفحك لا يدعم تشغيل الصوت
-                        </audio>
-                    </div>
-                <?php endfor; ?>
+            <div class="ruqyah-player d-flex flex-column align-items-center gap-3">
+                <button class="btn btn-primary ruqyah-play-btn">
+                    <span class="play-icon">▶️</span>
+                    <span class="pause-icon" style="display: none;">⏸️</span>
+                </button>
+
+                <audio id="ruqyahAudio" preload="none">
+                    متصفحك لا يدعم تشغيل الصوت
+                </audio>
             </div>
         </div>
     </div>
+
 
     <!-- Apps Section -->
     <div class="card shadow-sm mb-4 apps-promo-section">
