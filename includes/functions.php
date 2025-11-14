@@ -273,9 +273,9 @@ function createThumbnail($sourcePath, $extension, $maxWidth = 300, $maxHeight = 
 /**
  * Get image URL (with thumbnail option)
  */
-function getImageUrl($filename, $thumbnail = false)
+function getImageUrl($filename, $thumbnail = false, $default_image = '/assets/images/placeholder-memorial.svg')
 {
-    $default = BASE_URL . '/assets/images/placeholder-memorial.svg';
+    $default = BASE_URL . $default_image;
 
     if (!$filename)
         return $default;
