@@ -89,9 +89,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $autoApproveMessagesSetting = $stmt->fetchColumn();
             $autoApproveMessages = ($autoApproveMessagesSetting == '1') ? 1 : 0;
 
+            // Generate unique edit key
+            $editKey = generateEditKey();
+            
             $stmt = $pdo->prepare("
-                INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+                INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status, edit_key)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
             ");
 
             $stmt->execute([
@@ -103,15 +106,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $whatsapp ?: null,
                 $quote ?: null,
                 $autoApproveMessages,
-                $autoApproval
+                $autoApproval,
+                $editKey
             ]);
 
             $memorialId = $pdo->lastInsertId();
 
             if($autoApproval) {
-                redirect(site_url('success?id=' . $memorialId));
+                redirect(site_url('success?id=' . $memorialId . '&edit_key=' . urlencode($editKey)));
             } else {
-                redirect(site_url('unpublished?id=' . $memorialId));
+                redirect(site_url('unpublished?id=' . $memorialId . '&edit_key=' . urlencode($editKey)));
             }
 
         } catch (PDOException $e) {

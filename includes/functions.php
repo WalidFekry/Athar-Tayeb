@@ -507,3 +507,28 @@ function site_url($path = '')
     return rtrim($root, '/') . '/' . $path;
 }
 
+/**
+ * Generate a secure edit key for memorial pages
+ * @return string A unique, secure edit key
+ */
+function generateEditKey()
+{
+    // Generate a secure random string
+    $randomBytes = random_bytes(16);
+    $randomHash = bin2hex($randomBytes);
+    
+    // Create the edit key
+    return $randomHash;
+}
+
+/**
+ * Validate edit key format
+ * @param string $key The edit key to validate
+ * @return bool True if valid format, false otherwise
+ */
+function isValidEditKeyFormat($key)
+{
+    // Check if key matches expected format: exactly 32 bytes hex (64 hex chars), lowercase a-f0-9
+    return preg_match('/^[a-f0-9]{32}$/', $key) === 1;
+}
+

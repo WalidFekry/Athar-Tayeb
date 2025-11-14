@@ -66,7 +66,8 @@ CREATE TABLE `memorials` (
   `tasbeeh_lailaha` int DEFAULT '0',
   `tasbeeh_allahu` int DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` tinyint(1) DEFAULT '0' COMMENT '0=pending, 1=approved'
+  `status` tinyint(1) DEFAULT '0' COMMENT '0=pending, 1=approved',
+  `edit_key` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -111,7 +112,8 @@ ALTER TABLE `memorials`
   ADD KEY `idx_status` (`status`),
   ADD KEY `idx_image_status` (`image_status`),
   ADD KEY `idx_quote_status` (`quote_status`),
-  ADD KEY `idx_created_at` (`created_at`);
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `idx_edit_key` (`edit_key`);
 ALTER TABLE `memorials` ADD FULLTEXT KEY `idx_name` (`name`);
 
 --

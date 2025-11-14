@@ -21,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'approve') {
         $stmt = $pdo->prepare("UPDATE memorials SET image_status = 1 WHERE id = ?");
         $stmt->execute([$memorialId]);
-        invalidateMemorialCache($memorialId);
         $success = 'تمت الموافقة على الصورة';
     } elseif ($action === 'reject') {
         // Get memorial to delete image file
@@ -52,7 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$memorialId]);
         }
         
-        invalidateMemorialCache($memorialId);
         $success = 'تم رفض الصورة وحذفها من الخادم';
     }
 }

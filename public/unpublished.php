@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/maintenance_check.php';
 
 
 $memorialId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$editKey = isset($_GET['edit_key']) ? trim($_GET['edit_key']) : '';
 
 if (!$memorialId) {
     redirect(BASE_URL);
@@ -106,6 +107,45 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
             </div>
+
+            <!-- Manage Memorial Section -->
+            <?php if ($editKey): ?>
+            <div class="card shadow-sm mb-4 border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">🔧 إدارة صفحتك التذكارية</h5>
+                    <p class="text-muted mb-3">
+                        يمكنك تعديل أو حذف صفحتك التذكارية في أي وقت باستخدام الرابط التالي.
+                        <strong class="text-danger">احتفظ بهذا الرابط في مكان آمن!</strong>
+                    </p>
+                    
+                    <div class="alert alert-warning mb-3">
+                        <strong>⚠️ تنبيه مهم:</strong> أي شخص يملك هذا الرابط يمكنه تعديل أو حذف الصفحة التذكارية. 
+                        لا تشاركه مع أحد إلا إذا كنت تثق به تماماً.
+                    </div>
+                    
+                    <div class="input-group mb-3">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            value="<?= e(site_url('edit?key=' . $editKey)) ?>" 
+                            readonly
+                            id="editLink"
+                        >
+                        <button 
+                            class="btn btn-outline-warning copy-link-btn" 
+                            data-url="<?= e(site_url('edit?key=' . $editKey)) ?>"
+                            type="button"
+                        >
+                            📋 نسخ
+                        </button>
+                    </div>
+                    
+                    <a href="<?= site_url('edit?key=' . $editKey) ?>" class="btn btn-warning w-100" target="_blank">
+                        ✏️ تعديل أو حذف الصفحة
+                    </a>
+                </div>
+            </div>
+            <?php endif; ?>
     </div>
 <?php endif; ?>
 

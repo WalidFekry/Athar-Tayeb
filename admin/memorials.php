@@ -45,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $quoteStatus,
             $memorialId
         ]);
-        invalidateMemorialCache($memorialId);
         $success = 'تم تحديث الصفحة بنجاح';
     }
 }
@@ -61,14 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         case 'publish':
             $stmt = $pdo->prepare("UPDATE memorials SET status = 1 WHERE id = ?");
             $stmt->execute([$memorialId]);
-            invalidateMemorialCache($memorialId);
             $success = 'تم نشر الصفحة بنجاح';
             break;
             
         case 'unpublish':
             $stmt = $pdo->prepare("UPDATE memorials SET status = 0 WHERE id = ?");
             $stmt->execute([$memorialId]);
-            invalidateMemorialCache($memorialId);
             $success = 'تم إلغاء نشر الصفحة';
             break;
             
@@ -93,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             
             $stmt = $pdo->prepare("DELETE FROM memorials WHERE id = ?");
             $stmt->execute([$memorialId]);
-            invalidateMemorialCache($memorialId);
             $success = 'تم حذف الصفحة بنجاح';
             break;
     }
