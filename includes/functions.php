@@ -513,12 +513,16 @@ function site_url($path = '')
  */
 function generateEditKey()
 {
-    // Generate a secure random string
+    // Generate a secure random string (16 bytes = 128 bits)
     $randomBytes = random_bytes(16);
-    $randomHash = bin2hex($randomBytes);
     
-    // Create the edit key
-    return $randomHash;
+    // Base64 encode
+    $base64 = base64_encode($randomBytes);
+    
+    // Convert to URL-safe base64 (base64url) and remove padding '='
+    $base64url = rtrim(strtr($base64, '+/', '-_'), '=');
+    
+    return $base64url;
 }
 
 /**
@@ -528,7 +532,9 @@ function generateEditKey()
  */
 function isValidEditKeyFormat($key)
 {
-    // Check if key matches expected format: exactly 32 bytes hex (64 hex chars), lowercase a-f0-9
-    return preg_match('/^[a-f0-9]{32}$/', $key) === 1;
+    // Base64url characters only: A-Z, a-z, 0-9, -, _
+    // Length between 20 and 24
+    return preg_match('/^[A-Za-z0-9\-_]{20,24}$/', $key) === 1;
 }
+
 

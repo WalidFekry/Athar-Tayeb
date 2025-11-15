@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Generate unique edit key
             $editKey = generateEditKey();
-
+            
             $stmt = $pdo->prepare("
                 INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status, edit_key, generate_duaa_image)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)
