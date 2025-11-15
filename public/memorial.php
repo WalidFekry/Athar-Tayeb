@@ -297,6 +297,38 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
+        <!-- Duaa Image Section -->
+    <?php 
+    $duaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $memorial['image'];
+    $duaaImageUrl = BASE_URL . '/uploads/duaa_images/' . $memorial['image'];
+    if ($memorial['image_status'] == 1 && $memorial['generate_duaa_image'] && file_exists($duaaImagePath)): 
+    ?>
+    <div class="card shadow-sm mb-4 border-success">
+        <div class="card-body">
+            <h4 class="text-center mb-4 text-success">بطاقة الدعاء 📜</h4>
+            <p class="text-center text-muted mb-4">
+                بطاقة دعاء مخصصة <?= getPronoun($memorial['gender'], 'للمرحوم') ?> <strong><?= e($memorial['name']) ?></strong>
+            </p>
+            
+            <div class="text-center mb-4">
+                <img src="<?= $duaaImageUrl ?>" alt="بطاقة دعاء <?= e($memorial['name']) ?>" 
+                     class="img-fluid rounded shadow duaa-card-image" 
+                     style="width: 100%; max-width: 500px; height: auto; cursor: pointer;"
+                     onclick="openDuaaImageModal('<?= $duaaImageUrl ?>', '<?= e($memorial['name']) ?>')">
+            </div>
+            
+            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                <button class="btn btn-success" onclick="openDuaaImageModal('<?= $duaaImageUrl ?>', '<?= e($memorial['name']) ?>')">
+                    👁️ عرض بالحجم الكامل
+                </button>
+                <a href="<?= $duaaImageUrl ?>" download="duaa_<?= e($memorial['name']) ?>.png" class="btn btn-outline-primary">
+                    💾 تحميل البطاقة
+                </a>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Azkar Section -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
@@ -788,6 +820,34 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 </div>
+
+<!-- Duaa Image Modal -->
+<div class="modal fade" id="duaaImageModal" tabindex="-1" aria-labelledby="duaaImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="duaaImageModalLabel">بطاقة الدعاء</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body p-3 text-center">
+                <img id="duaaModalImage" src="" alt="بطاقة دعاء" class="img-fluid rounded shadow" style="max-height: 80vh;">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <a id="duaaDownloadBtn" href="" download="" class="btn btn-success">
+                    💾 تحميل البطاقة
+                </a>
+                <button class="btn btn-outline-primary" onclick="copyDuaaImageLink()">
+                    📋 نسخ الرابط
+                </button>
+                <button class="btn btn-outline-secondary" onclick="shareDuaaImageFromModal()">
+                    📤 مشاركة
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <?php include __DIR__ . '/../includes/yaseen_modal.php'; ?>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

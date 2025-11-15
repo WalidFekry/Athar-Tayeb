@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gender = trim($_POST['gender'] ?? 'male');
     $whatsapp = trim($_POST['whatsapp'] ?? '');
     $quote = trim($_POST['quote'] ?? '');
+    $generateDuaaImage = isset($_POST['generate_duaa_image']) ? 1 : 0;
 
     $errors = [];
 
@@ -76,6 +77,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
+        // Generate duaa image if requested and image uploaded
+        if ($generateDuaaImage && $imageName) {
+            require_once __DIR__ . '/../includes/generate_duaa_image.php';
+            $imagePath = $imageName ? UPLOAD_PATH . '/' . $imageName : null;
+            generateDuaaImage($imageName, $name, $gender, $imagePath, $death_date);
+        } elseif ($generateDuaaImage && !$imageName) {
+            $errors[] = 'يجب تحميل صورة تذكارية للمتوفي لإنشاء بطاقة دعاء.';
+        }
+    }
+
+
+
+    if (empty($errors)) {
         try {
             // Get auto approval setting for pages
             $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'auto_approval'");
@@ -91,10 +105,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Generate unique edit key
             $editKey = generateEditKey();
-            
+
             $stmt = $pdo->prepare("
-                INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status, edit_key)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
+                INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status, edit_key, generate_duaa_image)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)
             ");
 
             $stmt->execute([
@@ -107,12 +121,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $quote ?: null,
                 $autoApproveMessages,
                 $autoApproval,
-                $editKey
+                $editKey,
+                $generateDuaaImage
             ]);
 
             $memorialId = $pdo->lastInsertId();
 
-            if($autoApproval) {
+            if ($autoApproval) {
                 redirect(site_url('success?id=' . $memorialId . '&edit_key=' . urlencode($editKey)));
             } else {
                 redirect(site_url('unpublished?id=' . $memorialId . '&edit_key=' . urlencode($editKey)));
@@ -157,14 +172,14 @@ include __DIR__ . '/../includes/header.php';
 
             <!-- Errors Display -->
             <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger" role="alert" aria-live="assertive">
-                <h5 class="alert-heading">حدثت أخطاء:</h5>
-                <ul class="mb-0">
-                    <?php foreach ($errors as $error): ?>
-                    <li><?= e($error) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
+                <div class="alert alert-danger" role="alert" aria-live="assertive">
+                    <h5 class="alert-heading">حدثت أخطاء:</h5>
+                    <ul class="mb-0">
+                        <?php foreach ($errors as $error): ?>
+                            <li><?= e($error) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
             <?php endif; ?>
 
             <!-- Create Form -->
@@ -179,7 +194,8 @@ include __DIR__ . '/../includes/header.php';
                                 اسم منشئ الصفحة - اختياري
                             </label>
                             <input type="text" class="form-control" id="from_name" name="from_name"
-                                placeholder="مثال: عائلة الإمبابي" maxlength="31" aria-activedescendant=""value="<?= e($_POST['from_name'] ?? '') ?>" aria-describedby="from_name_help">
+                                placeholder="مثال: عائلة الإمبابي" maxlength="31" aria-activedescendant=""
+                                value="<?= e($_POST['from_name'] ?? '') ?>" aria-describedby="from_name_help">
                             <small id="from_name_help" class="form-text text-muted">
                                 يمكنك كتابة اسمك أو اسم العائلة
                             </small>
@@ -216,7 +232,8 @@ include __DIR__ . '/../includes/header.php';
                                 <label for="death_date_picker" class="visually-hidden">اختر تاريخ الوفاة</label>
                                 <div class="input-group">
                                     <input type="text" id="death_date_picker" class="form-control"
-                                        placeholder="اضغط هنا لاختيار التاريخ 📅" readonly aria-label="حقل اختيار تاريخ الوفاة">
+                                        placeholder="اضغط هنا لاختيار التاريخ 📅" readonly
+                                        aria-label="حقل اختيار تاريخ الوفاة">
                                 </div>
                             </div>
                             <div class="row g-2">
@@ -225,21 +242,24 @@ include __DIR__ . '/../includes/header.php';
                                     <input type="number" class="form-control text-center" id="death_day"
                                         name="death_day" placeholder="اليوم" min="1" max="31"
                                         value="<?= e($_POST['death_day'] ?? '') ?>" aria-label="يوم الوفاة">
-                                    <small class="form-text text-muted d-block text-center mt-1" aria-hidden="true">اليوم</small>
+                                    <small class="form-text text-muted d-block text-center mt-1"
+                                        aria-hidden="true">اليوم</small>
                                 </div>
                                 <div class="col-4">
                                     <label for="death_month" class="visually-hidden">الشهر</label>
                                     <input type="number" class="form-control text-center" id="death_month"
                                         name="death_month" placeholder="الشهر" min="1" max="12"
                                         value="<?= e($_POST['death_month'] ?? '') ?>" aria-label="شهر الوفاة">
-                                    <small class="form-text text-muted d-block text-center mt-1" aria-hidden="true">الشهر</small>
+                                    <small class="form-text text-muted d-block text-center mt-1"
+                                        aria-hidden="true">الشهر</small>
                                 </div>
                                 <div class="col-4">
                                     <label for="death_year" class="visually-hidden">السنة</label>
                                     <input type="number" class="form-control text-center" id="death_year"
                                         name="death_year" placeholder="السنة" min="1900" max="<?= date('Y') ?>"
                                         value="<?= e($_POST['death_year'] ?? '') ?>" aria-label="سنة الوفاة">
-                                    <small class="form-text text-muted d-block text-center mt-1" aria-hidden="true">السنة</small>
+                                    <small class="form-text text-muted d-block text-center mt-1"
+                                        aria-hidden="true">السنة</small>
                                 </div>
                             </div>
                             <small class="form-text text-muted d-block mt-2" id="date_help">
@@ -252,7 +272,8 @@ include __DIR__ . '/../includes/header.php';
                             <label for="gender" class="form-label">
                                 الجنس <span class="text-danger" aria-label="حقل إجباري">*</span>
                             </label>
-                            <select class="form-select" id="gender" name="gender" required aria-required="true" aria-describedby="gender_help">
+                            <select class="form-select" id="gender" name="gender" required aria-required="true"
+                                aria-describedby="gender_help">
                                 <option value="male" <?= ($_POST['gender'] ?? 'male') === 'male' ? 'selected' : '' ?>>
                                     ذكر
                                 </option>
@@ -271,7 +292,8 @@ include __DIR__ . '/../includes/header.php';
                                 رقم الواتساب - اختياري
                             </label>
                             <input type="tel" class="form-control" id="whatsapp" name="whatsapp"
-                                placeholder="+20 123 456 7890" value="<?= e($_POST['whatsapp'] ?? '') ?>" aria-describedby="whatsapp_help">
+                                placeholder="+20 123 456 7890" value="<?= e($_POST['whatsapp'] ?? '') ?>"
+                                aria-describedby="whatsapp_help">
                             <small id="whatsapp_help" class="form-text text-muted">
                                 لنتمكن من التواصل معك في حال وجود أي استفسار بخصوص الصفحة
                             </small>
@@ -283,12 +305,27 @@ include __DIR__ . '/../includes/header.php';
                                 رسالة أو دعاء - اختياري
                             </label>
                             <textarea class="form-control" id="quote" name="quote" rows="4" maxlength="301"
-                                placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..." aria-describedby="quote_help quote_counter"><?= e($_POST['quote'] ?? '') ?></textarea>
+                                placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..."
+                                aria-describedby="quote_help quote_counter"><?= e($_POST['quote'] ?? '') ?></textarea>
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <small id="quote_help" class="form-text text-muted">
                                     سوف تظهر هذه الرسالة في الصفحة التذكارية وستخضع للمراجعة قبل النشر
                                 </small>
                             </div>
+                        </div>
+
+                        <!-- Duaa Image Generation -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="generate_duaa_image"
+                                    name="generate_duaa_image" value="1" <?= isset($_POST['generate_duaa_image']) ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="generate_duaa_image">
+                                    <strong>📜 إنشاء بطاقة دعاء للمتوفى</strong>
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                      لإنشاء بطاقة تذكارية جميلة تحتوي على اسم المتوفى ودعاء مختار، يجب أولًا رفع صورة للمتوفى. بعد رفع الصورة ستظهر البطاقة في الصفحة التذكارية مع إمكانية تحميلها ومشاركتها.
+                            </small>
                         </div>
 
                         <!-- Submit Button -->
@@ -321,124 +358,124 @@ include __DIR__ . '/../includes/header.php';
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
 
 <script>
-// Initialize Flatpickr for date picker
-(function() {
-    const datePickerInput = document.getElementById('death_date_picker');
-    const deathDayInput = document.getElementById('death_day');
-    const deathMonthInput = document.getElementById('death_month');
-    const deathYearInput = document.getElementById('death_year');
+    // Initialize Flatpickr for date picker
+    (function () {
+        const datePickerInput = document.getElementById('death_date_picker');
+        const deathDayInput = document.getElementById('death_day');
+        const deathMonthInput = document.getElementById('death_month');
+        const deathYearInput = document.getElementById('death_year');
 
-    if (datePickerInput) {
-        const fp = flatpickr(datePickerInput, {
-            dateFormat: "Y-m-d",
-            locale: "ar",
-            disableMobile: false,
-            maxDate: "today",
-            minDate: "1900-01-01",
-            allowInput: false,
-            clickOpens: true,
-            onChange: function(selectedDates, dateStr, instance) {
-                if (selectedDates.length > 0) {
-                    const date = selectedDates[0];
-                    const day = date.getDate();
-                    const month = date.getMonth() + 1;
-                    const year = date.getFullYear();
+        if (datePickerInput) {
+            const fp = flatpickr(datePickerInput, {
+                dateFormat: "Y-m-d",
+                locale: "ar",
+                disableMobile: false,
+                maxDate: "today",
+                minDate: "1900-01-01",
+                allowInput: false,
+                clickOpens: true,
+                onChange: function (selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 0) {
+                        const date = selectedDates[0];
+                        const day = date.getDate();
+                        const month = date.getMonth() + 1;
+                        const year = date.getFullYear();
 
-                    if (deathDayInput) deathDayInput.value = day;
-                    if (deathMonthInput) deathMonthInput.value = month;
-                    if (deathYearInput) deathYearInput.value = year;
+                        if (deathDayInput) deathDayInput.value = day;
+                        if (deathMonthInput) deathMonthInput.value = month;
+                        if (deathYearInput) deathYearInput.value = year;
 
-                    // Visual feedback
-                    [deathDayInput, deathMonthInput, deathYearInput].forEach(function(input) {
-                        if (input) {
-                            input.style.backgroundColor = 'var(--muted-bg)';
-                            input.style.transition = 'background-color 0.3s ease';
-                            setTimeout(function() {
-                                input.style.backgroundColor = '';
-                            }, 800);
-                        }
-                    });
+                        // Visual feedback
+                        [deathDayInput, deathMonthInput, deathYearInput].forEach(function (input) {
+                            if (input) {
+                                input.style.backgroundColor = 'var(--muted-bg)';
+                                input.style.transition = 'background-color 0.3s ease';
+                                setTimeout(function () {
+                                    input.style.backgroundColor = '';
+                                }, 800);
+                            }
+                        });
+                    }
+                },
+                onReady: function (selectedDates, dateStr, instance) {
+                    // Ensure mobile compatibility
+                    instance.calendarContainer.style.touchAction = 'manipulation';
                 }
-            },
-            onReady: function(selectedDates, dateStr, instance) {
-                // Ensure mobile compatibility
-                instance.calendarContainer.style.touchAction = 'manipulation';
-            }
-        });
+            });
 
-        // Also open on input click
-        datePickerInput.addEventListener('click', function(e) {
-            e.preventDefault();
-            fp.open();
-        });
+            // Also open on input click
+            datePickerInput.addEventListener('click', function (e) {
+                e.preventDefault();
+                fp.open();
+            });
 
-        // Populate picker if fields already have values
-        if (deathYearInput && deathMonthInput && deathDayInput) {
-            const year = deathYearInput.value;
-            const month = deathMonthInput.value;
-            const day = deathDayInput.value;
+            // Populate picker if fields already have values
+            if (deathYearInput && deathMonthInput && deathDayInput) {
+                const year = deathYearInput.value;
+                const month = deathMonthInput.value;
+                const day = deathDayInput.value;
 
-            if (year && month && day) {
-                const dateStr = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
-                fp.setDate(dateStr, false);
+                if (year && month && day) {
+                    const dateStr = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                    fp.setDate(dateStr, false);
+                }
             }
         }
-    }
-})();
+    })();
 
-// Character counter for quote, name, and from_name
-(function() {
-    const fields = [
-        { id: 'quote', max: 300 },
-        { id: 'name', max: 30 },
-        { id: 'from_name', max: 30 }
-    ];
+    // Character counter for quote, name, and from_name
+    (function () {
+        const fields = [
+            { id: 'quote', max: 300 },
+            { id: 'name', max: 30 },
+            { id: 'from_name', max: 30 }
+        ];
 
-    fields.forEach(field => {
-        const input = document.getElementById(field.id);
-        if (!input) return;
+        fields.forEach(field => {
+            const input = document.getElementById(field.id);
+            if (!input) return;
 
-        // Create counter container
-        const counter = document.createElement('small');
-        counter.className = 'form-text text-muted d-block text-end mt-1';
-        counter.innerHTML = `<span id="${field.id}_current">0</span>/${field.max}`;
-        input.insertAdjacentElement('afterend', counter);
+            // Create counter container
+            const counter = document.createElement('small');
+            counter.className = 'form-text text-muted d-block text-end mt-1';
+            counter.innerHTML = `<span id="${field.id}_current">0</span>/${field.max}`;
+            input.insertAdjacentElement('afterend', counter);
 
-        const currentSpan = document.getElementById(`${field.id}_current`);
-        const MAX_LENGTH = field.max;
+            const currentSpan = document.getElementById(`${field.id}_current`);
+            const MAX_LENGTH = field.max;
 
-        // Function to update character count
-        function updateCharCount() {
-            const currentLength = input.value.length;
-            currentSpan.textContent = currentLength;
+            // Function to update character count
+            function updateCharCount() {
+                const currentLength = input.value.length;
+                currentSpan.textContent = currentLength;
 
-            if (currentLength > MAX_LENGTH) {
-                input.style.borderColor = '#dc3545';
-                input.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
-                counter.style.color = '#dc3545';
-                counter.style.fontWeight = 'bold';
-            } else if (currentLength >= MAX_LENGTH - 5) {
-                input.style.borderColor = '#ffc107';
-                input.style.boxShadow = '';
-                counter.style.color = '#ffc107';
-                counter.style.fontWeight = 'bold';
-            } else {
-                input.style.borderColor = '';
-                input.style.boxShadow = '';
-                counter.style.color = '#6c757d';
-                counter.style.fontWeight = 'normal';
+                if (currentLength > MAX_LENGTH) {
+                    input.style.borderColor = '#dc3545';
+                    input.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+                    counter.style.color = '#dc3545';
+                    counter.style.fontWeight = 'bold';
+                } else if (currentLength >= MAX_LENGTH - 5) {
+                    input.style.borderColor = '#ffc107';
+                    input.style.boxShadow = '';
+                    counter.style.color = '#ffc107';
+                    counter.style.fontWeight = 'bold';
+                } else {
+                    input.style.borderColor = '';
+                    input.style.boxShadow = '';
+                    counter.style.color = '#6c757d';
+                    counter.style.fontWeight = 'normal';
+                }
             }
-        }
 
-        // Events
-        input.addEventListener('input', updateCharCount);
-        input.addEventListener('keyup', updateCharCount);
-        input.addEventListener('change', updateCharCount);
+            // Events
+            input.addEventListener('input', updateCharCount);
+            input.addEventListener('keyup', updateCharCount);
+            input.addEventListener('change', updateCharCount);
 
-        // Initialize
-        updateCharCount();
-    });
-})();
+            // Initialize
+            updateCharCount();
+        });
+    })();
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 12, 2025 at 03:21 PM
+-- Generation Time: Nov 15, 2025 at 03:14 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.27
 
@@ -29,9 +29,9 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `admins` (
   `id` int NOT NULL,
-  `username` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'admin',
+  `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'admin',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -50,15 +50,15 @@ INSERT INTO `admins` (`id`, `username`, `password`, `role`, `created_at`) VALUES
 
 CREATE TABLE `memorials` (
   `id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `from_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `from_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `image_status` tinyint(1) DEFAULT '0' COMMENT '0=pending, 1=approved',
-  `quote` text COLLATE utf8mb4_unicode_ci,
+  `quote` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `quote_status` tinyint(1) DEFAULT '0' COMMENT '0=pending, 1=approved',
   `death_date` date DEFAULT NULL,
-  `gender` enum('male','female') COLLATE utf8mb4_unicode_ci DEFAULT 'male',
-  `whatsapp` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gender` enum('male','female') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'male',
+  `whatsapp` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `visits` int DEFAULT '0',
   `last_visit` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `tasbeeh_subhan` int DEFAULT '0',
@@ -67,7 +67,8 @@ CREATE TABLE `memorials` (
   `tasbeeh_allahu` int DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `status` tinyint(1) DEFAULT '0' COMMENT '0=pending, 1=approved',
-  `edit_key` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL UNIQUE
+  `edit_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `generate_duaa_image` tinyint(1) DEFAULT '0' COMMENT '0=no, 1=yes'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -78,8 +79,8 @@ CREATE TABLE `memorials` (
 
 CREATE TABLE `settings` (
   `id` int NOT NULL,
-  `setting_key` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `setting_value` text COLLATE utf8mb4_unicode_ci,
+  `setting_key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `setting_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -89,9 +90,9 @@ CREATE TABLE `settings` (
 --
 
 INSERT INTO `settings` (`id`, `setting_key`, `setting_value`, `created_at`, `updated_at`) VALUES
-(22, 'auto_approval', '1', '2025-11-07 12:01:14', '2025-11-07 12:12:08'),
+(22, 'auto_approval', '1', '2025-11-07 12:01:14', '2025-11-15 15:14:22'),
 (47, 'maintenance_mode', '0', '2025-11-07 13:21:27', '2025-11-07 13:35:04'),
-(60, 'auto_approve_messages', '0', '2025-11-12 15:00:42', '2025-11-12 15:20:39');
+(60, 'auto_approve_messages', '0', '2025-11-12 15:00:42', '2025-11-15 15:14:18');
 
 --
 -- Indexes for dumped tables
@@ -109,11 +110,13 @@ ALTER TABLE `admins`
 --
 ALTER TABLE `memorials`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `edit_key` (`edit_key`),
   ADD KEY `idx_status` (`status`),
   ADD KEY `idx_image_status` (`image_status`),
   ADD KEY `idx_quote_status` (`quote_status`),
   ADD KEY `idx_created_at` (`created_at`),
-  ADD KEY `idx_edit_key` (`edit_key`);
+  ADD KEY `idx_edit_key` (`edit_key`),
+  ADD KEY `idx_generate_duaa_image` (`generate_duaa_image`);
 ALTER TABLE `memorials` ADD FULLTEXT KEY `idx_name` (`name`);
 
 --
@@ -144,7 +147,7 @@ ALTER TABLE `memorials`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

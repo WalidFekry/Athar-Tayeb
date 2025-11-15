@@ -561,4 +561,141 @@ document.addEventListener("DOMContentLoaded", function () {
     pauseIcon.style.display = "none";
     roqiaPlayBtn.classList.remove("playing");
   });
+
+  // =====================
+  // Duaa Image Modal Logic
+  // =====================
+
+  // Global variables for duaa image modal
+  let currentDuaaImageUrl = "";
+  let currentDuaaImageName = "";
+
+  // Open duaa image modal
+  window.openDuaaImageModal = function (imageUrl, name) {
+    currentDuaaImageUrl = imageUrl;
+    currentDuaaImageName = name;
+
+    const modalImage = document.getElementById("duaaModalImage");
+    const downloadBtn = document.getElementById("duaaDownloadBtn");
+    const modalTitle = document.getElementById("duaaImageModalLabel");
+    const modalElement = document.getElementById("duaaImageModal");
+
+    if (!modalImage || !downloadBtn || !modalTitle || !modalElement) {
+      console.warn("Duaa image modal elements not found in DOM.");
+      return;
+    }
+
+    modalImage.src = imageUrl;
+    modalImage.alt = "بطاقة دعاء " + name;
+    downloadBtn.href = imageUrl;
+    downloadBtn.download = "duaa_" + name + ".png";
+    modalTitle.textContent = "بطاقة دعاء " + name;
+
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  };
+
+  // Copy duaa image link
+  window.copyDuaaImageLink = function () {
+    if (!currentDuaaImageUrl) return;
+
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(currentDuaaImageUrl)
+        .then(() => {
+          showToast("تم نسخ رابط البطاقة بنجاح!", "success");
+        })
+        .catch(() => {
+          fallbackCopyTextToClipboard(currentDuaaImageUrl);
+        });
+    } else {
+      fallbackCopyTextToClipboard(currentDuaaImageUrl);
+    }
+  };
+
+  // Share duaa image
+  window.shareDuaaImage = function (imageUrl, name) {
+    const shareText = `بطاقة دعاء للفقيد/ة ${name} – شارك الأجر وادع له/لها بالرحمة.`;
+    const shareUrl = imageUrl;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: `بطاقة دعاء عن روح ${name}`,
+          text: shareText,
+          url: shareUrl,
+        })
+        .catch(console.error);
+    } else {
+      const whatsappText = `🌿 بطاقة دعاء عن روح ${name}\n\n${shareText}\n\n📷 الصورة:\n${shareUrl}`;
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
+        whatsappText
+      )}`;
+      window.open(whatsappUrl, "_blank");
+    }
+  };
+
+  // Share duaa image from modal
+  window.shareDuaaImageFromModal = function () {
+    if (!currentDuaaImageUrl) return;
+    shareDuaaImage(currentDuaaImageUrl, currentDuaaImageName);
+  };
+
+  // Toast notification function
+  window.showToast = function (message, type = "info") {
+    const toast = document.createElement("div");
+    toast.className = `toast align-items-center text-white bg-${
+      type === "success" ? "success" : "primary"
+    } border-0`;
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
+
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+      toastContainer = document.createElement("div");
+      toastContainer.id = "toast-container";
+      toastContainer.className =
+        "toast-container position-fixed bottom-0 end-0 p-3";
+      document.body.appendChild(toastContainer);
+    }
+
+    toastContainer.appendChild(toast);
+
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+
+    toast.addEventListener("hidden.bs.toast", () => {
+      toast.remove();
+    });
+  };
+
+  // Fallback copy function
+  window.fallbackCopyTextToClipboard = function (text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      document.execCommand("copy");
+      showToast("تم نسخ رابط الصورة بنجاح!", "success");
+    } catch (err) {
+      showToast("فشل في نسخ الرابط", "error");
+    }
+
+    document.body.removeChild(textArea);
+  };
 });
