@@ -197,6 +197,10 @@ $pageTitle = 'إدارة الصفحات التذكارية';
         <div class="alert alert-success"><?= e($success) ?></div>
     <?php endif; ?>
     
+    <?php if (isset($_GET['deleted']) && $_GET['deleted'] == '1'): ?>
+        <div class="alert alert-success">تم حذف الصفحة التذكارية بنجاح</div>
+    <?php endif; ?>
+    
     <?php if ($editMode && $editMemorial): ?>
         <!-- Edit Form -->
         <div class="card mb-4">
@@ -401,11 +405,67 @@ $pageTitle = 'إدارة الصفحات التذكارية';
                 <?php if ($totalPages > 1): ?>
                     <nav class="mt-3">
                         <ul class="pagination justify-content-center">
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                            <?php
+                            $maxVisiblePages = 5;
+                            $startPage = max(1, $page - floor($maxVisiblePages / 2));
+                            $endPage = min($totalPages, $startPage + $maxVisiblePages - 1);
+                            
+                            // Adjust start page if we're near the end
+                            if ($endPage - $startPage + 1 < $maxVisiblePages) {
+                                $startPage = max(1, $endPage - $maxVisiblePages + 1);
+                            }
+                            
+                            $queryParams = "filter=" . urlencode($filter) . "&search=" . urlencode($search) . "&id_search=" . urlencode($idSearch);
+                            ?>
+                            
+                            <!-- First page -->
+                            <?php if ($page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1&<?= $queryParams ?>">الأولى</a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <!-- Previous page -->
+                            <?php if ($page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $page - 1 ?>&<?= $queryParams ?>">السابق</a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <!-- Show ellipsis if there are pages before start -->
+                            <?php if ($startPage > 1): ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <!-- Page numbers -->
+                            <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
                                 <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-                                    <a class="page-link" href="?page=<?= $i ?>&filter=<?= $filter ?>&search=<?= urlencode($search) ?>&id_search=<?= urlencode($idSearch) ?>"><?= $i ?></a>
+                                    <a class="page-link" href="?page=<?= $i ?>&<?= $queryParams ?>"><?= $i ?></a>
                                 </li>
                             <?php endfor; ?>
+                            
+                            <!-- Show ellipsis if there are pages after end -->
+                            <?php if ($endPage < $totalPages): ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <!-- Next page -->
+                            <?php if ($page < $totalPages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $page + 1 ?>&<?= $queryParams ?>">التالي</a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <!-- Last page -->
+                            <?php if ($page < $totalPages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $totalPages ?>&<?= $queryParams ?>">الأخيرة</a>
+                                </li>
+                            <?php endif; ?>
                         </ul>
                     </nav>
                 <?php endif; ?>

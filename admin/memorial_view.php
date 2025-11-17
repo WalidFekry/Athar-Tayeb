@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/csrf.php';
 
 requireAdmin();
 
@@ -15,6 +16,48 @@ $memorialId = (int)($_GET['id'] ?? 0);
 
 if (!$memorialId) {
     redirect(ADMIN_URL . '/memorials.php');
+}
+
+// Handle delete action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+    checkCSRF();
+    
+    $deleteId = (int)$_POST['memorial_id'];
+    
+    if ($deleteId === $memorialId) {
+        // Get memorial data for file cleanup
+        $stmt = $pdo->prepare("SELECT image FROM memorials WHERE id = ?");
+        $stmt->execute([$deleteId]);
+        $memorialToDelete = $stmt->fetch();
+        
+        if ($memorialToDelete && $memorialToDelete['image']) {
+            // Delete main image
+            $imagePath = UPLOAD_PATH . '/' . $memorialToDelete['image'];
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+            
+            // Delete thumbnail
+            $ext = pathinfo($memorialToDelete['image'], PATHINFO_EXTENSION);
+            $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $imagePath);
+            if (file_exists($thumbPath)) {
+                unlink($thumbPath);
+            }
+            
+            // Delete Duaa card if exists
+            $duaaImagePath = __DIR__ . '/../public/uploads/duaa_images/' . $memorialToDelete['image'];
+            if (file_exists($duaaImagePath)) {
+                unlink($duaaImagePath);
+            }
+        }
+        
+        // Delete memorial record from database
+        $stmt = $pdo->prepare("DELETE FROM memorials WHERE id = ?");
+        $stmt->execute([$deleteId]);
+        
+        // Redirect back to memorials list with success message
+        redirect(ADMIN_URL . '/memorials.php?deleted=1');
+    }
 }
 
 $stmt = $pdo->prepare("SELECT * FROM memorials WHERE id = ?");
@@ -214,6 +257,14 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                        class="btn btn-warning">
                         ✏️ تعديل
                     </a>
+                    <form method="POST" style="display: inline;" onsubmit="return confirm('هل أنت متأكد من حذف هذه الصفحة نهائياً؟ سيتم حذف جميع الصور والبيانات المرتبطة بها. هذا الإجراء لا يمكن التراجع عنه.')">
+                        <?php csrfField(); ?>
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="memorial_id" value="<?= $memorial['id'] ?>">
+                        <button type="submit" class="btn btn-danger">
+                            🗑️ حذف الصفحة
+                        </button>
+                    </form>
                     <a href="<?= ADMIN_URL ?>/memorials.php" 
                        class="btn btn-secondary">
                         ← العودة للقائمة

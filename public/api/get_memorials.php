@@ -16,18 +16,20 @@ require_once __DIR__ . '/../../includes/functions.php';
 try {
     // Get ordering parameter
     $order = $_GET['order'] ?? '';
-    $limit = 25; // Default limit for ordered results
+    $defaultLimit = 25; // Default limit for ordered results
     
     // Base query for approved memorials
     $baseQuery = "
         SELECT 
             id,
             name,
+            from_name,
             death_date,
             created_at,
             visits,
             last_visit,
             image,
+            image_status,
             (tasbeeh_subhan + tasbeeh_alham + tasbeeh_lailaha + tasbeeh_allahu) as total_tasbeeh
         FROM memorials 
         WHERE status = 1 AND (image_status = 1 OR image IS NULL)
@@ -36,18 +38,26 @@ try {
     // Determine ordering and limit
     if ($order === 'created_at') {
         $query = $baseQuery . " ORDER BY created_at DESC LIMIT ?";
-        $params = [$limit];
+        $stmt  = $pdo->prepare($query);
+        $stmt->execute([$defaultLimit]);
+
     } elseif ($order === 'last_visit') {
         $query = $baseQuery . " ORDER BY last_visit DESC LIMIT ?";
-        $params = [$limit];
+        $stmt  = $pdo->prepare($query);
+        $stmt->execute([$defaultLimit]);
+
     } else {
-        // Default: all memorials ordered by creation date
-        $query = $baseQuery . " ORDER BY created_at DESC";
-        $params = [];
+        $offset = isset($_GET['offset']) ? max(0, (int)$_GET['offset']) : 0;
+        $limit  = isset($_GET['limit'])  ? max(1, (int)$_GET['limit'])   : 25;
+
+        $query = $baseQuery . " ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
+
+        $stmt = $pdo->prepare($query);
+        $stmt->bindValue(':limit',  $limit,  PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
     }
     
-    $stmt = $pdo->prepare($query);
-    $stmt->execute($params);
     $memorials = $stmt->fetchAll();
     
     // Format the response
@@ -56,11 +66,16 @@ try {
         $response[] = [
             'id' => (int)$memorial['id'],
             'name' => $memorial['name'],
+            'from_name' => $memorial['from_name'],
             'death_date' => $memorial['death_date'],
             'created_at' => $memorial['created_at'],
             'visits' => (int)$memorial['visits'],
             'total_tasbeeh' => (int)$memorial['total_tasbeeh'],
-            'image_url' => getImageUrl($memorial['image'], $memorial['image_status'], '/assets/images/placeholder-memorial.png'),
+            'image_url' => getImageUrl(
+                $memorial['image'] ?? null,
+                $memorial['image_status'] ?? null,
+                '/assets/images/placeholder-memorial.png'
+            ),
             'page_url' => site_url('m/' . $memorial['id'])
         ];
     }

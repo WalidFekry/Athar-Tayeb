@@ -26,6 +26,31 @@ $pendingQuotes = $stmt->fetchColumn();
 $stmt = $pdo->query("SELECT SUM(visits) FROM memorials");
 $totalVisits = $stmt->fetchColumn();
 
+$stmt = $pdo->query("SELECT SUM(tasbeeh_subhan + tasbeeh_alham + tasbeeh_lailaha + tasbeeh_allahu) FROM memorials");
+$totalTasbeeh = $stmt->fetchColumn();
+
+// Count actual image files on server
+$uploadsPath = __DIR__ . '/../public/uploads/memorials/';
+$mainImagesCount = 0;
+$thumbnailsCount = 0;
+
+if (is_dir($uploadsPath)) {
+    $files = scandir($uploadsPath);
+    foreach ($files as $file) {
+        if ($file !== '.' && $file !== '..' && is_file($uploadsPath . $file)) {
+            if (strpos($file, '_thumb.') !== false) {
+                $thumbnailsCount++;
+            } else {
+                // Check if it's an image file (not a thumbnail)
+                $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                    $mainImagesCount++;
+                }
+            }
+        }
+    }
+}
+
 // Latest memorials
 $stmt = $pdo->query("SELECT id, name, created_at, status FROM memorials ORDER BY created_at DESC LIMIT 5");
 $latestMemorials = $stmt->fetchAll();
@@ -100,6 +125,7 @@ $pageTitle = 'لوحة التحكم';
         
         <!-- Statistics Cards -->
         <div class="row g-4 mb-5">
+            <!-- First Row -->
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
@@ -132,6 +158,36 @@ $pageTitle = 'لوحة التحكم';
                     <div class="card-body">
                         <h3 class="text-info"><?= toArabicNumerals($totalVisits) ?></h3>
                         <p class="text-muted mb-0">إجمالي الزيارات</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Second Row for Additional Statistics -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="text-secondary"><?= toArabicNumerals($totalTasbeeh) ?></h3>
+                        <p class="text-muted mb-0">📿 إجمالي التسبيحات</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="text-dark"><?= toArabicNumerals($mainImagesCount) ?></h3>
+                        <p class="text-muted mb-0">🖼️ الصور الرئيسية</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="text-muted"><?= toArabicNumerals($thumbnailsCount) ?></h3>
+                        <p class="text-muted mb-0">🔍 الصور المصغرة</p>
                     </div>
                 </div>
             </div>
