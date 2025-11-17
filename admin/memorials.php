@@ -86,6 +86,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 if (file_exists($thumbPath)) {
                     unlink($thumbPath);
                 }
+                
+                // Delete Duaa card if exists
+                $duaaImagePath = __DIR__ . '/../public/uploads/duaa_images/' . $memorial['image'];
+                if (file_exists($duaaImagePath)) {
+                    unlink($duaaImagePath);
+                }
             }
             
             $stmt = $pdo->prepare("DELETE FROM memorials WHERE id = ?");

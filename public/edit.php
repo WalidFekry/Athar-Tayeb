@@ -68,6 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
                     if (file_exists($thumbPath)) {
                         unlink($thumbPath);
                     }
+                    
+                    // Delete Duaa card if exists
+                    $duaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $memorial['image'];
+                    if (file_exists($duaaImagePath)) {
+                        unlink($duaaImagePath);
+                    }
                 }
                 
                 // Delete memorial from database
@@ -144,6 +150,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
                     $oldThumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $oldImagePath);
                     if (file_exists($oldThumbPath)) {
                         unlink($oldThumbPath);
+                    }
+                    
+                    // Delete old Duaa card if exists
+                    $oldDuaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $memorial['image'];
+                    if (file_exists($oldDuaaImagePath)) {
+                        unlink($oldDuaaImagePath);
                     }
                 }
             } else {

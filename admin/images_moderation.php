@@ -42,6 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 unlink($thumbPath);
             }
             
+            // Delete Duaa card if exists
+            $duaaImagePath = __DIR__ . '/../public/uploads/duaa_images/' . $memorial['image'];
+            if (file_exists($duaaImagePath)) {
+                unlink($duaaImagePath);
+            }
+            
             // Update database: set image to NULL and status to rejected
             $stmt = $pdo->prepare("UPDATE memorials SET image = NULL, image_status = 2 WHERE id = ?");
             $stmt->execute([$memorialId]);
