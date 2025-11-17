@@ -13,6 +13,89 @@ requireAdmin();
 
 $success = '';
 $cleanupResult = '';
+$orphanedCleanupResult = '';
+
+// Handle orphaned images cleanup action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cleanup_orphaned') {
+    checkCSRF();
+
+    // Get all image filenames from database
+    $stmt = $pdo->query("SELECT image FROM memorials WHERE image IS NOT NULL AND image != ''");
+    $dbImages = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    // Convert to array for faster lookup
+    $dbImagesArray = array_flip($dbImages);
+    
+    $uploadsPath = __DIR__ . '/../public/uploads/memorials/';
+    $duaaPath = __DIR__ . '/../public/uploads/duaa_images/';
+    
+    $totalFound = 0;
+    $deletedMain = 0;
+    $deletedThumbs = 0;
+    $deletedDuaa = 0;
+    $failedCount = 0;
+    
+    // Scan uploads/memorials/ directory
+    if (is_dir($uploadsPath)) {
+        $files = scandir($uploadsPath);
+        
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..' || !is_file($uploadsPath . $file)) {
+                continue;
+            }
+            
+            // Skip thumbnail files for now, we'll handle them separately
+            if (strpos($file, '_thumb.') !== false) {
+                continue;
+            }
+            
+            // Check if it's an image file
+            $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            if (!in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                continue;
+            }
+            
+            $totalFound++;
+            
+            // Check if this image exists in database
+            if (!isset($dbImagesArray[$file])) {
+                try {
+                    // Delete main image
+                    $mainImagePath = $uploadsPath . $file;
+                    if (file_exists($mainImagePath)) {
+                        unlink($mainImagePath);
+                        $deletedMain++;
+                    }
+                    
+                    // Delete corresponding thumbnail
+                    $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $mainImagePath);
+                    if (file_exists($thumbPath)) {
+                        unlink($thumbPath);
+                        $deletedThumbs++;
+                    }
+                    
+                    // Delete corresponding duaa card image
+                    $duaaImagePath = $duaaPath . $file;
+                    if (file_exists($duaaImagePath)) {
+                        unlink($duaaImagePath);
+                        $deletedDuaa++;
+                    }
+                    
+                } catch (Exception $e) {
+                    $failedCount++;
+                }
+            }
+        }
+    }
+    
+    $orphanedCleanupResult = [
+        'total_found' => $totalFound,
+        'deleted_main' => $deletedMain,
+        'deleted_thumbs' => $deletedThumbs,
+        'deleted_duaa' => $deletedDuaa,
+        'failed' => $failedCount
+    ];
+}
 
 // Handle cleanup action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cleanup') {
@@ -73,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 // Handle settings update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!isset($_POST['action']) || $_POST['action'] !== 'cleanup')) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!isset($_POST['action']) || ($_POST['action'] !== 'cleanup' && $_POST['action'] !== 'cleanup_orphaned'))) {
     checkCSRF();
 
     $settings = [
@@ -149,6 +232,21 @@ $totalTasbeeh = $stmt->fetchColumn();
                     <li><strong>تم حذفها بنجاح:</strong> <?= $cleanupResult['deleted'] ?></li>
                     <?php if ($cleanupResult['failed'] > 0): ?>
                         <li><strong>فشل في الحذف:</strong> <?= $cleanupResult['failed'] ?></li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($orphanedCleanupResult): ?>
+            <div class="alert alert-success">
+                <h5 class="alert-heading">🗂️ نتائج تنظيف الصور المهجورة</h5>
+                <ul class="mb-0">
+                    <li><strong>إجمالي الصور الموجودة:</strong> <?= $orphanedCleanupResult['total_found'] ?></li>
+                    <li><strong>الصور الرئيسية المحذوفة:</strong> <?= $orphanedCleanupResult['deleted_main'] ?></li>
+                    <li><strong>الصور المصغرة المحذوفة:</strong> <?= $orphanedCleanupResult['deleted_thumbs'] ?></li>
+                    <li><strong>صور الدعاء المحذوفة:</strong> <?= $orphanedCleanupResult['deleted_duaa'] ?></li>
+                    <?php if ($orphanedCleanupResult['failed'] > 0): ?>
+                        <li><strong>فشل في الحذف:</strong> <?= $orphanedCleanupResult['failed'] ?></li>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -250,6 +348,34 @@ $totalTasbeeh = $stmt->fetchColumn();
                                 <i class="fas fa-broom"></i> تنظيف الآن
                             </button>
                         </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Orphaned Images Cleaner -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">🗂️ تنظيف الصور المهجورة</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    احذف الصور الموجودة على الخادم والتي لا تنتمي لأي صفحة تذكارية في قاعدة البيانات. 
+                    سيتم حذف الصورة الرئيسية والمصغرة وصورة الدعاء المقترنة بها إن وجدت.
+                </p>
+
+                <form method="POST"
+                    onsubmit="return confirm('هل أنت متأكد من حذف الصور المهجورة؟ سيتم حذف جميع الصور التي لا تنتمي لصفحات موجودة في قاعدة البيانات. هذا الإجراء لا يمكن التراجع عنه.')">
+                    <?php csrfField(); ?>
+                    <input type="hidden" name="action" value="cleanup_orphaned">
+
+                    <div class="d-flex align-items-center gap-3">
+                        <button type="submit" class="btn btn-danger">
+                            🗑️ حذف الصور المهجورة
+                        </button>
+                        <small class="text-muted">
+                            سيتم فحص مجلد uploads/memorials/ ومقارنته مع قاعدة البيانات
+                        </small>
                     </div>
                 </form>
             </div>

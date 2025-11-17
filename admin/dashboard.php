@@ -31,8 +31,10 @@ $totalTasbeeh = $stmt->fetchColumn();
 
 // Count actual image files on server
 $uploadsPath = __DIR__ . '/../public/uploads/memorials/';
+$uploadsCardsPath = __DIR__ . '/../public/uploads/duaa_images/';
 $mainImagesCount = 0;
 $thumbnailsCount = 0;
+$cardsCount = 0;
 
 if (is_dir($uploadsPath)) {
     $files = scandir($uploadsPath);
@@ -47,6 +49,15 @@ if (is_dir($uploadsPath)) {
                     $mainImagesCount++;
                 }
             }
+        }
+    }
+}
+
+if (is_dir($uploadsCardsPath)) {
+    $files = scandir($uploadsCardsPath);
+    foreach ($files as $file) {
+        if ($file !== '.' && $file !== '..' && is_file($uploadsCardsPath . $file)) {
+            $cardsCount++;
         }
     }
 }
@@ -165,7 +176,7 @@ $pageTitle = 'لوحة التحكم';
         
         <!-- Second Row for Additional Statistics -->
         <div class="row g-4 mb-5">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
                         <h3 class="text-secondary"><?= toArabicNumerals($totalTasbeeh) ?></h3>
@@ -174,7 +185,7 @@ $pageTitle = 'لوحة التحكم';
                 </div>
             </div>
             
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
                         <h3 class="text-dark"><?= toArabicNumerals($mainImagesCount) ?></h3>
@@ -183,11 +194,20 @@ $pageTitle = 'لوحة التحكم';
                 </div>
             </div>
             
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
                         <h3 class="text-muted"><?= toArabicNumerals($thumbnailsCount) ?></h3>
                         <p class="text-muted mb-0">🔍 الصور المصغرة</p>
+                    </div>
+                </div>
+            </div>
+
+           <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="text-muted"><?= toArabicNumerals($cardsCount) ?></h3>
+                        <p class="text-muted mb-0">📜 بطاقات الدعاء</p>
                     </div>
                 </div>
             </div>
