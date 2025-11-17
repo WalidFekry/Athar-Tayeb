@@ -24,8 +24,9 @@ $stmt = $pdo->prepare("SELECT * FROM memorials WHERE id = ?");
 $stmt->execute([$memorialId]);
 $memorial = $stmt->fetch();
 
+// Check if memorial exists
 if (!$memorial) {
-    redirect(BASE_URL);
+    redirect(site_url('404'));
 }
 
 // Generate URL (ID-based only)
