@@ -12,6 +12,7 @@ require_once __DIR__ . '/../../includes/functions.php';
 
 // Get query parameter
 $query = isset($_GET['q']) ? trim($_GET['q']) : '';
+$limit = isset($_GET['limit']) ? trim($_GET['limit']) : 10;
 
 if (empty($query) || strlen($query) < 2) {
     echo json_encode(['success' => false, 'error' => 'Query too short'], JSON_UNESCAPED_UNICODE);
@@ -22,12 +23,12 @@ try {
     // Search in published memorials
     $searchTerm = '%' . $query . '%';
     $stmt = $pdo->prepare("
-        SELECT id, name, death_date, image
+        SELECT id, name, from_name, death_date, image
         FROM memorials 
         WHERE status = 1 
         AND (name LIKE ? OR from_name LIKE ?)
         ORDER BY visits DESC, created_at DESC
-        LIMIT 10
+        LIMIT $limit
     ");
     $stmt->execute([$searchTerm, $searchTerm]);
     $results = $stmt->fetchAll();
@@ -38,8 +39,10 @@ try {
         $formattedResults[] = [
             'id' => $result['id'],
             'name' => $result['name'],
+            'from_name' => $result['from_name'],
             'death_date' => $result['death_date'] ? formatArabicDate($result['death_date']) : null,
-            'image_url' => getImageUrl($result['image'], true)
+            'image_url' => getImageUrl($result['image'], true,"/assets/images/placeholder-memorial.png"),
+            'page_url' => site_url('m/' . $result['id']),
         ];
     }
     
