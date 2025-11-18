@@ -12,11 +12,24 @@ require_once __DIR__ . '/../includes/csrf.php';
 require_once __DIR__ . '/../includes/maintenance_check.php';
 
 $errors = [];
-$success = false;
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     checkCSRF();
+
+    // Check rate limiting
+    $ip = getUserIp();
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM memorials 
+        WHERE ip_address = ? 
+          AND created_at >= (NOW() - INTERVAL 1 HOUR)
+    ");
+    $stmt->execute([$ip]);
+    $countLastHour = (int) $stmt->fetchColumn();
+    if ($countLastHour >= 1) {
+        $errors[] = 'يمكنك إنشاء صفحة تذكارية واحدة فقط كل ساعة من هذا الجهاز. يرجى المحاولة لاحقاً.';
+    }
 
     // Validate inputs first
     $name = trim($_POST['name'] ?? '');
@@ -36,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quote = trim($_POST['quote'] ?? '');
     $generateDuaaImage = isset($_POST['generate_duaa_image']) ? 1 : 0;
 
-    $errors = [];
+
 
     if (!empty($from_name) && mb_strlen($from_name) > 30) {
         $errors[] = 'اسم منشئ الصفحة يجب ألا يتجاوز 30 حرف';
@@ -54,13 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!in_array($gender, ['male', 'female'])) {
         $gender = 'male';
-    }
-
-    // Check rate limiting
-    if (empty($errors)) {
-        if (!checkRateLimit('create_memorial', CREATE_RATE_LIMIT, 3600)) {
-            $errors[] = 'يمكنك إنشاء صفحة تذكارية واحدة فقط كل ساعة. يرجى المحاولة لاحقاً.';
-        }
     }
 
     // Process image upload if no errors so far
@@ -105,10 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Generate unique edit key
             $editKey = generateEditKey();
-            
+
             $stmt = $pdo->prepare("
-                INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status, edit_key, generate_duaa_image)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)
+                INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status, edit_key, generate_duaa_image, ip_address)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)
             ");
 
             $stmt->execute([
@@ -122,7 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $autoApproveMessages,
                 $autoApproval,
                 $editKey,
-                $generateDuaaImage
+                $generateDuaaImage,
+                $ip
             ]);
 
             $memorialId = $pdo->lastInsertId();
@@ -324,7 +331,8 @@ include __DIR__ . '/../includes/header.php';
                                 </label>
                             </div>
                             <small class="form-text text-muted">
-                      لإنشاء بطاقة تذكارية جميلة تحتوي على اسم المتوفى ودعاء مختار، يجب أولًا رفع صورة للمتوفى. بعد رفع الصورة ستظهر البطاقة في الصفحة التذكارية مع إمكانية تحميلها ومشاركتها.
+                                لإنشاء بطاقة تذكارية جميلة تحتوي على اسم المتوفى ودعاء مختار، يجب أولًا رفع صورة
+                                للمتوفى. بعد رفع الصورة ستظهر البطاقة في الصفحة التذكارية مع إمكانية تحميلها ومشاركتها.
                             </small>
                         </div>
 

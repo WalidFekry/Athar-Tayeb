@@ -335,6 +335,28 @@ function checkRateLimit($key, $limit, $period = 3600)
 }
 
 /**
+ * Get user IP address
+ */
+function getUserIp()
+{
+    $keys = [
+        'HTTP_CF_CONNECTING_IP', // Cloudflare
+        'HTTP_X_FORWARDED_FOR',
+        'HTTP_X_REAL_IP',
+        'REMOTE_ADDR',
+    ];
+
+    foreach ($keys as $key) {
+        if (!empty($_SERVER[$key])) {
+            $ipList = explode(',', $_SERVER[$key]);
+            return trim($ipList[0]); // Return the first IP in the list
+        }
+    }
+
+    return 'unknown';
+}
+
+/**
  * Log authentication attempts
  */
 function logAuthAttempt($username, $success, $ip)
