@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 15, 2025 at 03:14 PM
+-- Generation Time: Nov 18, 2025 at 11:10 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.27
 
@@ -68,7 +68,8 @@ CREATE TABLE `memorials` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `status` tinyint(1) DEFAULT '0' COMMENT '0=pending, 1=approved',
   `edit_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `generate_duaa_image` tinyint(1) DEFAULT '0' COMMENT '0=no, 1=yes'
+  `generate_duaa_image` tinyint(1) DEFAULT '0' COMMENT '0=no, 1=yes',
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
