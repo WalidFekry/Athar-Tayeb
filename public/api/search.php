@@ -23,7 +23,7 @@ try {
     // Search in published memorials
     $searchTerm = '%' . $query . '%';
     $stmt = $pdo->prepare("
-        SELECT id, name, from_name, death_date, image
+        SELECT id, name, from_name, death_date, image, visits
         FROM memorials 
         WHERE status = 1 
         AND (name LIKE ? OR from_name LIKE ?)
@@ -40,6 +40,7 @@ try {
             'id' => $result['id'],
             'name' => $result['name'],
             'from_name' => $result['from_name'],
+            'visits' => $result['visits'],
             'death_date' => $result['death_date'] ? formatArabicDate($result['death_date']) : null,
             'image_url' => getImageUrl($result['image'], true,"/assets/images/placeholder-memorial.png"),
             'page_url' => site_url('m/' . $result['id']),

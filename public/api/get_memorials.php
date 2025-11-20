@@ -42,8 +42,12 @@ try {
         $stmt->execute([$defaultLimit]);
 
     } elseif ($order === 'last_visit') {
-        $query = $baseQuery . " ORDER BY last_visit DESC LIMIT ?";
-        $stmt  = $pdo->prepare($query);
+ $query = $baseQuery . "
+        AND last_visit IS NOT NULL
+        AND DATE(created_at) != CURDATE()
+        ORDER BY last_visit DESC LIMIT ?
+    ";
+            $stmt  = $pdo->prepare($query);
         $stmt->execute([$defaultLimit]);
 
     } else {

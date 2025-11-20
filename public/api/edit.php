@@ -240,7 +240,7 @@ try {
         'image_status' => $imageStatus,
         'image_url'    => $imageName ? getImageUrl($imageName) : null,
         'page_url'     => site_url('m/' . $id),
-        'status'       => $memorial['status'],
+        'status'       => $memorial['status'] ? 'approved' : 'pending',
         'edit_key'     => $editKey,
         'updated_at'   => date('Y-m-d H:i:s')
     ];
