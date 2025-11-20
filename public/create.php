@@ -70,8 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Process image upload if no errors so far
+    $imageName = null;
     if (empty($errors)) {
-        $imageName = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
             $uploadResult = processUploadedImage($_FILES['image'], 0);
             if ($uploadResult['success']) {

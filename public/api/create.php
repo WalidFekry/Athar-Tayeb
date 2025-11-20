@@ -55,8 +55,24 @@ try {
     $gender = trim($_POST['gender'] ?? 'male');
     $whatsapp = trim($_POST['whatsapp'] ?? '');
     $quote = trim($_POST['quote'] ?? '');
+    $generateDuaaImage = isset($_POST['generate_duaa_image']) ? 1 : 0;
+
 
     $errors = [];
+
+    // Check rate limiting
+    $ip = getUserIp();
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM memorials 
+        WHERE ip_address = ? 
+          AND created_at >= (NOW() - INTERVAL 1 HOUR)
+    ");
+    $stmt->execute([$ip]);
+    $countLastHour = (int) $stmt->fetchColumn();
+    if ($countLastHour >= 1) {
+        $errors[] = 'يمكنك إنشاء صفحة تذكارية واحدة فقط كل ساعة من هذا الجهاز. يرجى المحاولة لاحقاً.';
+    }
 
     // Validation rules (same as original create.php)
     if (!empty($from_name) && mb_strlen($from_name) > 30) {
@@ -90,6 +106,17 @@ try {
         }
     }
 
+    if (empty($errors)) {
+        // Generate duaa image if requested and image uploaded
+        if ($generateDuaaImage && $imageName) {
+            require_once __DIR__ . '/../includes/generate_duaa_image.php';
+            $imagePath = $imageName ? UPLOAD_PATH . '/' . $imageName : null;
+            generateDuaaImage($imageName, $name, $gender, $imagePath, $death_date);
+        } elseif ($generateDuaaImage && !$imageName) {
+            $errors[] = 'يجب تحميل صورة تذكارية للمتوفي لإنشاء بطاقة دعاء.';
+        }
+    }
+
     // Return validation errors if any
     if (!empty($errors)) {
         http_response_code(400);
@@ -113,10 +140,13 @@ try {
     $autoApproveMessagesSetting = $stmt->fetchColumn();
     $autoApproveMessages = ($autoApproveMessagesSetting == '1') ? 1 : 0;
 
+    // Generate unique edit key
+    $editKey = generateEditKey();
+
     $stmt = $pdo->prepare("
-        INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
-    ");
+                INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status, edit_key, generate_duaa_image, ip_address)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)
+            ");
 
     $stmt->execute([
         $name,
@@ -127,7 +157,10 @@ try {
         $whatsapp ?: null,
         $quote ?: null,
         $autoApproveMessages,
-        $autoApproval
+        $autoApproval,
+        $editKey,
+        $generateDuaaImage,
+        $ip
     ]);
 
     $memorialId = $pdo->lastInsertId();
@@ -139,12 +172,12 @@ try {
         'from_name' => $from_name ?: null,
         'death_date' => $death_date ?: null,
         'gender' => $gender,
-        'whatsapp' => $whatsapp ?: null,
         'quote' => $quote ?: null,
         'quote_status' => $autoApproveMessages ?: 0,
         'image_url' => $imageName ? getImageUrl($imageName) : null,
         'page_url' => site_url('m/' . $memorialId),
         'status' => $autoApproval ? 'approved' : 'pending',
+        'edit_key' => $editKey,
         'created_at' => date('Y-m-d H:i:s')
     ];
 
