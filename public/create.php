@@ -338,8 +338,12 @@ include __DIR__ . '/../includes/header.php';
 
                         <!-- Submit Button -->
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                إنشاء الصفحة التذكارية 💚
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <span class="btn-text">إنشاء الصفحة التذكارية 💚</span>
+                                <span class="btn-loading d-none">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    جاري الإنشاء..
+                                </span>
                             </button>
                         </div>
 
@@ -483,6 +487,26 @@ include __DIR__ . '/../includes/header.php';
             // Initialize
             updateCharCount();
         });
+    })();
+
+    // Form submission loading state
+    (function() {
+        const form = document.querySelector('form[data-validate]');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+
+        if (form && submitBtn) {
+            form.addEventListener('submit', function(e) {
+                // Show loading state
+                btnText.classList.add('d-none');
+                btnLoading.classList.remove('d-none');
+                submitBtn.disabled = true;
+                
+                // Add visual feedback
+                submitBtn.style.opacity = '0.8';
+            });
+        }
     })();
 </script>
 

@@ -100,11 +100,10 @@
   // Fallback: Hide loader if it's been showing too long
   setTimeout(() => {
     if (globalLoader && !globalLoader.classList.contains('hidden')) {
-      console.warn('Loader timeout - hiding loader');
       hideLoader();
     }
   }, 10000); // 10 second timeout
-
+  
   // Tasbeeh Counter Management
   const tasbeehButtons = document.querySelectorAll(".tasbeeh-card");
 
@@ -140,13 +139,9 @@
     const tasbeehId = card.dataset.tasbeehId;
     const maxCount = 33;
     
-    // Debug: Log initialization
-    console.log(`Initializing tasbeeh card: ${tasbeehId}`);
-    
     // Load saved progress from localStorage
     const savedCount = parseInt(localStorage.getItem(`tasbeeh_${tasbeehId}_${getMemorialId()}`) || "0");
     if (savedCount > 0) {
-      console.log(`Loading saved count for ${tasbeehId}: ${savedCount}`);
       updateTasbeehProgress(card, savedCount, maxCount);
       if (savedCount >= maxCount) {
         handleTasbeehCompletion(card);
@@ -156,20 +151,14 @@
     card.addEventListener("click", () => {
       // Check if already completed
       if (card.classList.contains('completed')) {
-        console.log(`Tasbeeh ${tasbeehId} already completed, ignoring click`);
         return;
       }
       
       const localCountSpan = card.querySelector(".tasbeeh-count");
-      if (!localCountSpan) {
-        console.error(`No .tasbeeh-count found in card ${tasbeehId}`);
-        return;
-      }
+      if (!localCountSpan) return;
 
       let count = parseInt(localCountSpan.textContent) || 0;
       count++;
-      
-      console.log(`Incrementing ${tasbeehId}: ${count}/${maxCount}`);
       
       // Update display and progress
       updateTasbeehProgress(card, count, maxCount);
@@ -187,7 +176,6 @@
       
       // Check for completion
       if (count >= maxCount) {
-        console.log(`Tasbeeh ${tasbeehId} completed! Triggering completion handler`);
         handleTasbeehCompletion(card);
       }
     });
@@ -212,23 +200,18 @@
   }
   
   function handleTasbeehCompletion(card) {
-    console.log('Handling tasbeeh completion...');
-    
     // Add completed class for styling
     card.classList.add('completed');
     
     // Show completion message
     const completionMessage = card.querySelector(".completion-message");
     if (completionMessage) {
-      console.log('Showing completion message');
       completionMessage.style.display = "flex";
       // Force reflow to ensure display change takes effect
       completionMessage.offsetHeight;
       setTimeout(() => {
         completionMessage.classList.add('show');
       }, 50);
-    } else {
-      console.error('No completion message element found');
     }
     
     // Add visual completion effect to the card
@@ -243,7 +226,6 @@
     // Re-enable after showing the message
     setTimeout(() => {
       card.style.pointerEvents = 'auto';
-      console.log('Tasbeeh completion handling finished');
     }, 4000);
   }
   
