@@ -35,12 +35,13 @@ try {
             death_date,
             created_at,
             visits,
-            last_visit,
             image,
+            gender,
+            whatsapp,
+            quote,
             image_status,
             edit_key,
-            (tasbeeh_subhan + tasbeeh_alham + tasbeeh_lailaha + tasbeeh_allahu) as total_tasbeeh,
-            status
+            (tasbeeh_subhan + tasbeeh_alham + tasbeeh_lailaha + tasbeeh_allahu) as total_tasbeeh
         FROM memorials 
         WHERE id = :id AND edit_key = :edit_key AND status = 1
         LIMIT 1
@@ -67,6 +68,9 @@ try {
                 'name' => $memorial['name'],
                 'from_name' => $memorial['from_name'],
                 'death_date' => $memorial['death_date'],
+                'gender' => $memorial['gender'],
+                'whatsapp' => $memorial['whatsapp'],
+                'quote' => $memorial['quote'],
                 'created_at' => $memorial['created_at'],
                 'visits' => (int)$memorial['visits'],
                 'total_tasbeeh' => (int)$memorial['total_tasbeeh'],
