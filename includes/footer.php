@@ -25,7 +25,7 @@
                         <li><a href="<?= site_url('') ?>" class="footer-link small">الرئيسية</a></li>
                         <li><a href="<?= site_url('create') ?>" class="footer-link small">أنشئ صفحة تذكارية</a></li>
                         <li><a href="<?= site_url('all') ?>" class="footer-link small">جميع الصفحات</a></li>
-                        <li><a href="<?= site_url('contact') ?>" class="footer-link small">تواصل معنا</a></li>
+                        <li><a href="<?= site_url('how-to-benefit') ?>" class="footer-link small">كيف تستفيد؟</a></li>
                     </ul>
                 </div>
                 
@@ -58,6 +58,41 @@
                                 <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Global Statistics Section -->
+            <?php 
+            $stats = getGlobalStatistics();
+            ?>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="global-stats-section">
+                        <h6 class="fw-bold text-center mb-3">إحصائيات أثر طيب 📊</h6>
+                        <div class="row g-3 text-center">
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <div class="stat-icon">📿</div>
+                                    <div class="stat-value"><?= toArabicNumerals(number_format($stats['tasbeeh'])) ?></div>
+                                    <div class="stat-label">إجمالي التسبيحات</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <div class="stat-icon">🌿</div>
+                                    <div class="stat-value"><?= toArabicNumerals($stats['memorials']) ?></div>
+                                    <div class="stat-label">الصفحات التذكارية</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <div class="stat-icon">👁️</div>
+                                    <div class="stat-value"><?= toArabicNumerals(number_format($stats['visits'])) ?></div>
+                                    <div class="stat-label">إجمالي الزيارات</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

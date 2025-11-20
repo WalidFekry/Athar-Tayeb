@@ -559,4 +559,39 @@ function isValidEditKeyFormat($key)
     return preg_match('/^[A-Za-z0-9\-_]{20,24}$/', $key) === 1;
 }
 
+/**
+ * Get global site statistics for footer display
+ * @return array Array containing total tasbeeh, total memorials, and total visits
+ */
+function getGlobalStatistics()
+{
+    global $pdo;
+    
+    try {
+        // Get total tasbeeh count from published memorials
+        $stmt = $pdo->query("SELECT SUM(tasbeeh_subhan + tasbeeh_alham + tasbeeh_lailaha + tasbeeh_allahu) FROM memorials WHERE status = 1");
+        $totalTasbeeh = $stmt->fetchColumn() ?: 0;
+        
+        // Get total published memorial pages
+        $stmt = $pdo->query("SELECT COUNT(*) FROM memorials WHERE status = 1");
+        $totalMemorials = $stmt->fetchColumn() ?: 0;
+        
+        // Get total visits from published memorials
+        $stmt = $pdo->query("SELECT SUM(visits) FROM memorials WHERE status = 1");
+        $totalVisits = $stmt->fetchColumn() ?: 0;
+        
+        return [
+            'tasbeeh' => (int)$totalTasbeeh,
+            'memorials' => (int)$totalMemorials,
+            'visits' => (int)$totalVisits
+        ];
+    } catch (Exception $e) {
+        // Return zeros if there's an error
+        return [
+            'tasbeeh' => 0,
+            'memorials' => 0,
+            'visits' => 0
+        ];
+    }
+}
 

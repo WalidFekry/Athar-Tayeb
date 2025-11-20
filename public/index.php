@@ -60,6 +60,9 @@ include __DIR__ . '/../includes/header.php';
         <a href="<?= site_url('create') ?>" class="btn btn-light btn-lg px-5 py-3" aria-label="انتقل إلى صفحة إنشاء صفحة تذكارية جديدة">
             أنشئ صفحة تذكارية الآن 💚
         </a>
+        <p class="text-white-50 mt-3 mb-0 small fst-italic">
+             تستغرق أقل من دقيقتين — بدون تسجيل دخول ⏱️
+        </p>
     </div>
 </section>
 

@@ -96,6 +96,9 @@ $structuredData = $structuredData ?? '';
                         <a class="nav-link" href="<?= site_url('all') ?>">جميع الصفحات</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="<?= site_url('how-to-benefit') ?>">كيف تستفيد؟</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="<?= site_url('contact') ?>">تواصل معنا</a>
                     </li>
                 </ul>
@@ -137,6 +140,20 @@ $structuredData = $structuredData ?? '';
                     </form>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Global Loading Overlay -->
+    <div id="globalLoader" class="global-loader">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <span class="logo-icon">🌿</span>
+                <span class="logo-text"><?= SITE_NAME ?></span>
+            </div>
+            <div class="loader-spinner">
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="loader-message">جاري التحميل..</div>
         </div>
     </div>
 

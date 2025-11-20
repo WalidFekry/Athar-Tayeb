@@ -297,36 +297,39 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
-        <!-- Duaa Image Section -->
-    <?php 
+    <!-- Duaa Image Section -->
+    <?php
     $duaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $memorial['image'];
     $duaaImageUrl = BASE_URL . '/uploads/duaa_images/' . $memorial['image'];
-    if ($memorial['image_status'] == 1 && $memorial['generate_duaa_image'] && file_exists($duaaImagePath)): 
-    ?>
-    <div class="card shadow-sm mb-4 border-success">
-        <div class="card-body">
-            <h4 class="text-center mb-4 text-success">بطاقة الدعاء 📜</h4>
-            <p class="text-center text-muted mb-4">
-                بطاقة دعاء مخصصة <?= getPronoun($memorial['gender'], 'للمرحوم') ?> <strong><?= e($memorial['name']) ?></strong>
-            </p>
-            
-            <div class="text-center mb-4">
-                <img src="<?= $duaaImageUrl ?>" alt="بطاقة دعاء <?= e($memorial['name']) ?>" 
-                     class="img-fluid rounded shadow duaa-card-image" 
-                     style="width: 100%; max-width: 500px; height: auto; cursor: pointer;"
-                     onclick="openDuaaImageModal('<?= $duaaImageUrl ?>', '<?= e($memorial['name']) ?>')">
-            </div>
-            
-            <div class="d-flex gap-2 justify-content-center flex-wrap">
-                <button class="btn btn-success" onclick="openDuaaImageModal('<?= $duaaImageUrl ?>', '<?= e($memorial['name']) ?>')">
-                    👁️ عرض بالحجم الكامل
-                </button>
-                <a href="<?= $duaaImageUrl ?>" download="duaa_<?= e($memorial['name']) ?>.png" class="btn btn-outline-primary">
-                    💾 تحميل البطاقة
-                </a>
+    if ($memorial['image_status'] == 1 && $memorial['generate_duaa_image'] && file_exists($duaaImagePath)):
+        ?>
+        <div class="card shadow-sm mb-4 border-success">
+            <div class="card-body">
+                <h4 class="text-center mb-4 text-success">بطاقة الدعاء 📜</h4>
+                <p class="text-center text-muted mb-4">
+                    بطاقة دعاء مخصصة <?= getPronoun($memorial['gender'], 'للمرحوم') ?>
+                    <strong><?= e($memorial['name']) ?></strong>
+                </p>
+
+                <div class="text-center mb-4">
+                    <img src="<?= $duaaImageUrl ?>" alt="بطاقة دعاء <?= e($memorial['name']) ?>"
+                        class="img-fluid rounded shadow duaa-card-image"
+                        style="width: 100%; max-width: 500px; height: auto; cursor: pointer;"
+                        onclick="openDuaaImageModal('<?= $duaaImageUrl ?>', '<?= e($memorial['name']) ?>')">
+                </div>
+
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                    <button class="btn btn-success"
+                        onclick="openDuaaImageModal('<?= $duaaImageUrl ?>', '<?= e($memorial['name']) ?>')">
+                        👁️ عرض بالحجم الكامل
+                    </button>
+                    <a href="<?= $duaaImageUrl ?>" download="duaa_<?= e($memorial['name']) ?>.png"
+                        class="btn btn-outline-primary">
+                        💾 تحميل البطاقة
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
     <?php endif; ?>
 
     <!-- Azkar Section -->
@@ -496,45 +499,94 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
 
-                <div class="tasbeeh-card local-only" data-field="localcounter">
+                <div class="tasbeeh-card local-only" data-field="localcounter" data-tasbeeh-id="mercy">
                     <div class="tasbeeh-title">
                         <?= $memorial['gender'] === 'female' ? 'اللهم ارحمها' : 'اللهم ارحمه' ?>
                     </div>
-                    <div class="tasbeeh-count"><?= number_format(0) ?></div>
+                    <div class="tasbeeh-count">0</div>
                     <div class="tasbeeh-label">
                         / <span class="tasbeeh-local">33</span>
                     </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="completion-message" style="display: none;">
+                        <div class="completion-icon">✅</div>
+                        <div class="completion-text">
+                            تم إكمال ٣٣ تسبيحة<br>
+                            <?= $memorial['gender'] === 'female'
+                                ? 'نسأل الله أن يتقبّلها ويجعلها نورًا يضيء قبرها 💚'
+                                : 'نسأل الله أن يتقبّلها ويجعلها نورًا يضيء قبره 💚' ?>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="tasbeeh-card local-only" data-field="localcounter">
+                <div class="tasbeeh-card local-only" data-field="localcounter" data-tasbeeh-id="forgiveness">
                     <div class="tasbeeh-title">
                         <?= $memorial['gender'] === 'female' ? 'اللهم اغفر لها' : 'اللهم اغفر له' ?>
                     </div>
-                    <div class="tasbeeh-count"><?= number_format(0) ?></div>
+                    <div class="tasbeeh-count">0</div>
                     <div class="tasbeeh-label">
                         / <span class="tasbeeh-local">33</span>
                     </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="completion-message" style="display: none;">
+                        <div class="completion-icon">✅</div>
+                        <div class="completion-text">
+                            تم إكمال ٣٣ تسبيحة<br>
+                            <?= $memorial['gender'] === 'female'
+                                ? 'نسأل الله أن يجعلها في ميزان حسناتها ويرفع درجتها 💚'
+                                : 'نسأل الله أن يجعلها في ميزان حسناته ويرفع درجته 💚' ?>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="tasbeeh-card local-only" data-field="localcounter">
+                <div class="tasbeeh-card local-only" data-field="localcounter" data-tasbeeh-id="pardon">
                     <div class="tasbeeh-title">
                         <?= $memorial['gender'] === 'female' ? 'اللهم اعفُ عنها' : 'اللهم اعفُ عنه' ?>
                     </div>
-                    <div class="tasbeeh-count"><?= number_format(0) ?></div>
+                    <div class="tasbeeh-count">0</div>
                     <div class="tasbeeh-label">
                         / <span class="tasbeeh-local">33</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="completion-message" style="display: none;">
+                        <div class="completion-icon">✅</div>
+                        <div class="completion-text">
+                            تم إكمال ٣٣ تسبيحة<br>
+                            <?= $memorial['gender'] === 'female'
+                                ? 'نسأل الله أن يغفر لها ويتجاوز عن سيئاتها 💚'
+                                : 'نسأل الله أن يغفر له ويتجاوز عن سيئاته 💚' ?>
+                        </div>
                     </div>
                 </div>
 
-                <div class="tasbeeh-card local-only" data-field="localcounter">
+                <div class="tasbeeh-card local-only" data-field="localcounter" data-tasbeeh-id="elevation">
                     <div class="tasbeeh-title">
-                        <?= $memorial['gender'] === 'female' ? 'اللهم ارفع  درجاتها' : 'اللهم ارفع  درجاته' ?>
+                        <?= $memorial['gender'] === 'female' ? 'اللهم ارفع درجاتها' : 'اللهم ارفع درجاته' ?>
                     </div>
-                    <div class="tasbeeh-count"><?= number_format(0) ?></div>
+                    <div class="tasbeeh-count">0</div>
                     <div class="tasbeeh-label">
                         / <span class="tasbeeh-local">33</span>
                     </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="completion-message" style="display: none;">
+                        <div class="completion-icon">✅</div>
+                        <div class="completion-text">
+                            تم إكمال ٣٣ تسبيحة<br>
+                            <?= $memorial['gender'] === 'female'
+                                ? 'نسأل الله أن يرفع منزلتها في الجنة ويجعل قبرها روضةً من رياض الجنة 💚'
+                                : 'نسأل الله أن يرفع منزلته في الجنة ويجعل قبره روضةً من رياض الجنة 💚' ?>
+                        </div>
+                    </div>
                 </div>
+
 
             </div>
 
@@ -830,7 +882,8 @@ include __DIR__ . '/../includes/header.php';
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <div class="modal-body p-3 text-center">
-                <img id="duaaModalImage" src="" alt="بطاقة دعاء" class="img-fluid rounded shadow" style="max-height: 80vh;">
+                <img id="duaaModalImage" src="" alt="بطاقة دعاء" class="img-fluid rounded shadow"
+                    style="max-height: 80vh;">
             </div>
             <div class="modal-footer justify-content-center">
                 <a id="duaaDownloadBtn" href="" download="" class="btn btn-success">

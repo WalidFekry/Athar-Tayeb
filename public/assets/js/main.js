@@ -49,6 +49,62 @@
     }
   }
 
+  // Global Loading System
+  const globalLoader = document.getElementById('globalLoader');
+  
+  // Show loader on page load
+  function showLoader() {
+    if (globalLoader) {
+      globalLoader.classList.remove('hidden');
+    }
+  }
+  
+  // Hide loader when page is ready
+  function hideLoader() {
+    if (globalLoader) {
+      globalLoader.classList.add('hidden');
+      // Remove from DOM after animation completes
+      setTimeout(() => {
+        if (globalLoader.classList.contains('hidden')) {
+          globalLoader.style.display = 'none';
+        }
+      }, 500);
+    }
+  }
+  
+  // Hide loader when page is fully loaded
+  window.addEventListener('load', () => {
+    setTimeout(hideLoader, 300); // Small delay for better UX
+  });
+  
+  // Show loader when navigating away (for internal links)
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (link && 
+        link.href && 
+        !link.href.startsWith('mailto:') && 
+        !link.href.startsWith('tel:') && 
+        !link.href.startsWith('#') &&
+        !link.target === '_blank' &&
+        link.hostname === window.location.hostname) {
+      
+      // Only show loader for page navigation, not for downloads or external links
+      if (!link.href.includes('.pdf') && 
+          !link.href.includes('.zip') && 
+          !link.href.includes('.doc')) {
+        showLoader();
+      }
+    }
+  });
+  
+  // Fallback: Hide loader if it's been showing too long
+  setTimeout(() => {
+    if (globalLoader && !globalLoader.classList.contains('hidden')) {
+      console.warn('Loader timeout - hiding loader');
+      hideLoader();
+    }
+  }, 10000); // 10 second timeout
+
   // Tasbeeh Counter Management
   const tasbeehButtons = document.querySelectorAll(".tasbeeh-card");
 
@@ -79,23 +135,130 @@
     });
   });
 
-  // Local-only Tasbeeh Counters
+  // Local-only Tasbeeh Counters with Progress Bars
   document.querySelectorAll(".tasbeeh-card.local-only").forEach((card) => {
+    const tasbeehId = card.dataset.tasbeehId;
+    const maxCount = 33;
+    
+    // Debug: Log initialization
+    console.log(`Initializing tasbeeh card: ${tasbeehId}`);
+    
+    // Load saved progress from localStorage
+    const savedCount = parseInt(localStorage.getItem(`tasbeeh_${tasbeehId}_${getMemorialId()}`) || "0");
+    if (savedCount > 0) {
+      console.log(`Loading saved count for ${tasbeehId}: ${savedCount}`);
+      updateTasbeehProgress(card, savedCount, maxCount);
+      if (savedCount >= maxCount) {
+        handleTasbeehCompletion(card);
+      }
+    }
+    
     card.addEventListener("click", () => {
+      // Check if already completed
+      if (card.classList.contains('completed')) {
+        console.log(`Tasbeeh ${tasbeehId} already completed, ignoring click`);
+        return;
+      }
+      
       const localCountSpan = card.querySelector(".tasbeeh-count");
-      if (!localCountSpan) return;
+      if (!localCountSpan) {
+        console.error(`No .tasbeeh-count found in card ${tasbeehId}`);
+        return;
+      }
 
       let count = parseInt(localCountSpan.textContent) || 0;
       count++;
-      localCountSpan.textContent = count;
+      
+      console.log(`Incrementing ${tasbeehId}: ${count}/${maxCount}`);
+      
+      // Update display and progress
+      updateTasbeehProgress(card, count, maxCount);
+      
+      // Save to localStorage
+      localStorage.setItem(`tasbeeh_${tasbeehId}_${getMemorialId()}`, count.toString());
 
-      // Optional: تأثير بصري صغير عند الضغط
+      // Click animation
       card.style.transform = "scale(0.95)";
       setTimeout(() => {
-        card.style.transform = "";
+        if (!card.classList.contains('completed')) {
+          card.style.transform = "";
+        }
       }, 100);
+      
+      // Check for completion
+      if (count >= maxCount) {
+        console.log(`Tasbeeh ${tasbeehId} completed! Triggering completion handler`);
+        handleTasbeehCompletion(card);
+      }
     });
   });
+  
+  function updateTasbeehProgress(card, count, maxCount) {
+    const localCountSpan = card.querySelector(".tasbeeh-count");
+    const progressBar = card.querySelector(".progress-bar");
+    
+    if (localCountSpan) {
+      localCountSpan.textContent = count;
+    }
+    
+    if (progressBar) {
+      const percentage = Math.min((count / maxCount) * 100, 100);
+      progressBar.style.width = percentage + "%";
+      
+      if (count >= maxCount) {
+        progressBar.classList.add('complete');
+      }
+    }
+  }
+  
+  function handleTasbeehCompletion(card) {
+    console.log('Handling tasbeeh completion...');
+    
+    // Add completed class for styling
+    card.classList.add('completed');
+    
+    // Show completion message
+    const completionMessage = card.querySelector(".completion-message");
+    if (completionMessage) {
+      console.log('Showing completion message');
+      completionMessage.style.display = "flex";
+      // Force reflow to ensure display change takes effect
+      completionMessage.offsetHeight;
+      setTimeout(() => {
+        completionMessage.classList.add('show');
+      }, 50);
+    } else {
+      console.error('No completion message element found');
+    }
+    
+    // Add visual completion effect to the card
+    card.style.background = 'linear-gradient(135deg, var(--success) 0%, #4a7c59 100%)';
+    card.style.color = 'white';
+    card.style.transform = 'scale(1.02)';
+    card.style.boxShadow = '0 8px 25px rgba(90, 125, 78, 0.3)';
+    
+    // Disable further clicks temporarily
+    card.style.pointerEvents = 'none';
+    
+    // Re-enable after showing the message
+    setTimeout(() => {
+      card.style.pointerEvents = 'auto';
+      console.log('Tasbeeh completion handling finished');
+    }, 4000);
+  }
+  
+  function getMemorialId() {
+    // Extract memorial ID from URL or page context
+    const pathParts = window.location.pathname.split('/');
+    const memorialIndex = pathParts.indexOf('m');
+    if (memorialIndex !== -1 && pathParts[memorialIndex + 1]) {
+      return pathParts[memorialIndex + 1];
+    }
+    
+    // Fallback: try to get from memorial data or URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id') || 'default';
+  }
 
   function incrementTasbeeh(memorialId, field, countElement) {
     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
