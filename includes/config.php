@@ -27,7 +27,7 @@ define('CACHE_PATH', ROOT_PATH . '/cache');
 define('LOGS_PATH', ROOT_PATH . '/logs');
 
 // Upload Settings
-define('MAX_FILE_SIZE', 2 * 1024 * 1024); // 2MB
+define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
 define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png']);
 define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png']);
 

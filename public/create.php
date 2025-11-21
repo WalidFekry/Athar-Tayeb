@@ -225,7 +225,7 @@ include __DIR__ . '/../includes/header.php';
                             <input type="file" class="form-control" id="imageInput" name="image"
                                 accept=".jpg,.jpeg,.png" aria-describedby="image_help">
                             <small id="image_help" class="form-text text-muted">
-                                الحد الأقصى: 2 ميجابايت | الصيغ المسموحة: JPG, PNG
+                                الحد الأقصى: 5 ميجابايت | الصيغ المسموحة: JPG, PNG
                             </small>
                             <div id="imagePreview" class="mt-3 text-center" role="img" aria-live="polite"></div>
                         </div>

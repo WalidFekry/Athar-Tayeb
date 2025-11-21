@@ -376,8 +376,8 @@
 
       if (file) {
         // Validate file size
-        if (file.size > 2 * 1024 * 1024) {
-          alert("حجم الملف كبير جداً (الحد الأقصى 2 ميجابايت)");
+        if (file.size > 5 * 1024 * 1024) {
+          alert("حجم الملف كبير جداً (الحد الأقصى 5 ميجابايت)");
           this.value = "";
           imagePreview.innerHTML = "";
           return;
