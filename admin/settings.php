@@ -14,6 +14,98 @@ requireAdmin();
 $success = '';
 $cleanupResult = '';
 $orphanedCleanupResult = '';
+$sitemapResult = '';
+
+// Handle sitemap generation action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'generate_sitemap') {
+    checkCSRF();
+    
+    try {
+        // Get the site URL from config (remove /public if present)
+        $siteUrl = preg_replace('~/public/?$~', '', BASE_URL);
+        
+        // Get current timestamp in ISO 8601 format
+        $lastmod = date('c'); // ISO 8601 format with timezone
+        
+        // Start building sitemap XML
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
+        $xml .= '        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' . "\n";
+        $xml .= '        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9' . "\n";
+        $xml .= '                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">' . "\n";
+        $xml .= '  <!-- Generated automatically on ' . date('Y-m-d H:i:s') . ' -->' . "\n";
+        
+        // Static pages with priorities
+        $staticPages = [
+            '' => ['priority' => '1.00'], // Home page
+            'create' => ['priority' => '0.90'],
+            'all' => ['priority' => '0.80'],
+            'how-to-benefit' => ['priority' => '0.70'],
+            'contact' => ['priority' => '0.60'],
+            'search' => ['priority' => '0.50'],
+            'developer' => ['priority' => '0.30']
+        ];
+        
+        // Add static pages
+        foreach ($staticPages as $page => $config) {
+            $url = rtrim($siteUrl, '/') . '/' . $page;
+            $xml .= '  <url>' . "\n";
+            $xml .= '    <loc>' . htmlspecialchars($url) . '</loc>' . "\n";
+            $xml .= '    <lastmod>' . $lastmod . '</lastmod>' . "\n";
+            $xml .= '    <priority>' . $config['priority'] . '</priority>' . "\n";
+            $xml .= '  </url>' . "\n";
+        }
+        
+        // Get all published memorial pages
+        $stmt = $pdo->query("SELECT id, created_at FROM memorials WHERE status = 1 ORDER BY id ASC");
+        $memorials = $stmt->fetchAll();
+        
+        $memorialCount = 0;
+        foreach ($memorials as $memorial) {
+            $memorialUrl = rtrim($siteUrl, '/') . '/m/' . $memorial['id'];
+            // Use memorial creation date or current date for lastmod
+            $memorialLastmod = $memorial['created_at'] ? date('c', strtotime($memorial['created_at'])) : $lastmod;
+            
+            $xml .= '  <url>' . "\n";
+            $xml .= '    <loc>' . htmlspecialchars($memorialUrl) . '</loc>' . "\n";
+            $xml .= '    <lastmod>' . $memorialLastmod . '</lastmod>' . "\n";
+            $xml .= '    <priority>0.80</priority>' . "\n";
+            $xml .= '  </url>' . "\n";
+            
+            $memorialCount++;
+        }
+        
+        $xml .= '</urlset>' . "\n";
+        
+        // Delete old sitemap if exists
+        $sitemapPath = __DIR__ . '/../sitemap.xml';
+        if (file_exists($sitemapPath)) {
+            unlink($sitemapPath);
+        }
+        
+        // Write new sitemap
+        $bytesWritten = file_put_contents($sitemapPath, $xml);
+        
+        if ($bytesWritten !== false) {
+            $sitemapResult = [
+                'success' => true,
+                'static_pages' => count($staticPages),
+                'memorial_pages' => $memorialCount,
+                'total_urls' => count($staticPages) + $memorialCount,
+                'file_size' => $bytesWritten,
+                'generated_at' => date('Y-m-d H:i:s')
+            ];
+        } else {
+            throw new Exception('فشل في كتابة ملف sitemap.xml');
+        }
+        
+    } catch (Exception $e) {
+        $sitemapResult = [
+            'success' => false,
+            'error' => $e->getMessage()
+        ];
+    }
+}
 
 // Handle orphaned images cleanup action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cleanup_orphaned') {
@@ -156,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 // Handle settings update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!isset($_POST['action']) || ($_POST['action'] !== 'cleanup' && $_POST['action'] !== 'cleanup_orphaned'))) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!isset($_POST['action']) || ($_POST['action'] !== 'cleanup' && $_POST['action'] !== 'cleanup_orphaned' && $_POST['action'] !== 'generate_sitemap'))) {
     checkCSRF();
 
     $settings = [
@@ -250,6 +342,26 @@ $totalTasbeeh = $stmt->fetchColumn();
                     <?php endif; ?>
                 </ul>
             </div>
+        <?php endif; ?>
+
+        <?php if ($sitemapResult): ?>
+            <?php if ($sitemapResult['success']): ?>
+                <div class="alert alert-success">
+                    <h5 class="alert-heading">🗺️ تم إنشاء خريطة الموقع بنجاح</h5>
+                    <ul class="mb-0">
+                        <li><strong>الصفحات الثابتة:</strong> <?= $sitemapResult['static_pages'] ?></li>
+                        <li><strong>صفحات التذكار:</strong> <?= $sitemapResult['memorial_pages'] ?></li>
+                        <li><strong>إجمالي الروابط:</strong> <?= $sitemapResult['total_urls'] ?></li>
+                        <li><strong>حجم الملف:</strong> <?= number_format($sitemapResult['file_size']) ?> بايت</li>
+                        <li><strong>تاريخ الإنشاء:</strong> <?= $sitemapResult['generated_at'] ?></li>
+                    </ul>
+                </div>
+            <?php else: ?>
+                <div class="alert alert-danger">
+                    <h5 class="alert-heading">❌ فشل في إنشاء خريطة الموقع</h5>
+                    <p class="mb-0"><strong>الخطأ:</strong> <?= e($sitemapResult['error']) ?></p>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
 
         <!-- Statistics -->
@@ -378,6 +490,54 @@ $totalTasbeeh = $stmt->fetchColumn();
                         </small>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Sitemap Generator -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">🗺️ إنشاء خريطة الموقع (Sitemap)</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    قم بإنشاء أو تحديث ملف sitemap.xml الذي يساعد محركات البحث في فهرسة صفحات الموقع. 
+                    سيتم تضمين جميع الصفحات الثابتة وصفحات التذكار المنشورة.
+                </p>
+
+                <form method="POST"
+                    onsubmit="return confirm('هل تريد إنشاء خريطة موقع جديدة؟ سيتم استبدال الملف الحالي إن وجد.')">
+                    <?php csrfField(); ?>
+                    <input type="hidden" name="action" value="generate_sitemap">
+
+                    <div class="d-flex align-items-center gap-3">
+                        <button type="submit" class="btn btn-success">
+                            🗺️ إنشاء خريطة الموقع
+                        </button>
+                        <small class="text-muted">
+                            سيتم إنشاء ملف sitemap.xml في جذر الموقع
+                        </small>
+                    </div>
+                </form>
+                
+                <?php 
+                $sitemapPath = __DIR__ . '/../sitemap.xml';
+                if (file_exists($sitemapPath)): 
+                    $sitemapSize = filesize($sitemapPath);
+                    $sitemapDate = date('Y-m-d H:i:s', filemtime($sitemapPath));
+                ?>
+                <div class="mt-3 p-3 bg-light rounded">
+                    <h6 class="mb-2">📄 معلومات خريطة الموقع الحالية:</h6>
+                    <ul class="mb-0 small">
+                        <li><strong>حجم الملف:</strong> <?= number_format($sitemapSize) ?> بايت</li>
+                        <li><strong>آخر تحديث:</strong> <?= $sitemapDate ?></li>
+                        <li><strong>الرابط:</strong> <a href="<?= BASE_URL ?>/sitemap.xml" target="_blank">عرض خريطة الموقع</a></li>
+                    </ul>
+                </div>
+                <?php else: ?>
+                <div class="mt-3 p-3 bg-warning bg-opacity-10 rounded">
+                    <small class="text-warning">⚠️ لم يتم إنشاء خريطة الموقع بعد</small>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
 

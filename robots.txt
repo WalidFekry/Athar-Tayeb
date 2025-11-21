@@ -24,3 +24,6 @@ Allow: /public/assets/
 Allow: /public/uploads/
 Allow: /assets/
 Allow: /uploads/
+
+# Sitemap location
+Sitemap: https://athar.walid-fekry.com/sitemap.xml
