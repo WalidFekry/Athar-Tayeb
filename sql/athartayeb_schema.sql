@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 18, 2025 at 11:10 PM
+-- Generation Time: Nov 21, 2025 at 11:22 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.27
 
@@ -66,6 +66,7 @@ CREATE TABLE `memorials` (
   `tasbeeh_lailaha` int DEFAULT '0',
   `tasbeeh_allahu` int DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `status` tinyint(1) DEFAULT '0' COMMENT '0=pending, 1=approved',
   `edit_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `generate_duaa_image` tinyint(1) DEFAULT '0' COMMENT '0=no, 1=yes',

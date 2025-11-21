@@ -186,7 +186,8 @@ try {
                 whatsapp = ?, 
                 quote = ?, 
                 quote_status = ?, 
-                image_status = ?
+                image_status = ?, 
+                updated_at = NOW()
             WHERE id = ? AND edit_key = ?
         ");
 
@@ -212,7 +213,8 @@ try {
                 gender = ?, 
                 whatsapp = ?, 
                 quote = ?, 
-                quote_status = ?
+                quote_status = ?, 
+                updated_at = NOW()
             WHERE id = ? AND edit_key = ?
         ");
 

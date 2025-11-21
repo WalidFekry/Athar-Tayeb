@@ -322,7 +322,7 @@ include __DIR__ . '/../includes/header.php';
                         </div>
 
                         <!-- Duaa Image Generation -->
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="generate_duaa_image"
                                     name="generate_duaa_image" value="1" <?= isset($_POST['generate_duaa_image']) ? 'checked' : '' ?>>
@@ -334,7 +334,7 @@ include __DIR__ . '/../includes/header.php';
                                 لإنشاء بطاقة تذكارية جميلة تحتوي على اسم المتوفى ودعاء مختار، يجب أولًا رفع صورة
                                 للمتوفى. بعد رفع الصورة ستظهر البطاقة في الصفحة التذكارية مع إمكانية تحميلها ومشاركتها.
                             </small>
-                        </div>
+                        </div> -->
 
                         <!-- Submit Button -->
                         <div class="d-grid gap-2">

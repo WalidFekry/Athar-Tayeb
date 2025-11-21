@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
                     $stmt = $pdo->prepare("
                         UPDATE memorials 
                         SET name = ?, from_name = ?, image = ?, death_date = ?, gender = ?, 
-                            whatsapp = ?, quote = ?, quote_status = ?, image_status = ?
+                            whatsapp = ?, quote = ?, quote_status = ?, image_status = ?, updated_at = NOW()
                         WHERE id = ?
                     ");
                     $stmt->execute([
@@ -208,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
                     $stmt = $pdo->prepare("
                         UPDATE memorials 
                         SET name = ?, from_name = ?, death_date = ?, gender = ?, 
-                            whatsapp = ?, quote = ?, quote_status = ?
+                            whatsapp = ?, quote = ?, quote_status = ?, updated_at = NOW()
                         WHERE id = ?
                     ");
                     $stmt->execute([
