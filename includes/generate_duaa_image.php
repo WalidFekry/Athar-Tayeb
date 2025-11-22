@@ -89,7 +89,7 @@ function generateDuaaImage($imageName, $name, $gender, $imagePath = null, $death
         // 5. Draw death date at bottom
         if ($death_date) {
             $dateText = "تاريخ الوفاة: " . $death_date;
-            drawTextWithShadow($canvas, $dateText, $duaaFont, 40, $whiteColor, $shadowColor, $width / 2, $height - 175, true);
+            drawTextWithShadow($canvas, $dateText, $duaaFont, 35, $whiteColor, $shadowColor, $width / 2, $height - 175, true);
         }
 
         // 6. Add decorative elements
