@@ -96,7 +96,7 @@ $structuredData = $structuredData ?? '';
                         <a class="nav-link" href="<?= site_url('all') ?>">جميع الصفحات</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= site_url('how-to-benefit') ?>">كيف تستفيد؟</a>
+                        <a class="nav-link" href="<?= site_url('guide') ?>">دليل الاستخدام</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= site_url('contact') ?>">تواصل معنا</a>

@@ -19,14 +19,14 @@ $sitemapResult = '';
 // Handle sitemap generation action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'generate_sitemap') {
     checkCSRF();
-    
+
     try {
         // Get the site URL from config (remove /public if present)
         $siteUrl = preg_replace('~/public/?$~', '', BASE_URL);
-        
+
         // Get current timestamp in ISO 8601 format
         $lastmod = date('c'); // ISO 8601 format with timezone
-        
+
         // Start building sitemap XML
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
@@ -34,18 +34,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $xml .= '        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9' . "\n";
         $xml .= '                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">' . "\n";
         $xml .= '  <!-- Generated automatically on ' . date('Y-m-d H:i:s') . ' -->' . "\n";
-        
+
         // Static pages with priorities
         $staticPages = [
             '' => ['priority' => '1.00'], // Home page
             'create' => ['priority' => '0.90'],
             'all' => ['priority' => '0.80'],
             'how-to-benefit' => ['priority' => '0.70'],
+            'guide' => ['priority' => '0.70'],
             'contact' => ['priority' => '0.60'],
             'search' => ['priority' => '0.50'],
-            'developer' => ['priority' => '0.30']
+            'developer' => ['priority' => '0.30'],
+            'share-guide' => ['priority' => '0.55'],
+            'mobile-guide' => ['priority' => '0.55'],
+            'memorial-guide' => ['priority' => '0.55'],
+            'faq' => ['priority' => '0.40'],
+            'duaa-etiquette' => ['priority' => '0.45'],
+            'athar-pages' => ['priority' => '0.35'],
         ];
-        
+
         // Add static pages
         foreach ($staticPages as $page => $config) {
             $url = rtrim($siteUrl, '/') . '/' . $page;
@@ -55,37 +62,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $xml .= '    <priority>' . $config['priority'] . '</priority>' . "\n";
             $xml .= '  </url>' . "\n";
         }
-        
+
         // Get all published memorial pages
         $stmt = $pdo->query("SELECT id, created_at FROM memorials WHERE status = 1 ORDER BY id ASC");
         $memorials = $stmt->fetchAll();
-        
+
         $memorialCount = 0;
         foreach ($memorials as $memorial) {
             $memorialUrl = rtrim($siteUrl, '/') . '/m/' . $memorial['id'];
             // Use memorial creation date or current date for lastmod
             $memorialLastmod = $memorial['created_at'] ? date('c', strtotime($memorial['created_at'])) : $lastmod;
-            
+
             $xml .= '  <url>' . "\n";
             $xml .= '    <loc>' . htmlspecialchars($memorialUrl) . '</loc>' . "\n";
             $xml .= '    <lastmod>' . $memorialLastmod . '</lastmod>' . "\n";
             $xml .= '    <priority>0.80</priority>' . "\n";
             $xml .= '  </url>' . "\n";
-            
+
             $memorialCount++;
         }
-        
+
         $xml .= '</urlset>' . "\n";
-        
+
         // Delete old sitemap if exists
         $sitemapPath = __DIR__ . '/../sitemap.xml';
         if (file_exists($sitemapPath)) {
             unlink($sitemapPath);
         }
-        
+
         // Write new sitemap
         $bytesWritten = file_put_contents($sitemapPath, $xml);
-        
+
         if ($bytesWritten !== false) {
             $sitemapResult = [
                 'success' => true,
@@ -98,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         } else {
             throw new Exception('فشل في كتابة ملف sitemap.xml');
         }
-        
+
     } catch (Exception $e) {
         $sitemapResult = [
             'success' => false,
@@ -114,41 +121,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     // Get all image filenames from database
     $stmt = $pdo->query("SELECT image FROM memorials WHERE image IS NOT NULL AND image != ''");
     $dbImages = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    
+
     // Convert to array for faster lookup
     $dbImagesArray = array_flip($dbImages);
-    
+
     $uploadsPath = __DIR__ . '/../public/uploads/memorials/';
     $duaaPath = __DIR__ . '/../public/uploads/duaa_images/';
-    
+
     $totalFound = 0;
     $deletedMain = 0;
     $deletedThumbs = 0;
     $deletedDuaa = 0;
     $failedCount = 0;
-    
+
     // Scan uploads/memorials/ directory
     if (is_dir($uploadsPath)) {
         $files = scandir($uploadsPath);
-        
+
         foreach ($files as $file) {
             if ($file === '.' || $file === '..' || !is_file($uploadsPath . $file)) {
                 continue;
             }
-            
+
             // Skip thumbnail files for now, we'll handle them separately
             if (strpos($file, '_thumb.') !== false) {
                 continue;
             }
-            
+
             // Check if it's an image file
             $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
             if (!in_array($ext, ['jpg', 'jpeg', 'png'])) {
                 continue;
             }
-            
+
             $totalFound++;
-            
+
             // Check if this image exists in database
             if (!isset($dbImagesArray[$file])) {
                 try {
@@ -158,28 +165,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         unlink($mainImagePath);
                         $deletedMain++;
                     }
-                    
+
                     // Delete corresponding thumbnail
                     $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $mainImagePath);
                     if (file_exists($thumbPath)) {
                         unlink($thumbPath);
                         $deletedThumbs++;
                     }
-                    
+
                     // Delete corresponding duaa card image
                     $duaaImagePath = $duaaPath . $file;
                     if (file_exists($duaaImagePath)) {
                         unlink($duaaImagePath);
                         $deletedDuaa++;
                     }
-                    
+
                 } catch (Exception $e) {
                     $failedCount++;
                 }
             }
         }
     }
-    
+
     $orphanedCleanupResult = [
         'total_found' => $totalFound,
         'deleted_main' => $deletedMain,
@@ -222,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 if (file_exists($thumbPath)) {
                     unlink($thumbPath);
                 }
-                
+
                 // Delete Duaa card if exists
                 $duaaImagePath = __DIR__ . '/../public/uploads/duaa_images/' . $page['image'];
                 if (file_exists($duaaImagePath)) {
@@ -472,7 +479,7 @@ $totalTasbeeh = $stmt->fetchColumn();
             </div>
             <div class="card-body">
                 <p class="text-muted mb-3">
-                    احذف الصور الموجودة على الخادم والتي لا تنتمي لأي صفحة تذكارية في قاعدة البيانات. 
+                    احذف الصور الموجودة على الخادم والتي لا تنتمي لأي صفحة تذكارية في قاعدة البيانات.
                     سيتم حذف الصورة الرئيسية والمصغرة وصورة الدعاء المقترنة بها إن وجدت.
                 </p>
 
@@ -500,7 +507,7 @@ $totalTasbeeh = $stmt->fetchColumn();
             </div>
             <div class="card-body">
                 <p class="text-muted mb-3">
-                    قم بإنشاء أو تحديث ملف sitemap.xml الذي يساعد محركات البحث في فهرسة صفحات الموقع. 
+                    قم بإنشاء أو تحديث ملف sitemap.xml الذي يساعد محركات البحث في فهرسة صفحات الموقع.
                     سيتم تضمين جميع الصفحات الثابتة وصفحات التذكار المنشورة.
                 </p>
 
@@ -518,25 +525,26 @@ $totalTasbeeh = $stmt->fetchColumn();
                         </small>
                     </div>
                 </form>
-                
-                <?php 
+
+                <?php
                 $sitemapPath = __DIR__ . '/../sitemap.xml';
-                if (file_exists($sitemapPath)): 
+                if (file_exists($sitemapPath)):
                     $sitemapSize = filesize($sitemapPath);
                     $sitemapDate = date('Y-m-d H:i:s', filemtime($sitemapPath));
-                ?>
-                <div class="mt-3 p-3 bg-light rounded">
-                    <h6 class="mb-2">📄 معلومات خريطة الموقع الحالية:</h6>
-                    <ul class="mb-0 small">
-                        <li><strong>حجم الملف:</strong> <?= number_format($sitemapSize) ?> بايت</li>
-                        <li><strong>آخر تحديث:</strong> <?= $sitemapDate ?></li>
-                        <li><strong>الرابط:</strong> <a href="<?= BASE_URL ?>/sitemap.xml" target="_blank">عرض خريطة الموقع</a></li>
-                    </ul>
-                </div>
+                    ?>
+                    <div class="mt-3 p-3 bg-light rounded">
+                        <h6 class="mb-2">📄 معلومات خريطة الموقع الحالية:</h6>
+                        <ul class="mb-0 small">
+                            <li><strong>حجم الملف:</strong> <?= number_format($sitemapSize) ?> بايت</li>
+                            <li><strong>آخر تحديث:</strong> <?= $sitemapDate ?></li>
+                            <li><strong>الرابط:</strong> <a href="<?= BASE_URL ?>/sitemap.xml" target="_blank">عرض خريطة
+                                    الموقع</a></li>
+                        </ul>
+                    </div>
                 <?php else: ?>
-                <div class="mt-3 p-3 bg-warning bg-opacity-10 rounded">
-                    <small class="text-warning">⚠️ لم يتم إنشاء خريطة الموقع بعد</small>
-                </div>
+                    <div class="mt-3 p-3 bg-warning bg-opacity-10 rounded">
+                        <small class="text-warning">⚠️ لم يتم إنشاء خريطة الموقع بعد</small>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>

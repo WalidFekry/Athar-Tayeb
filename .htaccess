@@ -39,7 +39,7 @@ RewriteRule ^api/([a-zA-Z0-9_-]+)/?$ public/api/$1.php [QSA,L]
 RewriteRule ^m/([0-9]+)/?$ public/memorial.php?id=$1 [QSA,L]
 
 # Public pages without .php
-RewriteRule ^(index|create|all|contact|search|success|unpublished|404|maintenance|developer|memorial|edit|deleted|how-to-benefit)/?$ public/$1.php [QSA,L]
+RewriteRule ^(index|create|all|contact|search|success|unpublished|404|maintenance|developer|memorial|edit|deleted|how-to-benefit|share-guide|mobile-guide|memorial-guide|faq|duaa-etiquette|athar-pages|guide)/?$ public/$1.php [QSA,L]
 
 # Canonicalize .php (avoid admin and avoid public/404.php)
 RewriteCond %{REQUEST_URI} !^/admin/

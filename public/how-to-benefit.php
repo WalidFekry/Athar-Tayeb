@@ -32,7 +32,7 @@ include __DIR__ . '/../includes/header.php';
 </section>
 
 <div class="container my-5">
-    
+
     <!-- Introduction -->
     <section class="row mb-5">
         <div class="col-lg-10 mx-auto">
@@ -40,7 +40,7 @@ include __DIR__ . '/../includes/header.php';
                 <div class="card-body p-5">
                     <h2 class="text-center mb-4">منصة رقمية للصدقة الجارية 💚</h2>
                     <p class="text-center lead">
-                        أثر طيب هي منصة مجانية تتيح لك إنشاء صفحات تذكارية تفاعلية لأحبائك المتوفين، 
+                        أثر طيب هي منصة مجانية تتيح لك إنشاء صفحات تذكارية تفاعلية لأحبائك المتوفين،
                         حيث يمكن للزوار المشاركة في الدعاء والتسبيح والقرآن، ليكون لك ولهم أجر مستمر بإذن الله.
                     </p>
                 </div>
@@ -53,7 +53,7 @@ include __DIR__ . '/../includes/header.php';
         <div class="col-12">
             <h2 class="text-center mb-5">خطوات الاستفادة من المنصة 📋</h2>
         </div>
-        
+
         <!-- Step 1 -->
         <div class="col-lg-4 mb-4">
             <div class="card h-100 border-0 shadow-sm step-card">
@@ -62,7 +62,7 @@ include __DIR__ . '/../includes/header.php';
                     <div class="step-icon mb-3">🌱</div>
                     <h4 class="text-muted mb-3">أنشئ صفحة تذكارية</h4>
                     <p class="text-muted">
-                        ابدأ بإنشاء صفحة تذكارية لأحد أحبائك المتوفين. أدخل اسمه وتاريخ وفاته، 
+                        ابدأ بإنشاء صفحة تذكارية لأحد أحبائك المتوفين. أدخل اسمه وتاريخ وفاته،
                         وأضف صورة شخصية ورسالة خاصة إن أردت.
                     </p>
                     <div class="mt-4">
@@ -80,7 +80,7 @@ include __DIR__ . '/../includes/header.php';
                     <div class="step-icon mb-3">📤</div>
                     <h4 class="text-muted mb-3">شارك الصفحة مع الأحباب</h4>
                     <p class="text-muted">
-                        بعد إنشاء الصفحة، شاركها مع الأهل والأصدقاء عبر وسائل التواصل المختلفة. 
+                        بعد إنشاء الصفحة، شاركها مع الأهل والأصدقاء عبر وسائل التواصل المختلفة.
                         كل مشاركة تزيد من فرص الدعاء والأجر.
                     </p>
                     <div class="mt-4">
@@ -98,7 +98,7 @@ include __DIR__ . '/../includes/header.php';
                     <div class="step-icon mb-3">📿</div>
                     <h4 class="text-muted mb-3">اجعل التسبيح عادة يومية</h4>
                     <p class="text-muted">
-                        استخدم التسبيح الإلكتروني يومياً للدعاء لأحبائك. كل تسبيحة تُحسب لك ولهم، 
+                        استخدم التسبيح الإلكتروني يومياً للدعاء لأحبائك. كل تسبيحة تُحسب لك ولهم،
                         وتكون صدقة جارية مستمرة.
                     </p>
                     <div class="mt-4">
@@ -114,7 +114,7 @@ include __DIR__ . '/../includes/header.php';
         <div class="col-12">
             <h2 class="text-center mb-5">مميزات الصفحة التذكارية ✨</h2>
         </div>
-        
+
         <div class="col-md-6 mb-4">
             <div class="feature-item d-flex align-items-start">
                 <div class="feature-icon me-3">📿</div>
@@ -170,7 +170,7 @@ include __DIR__ . '/../includes/header.php';
             <div class="card border-0 shadow-sm bg-light">
                 <div class="card-body p-5">
                     <h3 class="text-muted mb-4">نصائح لزيادة الأجر والفائدة 💡</h3>
-                    
+
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="tip-item">
@@ -180,7 +180,7 @@ include __DIR__ . '/../includes/header.php';
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="tip-item">
                                 <h6 class="fw-bold text-primary">👥 شارك مع الآخرين</h6>
@@ -189,7 +189,7 @@ include __DIR__ . '/../includes/header.php';
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="tip-item">
                                 <h6 class="fw-bold text-primary">📱 استخدم الهاتف</h6>
@@ -198,7 +198,7 @@ include __DIR__ . '/../includes/header.php';
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="tip-item">
                                 <h6 class="fw-bold text-primary">💚 انشر الخير</h6>
@@ -210,6 +210,16 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Usage Guide Link -->
+    <section class="row mb-4">
+        <div class="col-lg-8 mx-auto text-center">
+            <a href="<?= site_url('guide') ?>" class="btn btn-outline-primary btn-lg">
+                📖 دليل الاستخدام: كل ما تحتاجه لفهم فكرة أثر طيب وكيفية إنشاء صفحة تذكارية ومشاركتها واستخدامها من
+                الجوال في مكان واحد
+            </a>
         </div>
     </section>
 
@@ -238,70 +248,70 @@ include __DIR__ . '/../includes/header.php';
 </div>
 
 <style>
-/* Custom styles for how-to-benefit page */
-.step-card {
-    position: relative;
-    transition: var(--transition);
-    background-color: var(--card-bg);
-    border: 1px solid var(--border);
-}
+    /* Custom styles for how-to-benefit page */
+    .step-card {
+        position: relative;
+        transition: var(--transition);
+        background-color: var(--card-bg);
+        border: 1px solid var(--border);
+    }
 
-.step-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
-}
+    .step-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+    }
 
-.step-number {
-    position: absolute;
-    top: -15px;
-    right: 20px;
-    background: var(--primary);
-    color: var(--card-bg);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-}
+    .step-number {
+        position: absolute;
+        top: -15px;
+        right: 20px;
+        background: var(--primary);
+        color: var(--card-bg);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
 
-.step-icon {
-    font-size: 3rem;
-}
+    .step-icon {
+        font-size: 3rem;
+    }
 
-.feature-icon {
-    font-size: 2.5rem;
-    min-width: 60px;
-}
+    .feature-icon {
+        font-size: 2.5rem;
+        min-width: 60px;
+    }
 
-.feature-item {
-    padding: 1.5rem;
-    border-radius: var(--radius);
-    transition: var(--transition);
-}
+    .feature-item {
+        padding: 1.5rem;
+        border-radius: var(--radius);
+        transition: var(--transition);
+    }
 
-.feature-item:hover {
-    background-color: var(--muted-bg);
-}
+    .feature-item:hover {
+        background-color: var(--muted-bg);
+    }
 
-.tip-item {
-    padding: 1rem;
-    border-right: 3px solid var(--primary);
-    background-color: var(--card-bg);
-    border-radius: var(--radius);
-    color: var(--text);
-}
+    .tip-item {
+        padding: 1rem;
+        border-right: 3px solid var(--primary);
+        background-color: var(--card-bg);
+        border-radius: var(--radius);
+        color: var(--text);
+    }
 
-/* Dark mode specific adjustments */
-[data-theme="dark"] .tip-item {
-    border-right-color: var(--primary);
-}
+    /* Dark mode specific adjustments */
+    [data-theme="dark"] .tip-item {
+        border-right-color: var(--primary);
+    }
 
-[data-theme="dark"] .step-number {
-    color: var(--bg);
-}
+    [data-theme="dark"] .step-number {
+        color: var(--bg);
+    }
 </style>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
