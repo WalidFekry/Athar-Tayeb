@@ -38,13 +38,15 @@ if ($memorial['status'] != 1) {
     exit;
 }
 
-// Increment visit counter (simple debounce using session) and update last_visit
-$visitKey = 'visited_' . $memorialId;
-if (!isset($_SESSION[$visitKey]) || (time() - $_SESSION[$visitKey]) > 300) {
-    $stmt = $pdo->prepare("UPDATE memorials SET visits = visits + 1 , last_visit = current_timestamp() WHERE id = ?");
-    $stmt->execute([$memorialId]);
-    $_SESSION[$visitKey] = time();
-    $memorial['visits']++;
+// Update visit count and last visit time if not a bot
+if (!isBot()) {
+    $visitKey = 'visited_' . $memorialId;
+    if (!isset($_SESSION[$visitKey]) || (time() - $_SESSION[$visitKey]) > 300) {
+        $stmt = $pdo->prepare("UPDATE memorials SET visits = visits + 1 , last_visit = current_timestamp() WHERE id = ?");
+        $stmt->execute([$memorialId]);
+        $_SESSION[$visitKey] = time();
+        $memorial['visits']++;
+    }
 }
 
 // Generate page metadata

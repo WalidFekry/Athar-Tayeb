@@ -537,13 +537,13 @@ function generateEditKey()
 {
     // Generate a secure random string (16 bytes = 128 bits)
     $randomBytes = random_bytes(16);
-    
+
     // Base64 encode
     $base64 = base64_encode($randomBytes);
-    
+
     // Convert to URL-safe base64 (base64url) and remove padding '='
     $base64url = rtrim(strtr($base64, '+/', '-_'), '=');
-    
+
     return $base64url;
 }
 
@@ -566,24 +566,24 @@ function isValidEditKeyFormat($key)
 function getGlobalStatistics()
 {
     global $pdo;
-    
+
     try {
         // Get total tasbeeh count from published memorials
         $stmt = $pdo->query("SELECT SUM(tasbeeh_subhan + tasbeeh_alham + tasbeeh_lailaha + tasbeeh_allahu) FROM memorials WHERE status = 1");
         $totalTasbeeh = $stmt->fetchColumn() ?: 0;
-        
+
         // Get total published memorial pages
         $stmt = $pdo->query("SELECT COUNT(*) FROM memorials WHERE status = 1");
         $totalMemorials = $stmt->fetchColumn() ?: 0;
-        
+
         // Get total visits from published memorials
         $stmt = $pdo->query("SELECT SUM(visits) FROM memorials WHERE status = 1");
         $totalVisits = $stmt->fetchColumn() ?: 0;
-        
+
         return [
-            'tasbeeh' => (int)$totalTasbeeh,
-            'memorials' => (int)$totalMemorials,
-            'visits' => (int)$totalVisits
+            'tasbeeh' => (int) $totalTasbeeh,
+            'memorials' => (int) $totalMemorials,
+            'visits' => (int) $totalVisits
         ];
     } catch (Exception $e) {
         // Return zeros if there's an error
@@ -594,4 +594,37 @@ function getGlobalStatistics()
         ];
     }
 }
+
+/**
+ * Check if the visitor is a bot/crawler
+ * @return bool True if bot, false otherwise
+ */
+function isBot()
+{
+    $bots = [
+        'Googlebot',
+        'Bingbot',
+        'Slurp',
+        'DuckDuckBot',
+        'Baiduspider',
+        'YandexBot',
+        'Sogou',
+        'Exabot',
+        'facebot',
+        'ia_archiver'
+    ];
+
+    if (empty($_SERVER['HTTP_USER_AGENT'])) {
+        return true; // No user agent, likely a bot
+    }
+
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    foreach ($bots as $bot) {
+        if (stripos($userAgent, $bot) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
