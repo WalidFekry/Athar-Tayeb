@@ -34,6 +34,13 @@ $memorialUrl = site_url('m/' . $memorial['id']);
 
 $pageTitle = 'تم إنشاء الصفحة بنجاح — ' . SITE_NAME;
 
+// Generate memorial share text
+$shareText = getMemorialShareText(
+    $memorial['gender'],
+    $memorial['name'],
+    $memorialUrl
+);
+
 include __DIR__ . '/../includes/header.php';
 ?>
 
@@ -62,21 +69,21 @@ include __DIR__ . '/../includes/header.php';
                     <li>
                         <strong>الصورة:</strong>
                         <?php if ($memorial['image'] && $memorial['image_status'] == 0): ?>
-                            <span class="badge badge-pending">قيد المراجعة</span>
+                        <span class="badge badge-pending">قيد المراجعة</span>
                         <?php elseif ($memorial['image'] && $memorial['image_status'] == 1): ?>
-                            <span class="badge badge-pending">تم المراجعة</span>
+                        <span class="badge badge-pending">تم المراجعة</span>
                         <?php else: ?>
-                            <span class="text-muted">لم يتم رفع صورة</span>
+                        <span class="text-muted">لم يتم رفع صورة</span>
                         <?php endif; ?>
                     </li>
                     <li>
                         <strong>الرسالة:</strong>
                         <?php if ($memorial['quote'] && $memorial['quote_status'] == 0): ?>
-                            <span class="badge badge-pending">قيد المراجعة</span>
+                        <span class="badge badge-pending">قيد المراجعة</span>
                         <?php elseif ($memorial['quote'] && $memorial['quote_status'] == 1): ?>
-                            <span class="badge badge-pending">تم المراجعة</span>
+                        <span class="badge badge-pending">تم المراجعة</span>
                         <?php else: ?>
-                            <span class="text-muted">لم يتم إضافة رسالة</span>
+                        <span class="text-muted">لم يتم إضافة رسالة</span>
                         <?php endif; ?>
                     </li>
                 </ul>
@@ -105,13 +112,14 @@ include __DIR__ . '/../includes/header.php';
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h5 class="card-title">📤 شارك الصفحة</h5>
-                    <p class="text-muted">شارك الصفحة مع الأهل والأصدقاء ليشاركوا في الأجر والدعاء لـ
-                        <strong><?= e($memorial['name']) ?></strong> 💚</p>
+                    <p class="text-muted">
+                        شارك الصفحة مع الأهل والأصدقاء ليشاركوا في الأجر والدعاء لـ
+                        <strong><?= e($memorial['name']) ?></strong> 💚
+                    </p>
 
                     <div class="share-buttons d-flex justify-content-center gap-3 flex-wrap">
-                        <a href="https://wa.me/?text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة: ' . $memorialUrl) ?>"
-                            target="_blank" rel="noopener" class="share-btn share-whatsapp"
-                            aria-label="شارك عبر واتساب">
+                        <a href="https://wa.me/?text=<?= urlencode($shareText) ?>" target="_blank" rel="noopener"
+                            class="share-btn share-whatsapp" aria-label="شارك عبر واتساب">
                             📱 واتساب
                         </a>
 
@@ -121,7 +129,7 @@ include __DIR__ . '/../includes/header.php';
                             📘 فيسبوك
                         </a>
 
-                        <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode('دعاء وذكرى ' . getPronoun($memorial['gender'], 'للمرحوم') . ' ' . $memorial['name'] . '، شارك الدعاء والصدقة الجارية من خلال هذه الصفحة.') ?>"
+                        <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode($shareText) ?>"
                             target="_blank" rel="noopener" class="share-btn share-telegram"
                             aria-label="شارك عبر تيليجرام">
                             ✈️ تيليجرام
@@ -134,36 +142,36 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
             </div>
-
+            
             <!-- Manage Memorial Section -->
             <?php if ($editKey): ?>
-                <div class="card shadow-sm mb-4 border-warning">
-                    <div class="card-body">
-                        <h5 class="card-title text-warning">🔧 إدارة صفحتك التذكارية</h5>
-                        <p class="text-muted mb-3">
-                            يمكنك تعديل أو حذف صفحتك التذكارية في أي وقت باستخدام الرابط التالي.
-                            <strong class="text-danger">احتفظ بهذا الرابط في مكان آمن!</strong>
-                        </p>
+            <div class="card shadow-sm mb-4 border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">🔧 إدارة صفحتك التذكارية</h5>
+                    <p class="text-muted mb-3">
+                        يمكنك تعديل أو حذف صفحتك التذكارية في أي وقت باستخدام الرابط التالي.
+                        <strong class="text-danger">احتفظ بهذا الرابط في مكان آمن!</strong>
+                    </p>
 
-                        <div class="alert alert-warning mb-3">
-                            <strong>⚠️ تنبيه مهم:</strong> أي شخص يملك هذا الرابط يمكنه تعديل أو حذف الصفحة التذكارية.
-                            لا تشاركه مع أحد إلا إذا كنت تثق به تماماً.
-                        </div>
-
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" value="<?= e(site_url('edit?key=' . $editKey)) ?>"
-                                readonly id="editLink">
-                            <button class="btn btn-outline-warning copy-link-btn"
-                                data-url="<?= e(site_url('edit?key=' . $editKey)) ?>" type="button">
-                                📋 نسخ
-                            </button>
-                        </div>
-
-                        <a href="<?= site_url('edit?key=' . $editKey) ?>" class="btn btn-warning w-100" target="_blank">
-                            ✏️ تعديل أو حذف الصفحة
-                        </a>
+                    <div class="alert alert-warning mb-3">
+                        <strong>⚠️ تنبيه مهم:</strong> أي شخص يملك هذا الرابط يمكنه تعديل أو حذف الصفحة التذكارية.
+                        لا تشاركه مع أحد إلا إذا كنت تثق به تماماً.
                     </div>
+
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="<?= e(site_url('edit?key=' . $editKey)) ?>"
+                            readonly id="editLink">
+                        <button class="btn btn-outline-warning copy-link-btn"
+                            data-url="<?= e(site_url('edit?key=' . $editKey)) ?>" type="button">
+                            📋 نسخ
+                        </button>
+                    </div>
+
+                    <a href="<?= site_url('edit?key=' . $editKey) ?>" class="btn btn-warning w-100" target="_blank">
+                        ✏️ تعديل أو حذف الصفحة
+                    </a>
                 </div>
+            </div>
             <?php endif; ?>
 
             <!-- Duaa Image Preview -->
@@ -176,17 +184,19 @@ include __DIR__ . '/../includes/header.php';
                 <div class="card-body">
                     <h5 class="card-title text-success">📜 بطاقة الدعاء</h5>
                     <p class="text-muted mb-3">
-                        تم إنشاء بطاقة دعاء جميلة لـ <strong><?= e($memorial['name']) ?></strong>. 
+                        تم إنشاء بطاقة دعاء جميلة لـ <strong><?= e($memorial['name']) ?></strong>.
                         يمكنك مشاركتها أو تحميلها.
                     </p>
-                    
+
                     <div class="text-center mb-3">
-                        <img src="<?= $duaaImageUrl ?>" alt="بطاقة دعاء <?= e($memorial['name']) ?>" 
-                             class="img-fluid rounded shadow" style="width: 100%; max-width: 500px; height: auto; cursor: pointer;">
+                        <img src="<?= $duaaImageUrl ?>" alt="بطاقة دعاء <?= e($memorial['name']) ?>"
+                            class="img-fluid rounded shadow"
+                            style="width: 100%; max-width: 500px; height: auto; cursor: pointer;">
                     </div>
-                    
+
                     <div class="d-flex gap-2 justify-content-center flex-wrap">
-                        <a href="<?= $duaaImageUrl ?>" download="duaa_<?= e($memorial['name']) ?>.png" class="btn btn-success">
+                        <a href="<?= $duaaImageUrl ?>" download="duaa_<?= e($memorial['name']) ?>.png"
+                            class="btn btn-success">
                             💾 تحميل البطاقة
                         </a>
                         <button class="btn btn-outline-primary copy-link-btn" data-url="<?= e($duaaImageUrl) ?>">
@@ -206,7 +216,7 @@ include __DIR__ . '/../includes/header.php';
                         <li>شارك الرابط مع العائلة والأصدقاء</li>
                         <li>احفظ الرابط لديك للرجوع إليه</li>
                         <?php if ($editKey): ?>
-                            <li><strong>احفظ رابط التعديل في مكان آمن</strong> - ستحتاجه لتعديل الصفحة لاحقاً</li>
+                        <li><strong>احفظ رابط التعديل في مكان آمن</strong> - ستحتاجه لتعديل الصفحة لاحقاً</li>
                         <?php endif; ?>
                         <li>تابع الصفحة لمشاهدة التسبيحات والزيارات</li>
                         <li>انتظر موافقة الإدارة على الصورة والرسالة</li>
@@ -214,7 +224,7 @@ include __DIR__ . '/../includes/header.php';
                 </div>
             </div>
 
-            
+
 
             <!-- Back to Home -->
             <div class="text-center mt-4">

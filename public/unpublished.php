@@ -40,6 +40,16 @@ if ($memorial['status'] == 1) {
 $pageTitle = 'الصفحة قيد المراجعة — ' . SITE_NAME;
 $pageDescription = 'هذه الصفحة التذكارية قيد المراجعة من قبل الإدارة';
 
+// Generate URL (ID-based only)
+$memorialUrl = site_url('m/' . $memorial['id']);
+
+// Generate memorial share text
+$shareText = getMemorialShareText(
+    $memorial['gender'],
+    $memorial['name'],
+    $memorialUrl
+);
+
 include __DIR__ . '/../includes/header.php';
 ?>
 
@@ -82,18 +92,15 @@ include __DIR__ . '/../includes/header.php';
                         <div class="mt-4">
                             <p class="text-muted">رقم الصفحة: <strong><?= $memorialId ?></strong></p>
 
-                            <?php
-                            $memorialLink = site_url('m/' . $memorialId);
-                            ?>
                             <!-- Memorial Link -->
                             <div class="card shadow-sm mb-4">
                                 <div class="card-body">
                                     <h5 class="card-title">🔗رابط الصفحة التذكارية المؤقت</h5>
                                     <div class="input-group mb-3">
-                                        <input type="text" class="form-control" value="<?= e($memorialLink) ?>" readonly
+                                        <input type="text" class="form-control" value="<?= e($memorialUrl) ?>" readonly
                                             id="memorialLink">
                                         <button class="btn btn-outline-primary copy-link-btn"
-                                            data-url="<?= e($memorialLink) ?>" type="button">
+                                            data-url="<?= e($memorialUrl) ?>" type="button">
                                             📋 نسخ
                                         </button>
                                     </div>
@@ -135,7 +142,7 @@ include __DIR__ . '/../includes/header.php';
                         </div>
                     <?php endif; ?>
 
-                               <!-- Duaa Image Preview -->
+            <!-- Duaa Image Preview -->
             <?php 
             $duaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $memorial['image'];
             $duaaImageUrl = BASE_URL . '/uploads/duaa_images/' . $memorial['image'];
@@ -165,7 +172,41 @@ include __DIR__ . '/../includes/header.php';
                 </div>
             </div>
             <?php endif; ?>
-            
+
+                     <!-- Share Buttons -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">📤 شارك الصفحة</h5>
+                    <p class="text-muted">
+                        شارك الصفحة مع الأهل والأصدقاء ليشاركوا في الأجر والدعاء لـ
+                        <strong><?= e($memorial['name']) ?></strong> 💚
+                    </p>
+
+                    <div class="share-buttons d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="https://wa.me/?text=<?= urlencode($shareText) ?>" target="_blank" rel="noopener"
+                            class="share-btn share-whatsapp" aria-label="شارك عبر واتساب">
+                            📱 واتساب
+                        </a>
+
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>"
+                            target="_blank" rel="noopener" class="share-btn share-facebook"
+                            aria-label="شارك عبر فيسبوك">
+                            📘 فيسبوك
+                        </a>
+
+                        <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode($shareText) ?>"
+                            target="_blank" rel="noopener" class="share-btn share-telegram"
+                            aria-label="شارك عبر تيليجرام">
+                            ✈️ تيليجرام
+                        </a>
+
+                        <button class="share-btn share-copy copy-link-btn" data-url="<?= e($memorialUrl) ?>"
+                            aria-label="نسخ رابط المشاركة">
+                            📋 نسخ الرابط
+                        </button>
+                    </div>
+                </div>
+            </div>
                     <div class="mt-5">
                         <a href="<?= site_url('') ?>" class="btn btn-primary btn-lg">
                             🏠 العودة للرئيسية
