@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $siteUrl = preg_replace('~/public/?$~', '', BASE_URL);
 
         // Get current timestamp in ISO 8601 format
-        $lastmod = date('c'); // ISO 8601 format with timezone
+        $nowIso = date('c'); // ISO 8601 format with timezone
 
         // Start building sitemap XML
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -53,25 +53,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             'athar-pages' => ['priority' => '0.35'],
         ];
 
-        // Add static pages
+        // Add static pages to sitemap
         foreach ($staticPages as $page => $config) {
             $url = rtrim($siteUrl, '/') . '/' . $page;
             $xml .= '  <url>' . "\n";
             $xml .= '    <loc>' . htmlspecialchars($url) . '</loc>' . "\n";
-            $xml .= '    <lastmod>' . $lastmod . '</lastmod>' . "\n";
+            $xml .= '    <lastmod>' . $nowIso . '</lastmod>' . "\n";
             $xml .= '    <priority>' . $config['priority'] . '</priority>' . "\n";
             $xml .= '  </url>' . "\n";
         }
 
-        // Get all published memorial pages
-        $stmt = $pdo->query("SELECT id, created_at FROM memorials WHERE status = 1 ORDER BY id ASC");
+        // Get all published memorial pages (with updated_at)
+        $stmt = $pdo->query("
+            SELECT id, created_at, updated_at 
+            FROM memorials 
+            WHERE status = 1 
+            ORDER BY id ASC
+        ");
         $memorials = $stmt->fetchAll();
 
         $memorialCount = 0;
         foreach ($memorials as $memorial) {
             $memorialUrl = rtrim($siteUrl, '/') . '/m/' . $memorial['id'];
-            // Use memorial creation date or current date for lastmod
-            $memorialLastmod = $memorial['created_at'] ? date('c', strtotime($memorial['created_at'])) : $lastmod;
+
+            // Use updated_at if available, otherwise created_at, otherwise current time
+            if (!empty($memorial['updated_at'])) {
+                $timestamp = $memorial['updated_at'];
+            } elseif (!empty($memorial['created_at'])) {
+                $timestamp = $memorial['created_at'];
+            } else {
+                $timestamp = null;
+            }
+
+            $memorialLastmod = $timestamp
+                ? date('c', strtotime($timestamp))
+                : $nowIso;
 
             $xml .= '  <url>' . "\n";
             $xml .= '    <loc>' . htmlspecialchars($memorialUrl) . '</loc>' . "\n";
@@ -113,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         ];
     }
 }
+
 
 // Handle orphaned images cleanup action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cleanup_orphaned') {
