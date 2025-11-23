@@ -55,7 +55,7 @@ try {
     $gender = trim($_POST['gender'] ?? 'male');
     $whatsapp = trim($_POST['whatsapp'] ?? '');
     $quote = trim($_POST['quote'] ?? '');
-    $generateDuaaImage = isset($_POST['generate_duaa_image']) ? 1 : 0;
+    $generateDuaaImage = isset($_POST['generate_duaa_image']) ? $_POST['generate_duaa_image'] : 0;
 
 
     $errors = [];
@@ -106,16 +106,26 @@ try {
         }
     }
 
-    if (empty($errors)) {
-        // Generate duaa image if requested and image uploaded
-        if ($generateDuaaImage && $imageName) {
-            require_once __DIR__ . '/../includes/generate_duaa_image.php';
-            $imagePath = $imageName ? UPLOAD_PATH . '/' . $imageName : null;
-            generateDuaaImage($imageName, $name, $gender, $imagePath, $death_date);
-        } elseif ($generateDuaaImage && !$imageName) {
-            $errors[] = 'يجب تحميل صورة تذكارية للمتوفي لإنشاء بطاقة دعاء.';
+    $duaaImageUrl = null;
+
+if (empty($errors)) {
+    if ($generateDuaaImage && $imageName) {
+        require_once __DIR__ . '/../../includes/generate_duaa_image.php';
+        $imagePath = $imageName ? UPLOAD_PATH . '/' . $imageName : null;
+
+        // استدعاء الدالة وتخزين النتيجة
+        $result = generateDuaaImage($imageName, $name, $gender, $imagePath, $death_date);
+
+        if ($result['success']) {
+            $duaaImageUrl = $result['url'];
+        } else {
+            $errors[] = 'حدث خطأ أثناء إنشاء بطاقة الدعاء';
         }
+    } elseif ($generateDuaaImage && !$imageName) {
+        $errors[] = 'يجب تحميل صورة تذكارية للمتوفي لإنشاء بطاقة دعاء.';
     }
+}
+
 
     // Return validation errors if any
     if (!empty($errors)) {
@@ -175,6 +185,7 @@ try {
         'quote' => $quote ?: null,
         'quote_status' => $autoApproveMessages ?: 0,
         'image_url' => $imageName ? getImageUrl($imageName) : null,
+        'duaa_card_url' => $duaaImageUrl,
         'page_url' => site_url('m/' . $memorialId),
         'status' => $autoApproval ? 'approved' : 'pending',
         'edit_key' => $editKey,
