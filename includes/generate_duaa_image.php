@@ -74,7 +74,7 @@ function generateDuaaImage($imageName, $name, $gender, $imagePath = null, $death
         $maxWidth = $width - 120; // 60px margin on each side
         
         $duaaLines = wrapTextForImageMagick($canvas, $duaa, $duaaFont, 50, $maxWidth);
-        $lineHeight = 55; // 35 + 20
+        $lineHeight = 65;
         
         foreach ($duaaLines as $i => $line) {
             $currentY = $duaaY + ($i * $lineHeight);
