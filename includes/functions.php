@@ -303,6 +303,26 @@ function getImageUrl($filename, $thumbnail = false, $default_image = '/assets/im
     }
 }
 
+/**
+ * Get Duaa Card URL for a memorial image filename
+ */
+function getDuaaCardUrl($filename)
+{
+    if (!$filename) {
+        return null;
+    }
+
+    $duaaImagesDir = dirname(UPLOAD_PATH) . '/duaa_images/';
+    $duaaCardPath  = $duaaImagesDir . $filename;
+
+    if (file_exists($duaaCardPath)) {
+        return BASE_URL . '/uploads/duaa_images/' . $filename;
+    }
+    
+    return null;
+}
+
+
 
 /**
  * Check rate limit for IP

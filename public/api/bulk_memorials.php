@@ -41,6 +41,7 @@ try {
             quote,
             image_status,
             edit_key,
+            generate_duaa_image,
             (tasbeeh_subhan + tasbeeh_alham + tasbeeh_lailaha + tasbeeh_allahu) as total_tasbeeh
         FROM memorials 
         WHERE id = :id AND edit_key = :edit_key AND status = 1
@@ -79,6 +80,8 @@ try {
                     $memorial['image_status'] ?? null,
                     '/assets/images/placeholder-memorial.png'
                 ),
+                'duaa_card_url' => getDuaaCardUrl($memorial['image'] ?? null),
+                'generate_duaa_image' => $memorial['generate_duaa_image'] ? true : false,
                 'page_url' => site_url('m/' . $memorial['id']),
                 'edit_key' => $memorial['edit_key'],
             ];

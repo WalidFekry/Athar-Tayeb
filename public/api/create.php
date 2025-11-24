@@ -113,7 +113,6 @@ if (empty($errors)) {
         require_once __DIR__ . '/../../includes/generate_duaa_image.php';
         $imagePath = $imageName ? UPLOAD_PATH . '/' . $imageName : null;
 
-        // استدعاء الدالة وتخزين النتيجة
         $result = generateDuaaImage($imageName, $name, $gender, $imagePath, $death_date);
 
         if ($result['success']) {
@@ -185,6 +184,7 @@ if (empty($errors)) {
         'quote' => $quote ?: null,
         'quote_status' => $autoApproveMessages ?: 0,
         'image_url' => $imageName ? getImageUrl($imageName) : null,
+        'generate_duaa_image'=> $generateDuaaImage ? true : false,
         'duaa_card_url' => $duaaImageUrl,
         'page_url' => site_url('m/' . $memorialId),
         'status' => $autoApproval ? 'approved' : 'pending',
