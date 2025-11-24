@@ -1,7 +1,7 @@
 <?php
 /**
  * Edit Memorial Page
- * Allows users to edit their memorial using the edit key
+ * Allows users to edit or delete their memorial using the edit key
  */
 
 require_once __DIR__ . '/../includes/config.php';
@@ -11,10 +11,93 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/csrf.php';
 require_once __DIR__ . '/../includes/maintenance_check.php';
 
-$errors = [];
-$success = false;
+$errors   = [];
+$success  = false;
 $memorial = null;
-$editKey = isset($_GET['key']) ? trim($_GET['key']) : '';
+$editKey  = isset($_GET['key']) ? trim($_GET['key']) : '';
+
+/**
+ * Helper: normalize boolean-ish POST field
+ */
+function getPostBool(string $key, $default = false): bool
+{
+    if (!isset($_POST[$key])) {
+        return (bool)$default;
+    }
+
+    $value = $_POST[$key];
+
+    if (is_string($value)) {
+        $value = strtolower(trim($value));
+        return in_array($value, ['1', 'true', 'yes', 'on'], true);
+    }
+
+    return (bool)$value;
+}
+
+/**
+ * Helper: delete duaa image file if exists
+ */
+function deleteDuaaImage(?string $imageName): void
+{
+    if (!$imageName) {
+        return;
+    }
+
+    $duaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $imageName;
+    if (is_file($duaaImagePath)) {
+        @unlink($duaaImagePath);
+    }
+}
+
+/**
+ * Helper: delete main image + thumb + duaa image
+ */
+function deleteAllRelatedImages(?string $imageName): void
+{
+    if (!$imageName) {
+        return;
+    }
+
+    // Main image
+    $imagePath = UPLOAD_PATH . '/' . $imageName;
+    if (is_file($imagePath)) {
+        @unlink($imagePath);
+    }
+
+    // Thumbnail
+    $ext       = pathinfo($imageName, PATHINFO_EXTENSION);
+    $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $imagePath);
+    if (is_file($thumbPath)) {
+        @unlink($thumbPath);
+    }
+
+    // Duaa card
+    deleteDuaaImage($imageName);
+}
+
+/**
+ * Helper: generate duaa card
+ */
+function createDuaaImage(
+    string $imageName,
+    string $name,
+    string $gender,
+    ?string $imagePath,
+    ?string $deathDate,
+    array &$errors
+): ?string {
+    require_once __DIR__ . '/../includes/generate_duaa_image.php';
+
+    $result = generateDuaaImage($imageName, $name, $gender, $imagePath, $deathDate);
+
+    if (!empty($result['success'])) {
+        return $result['url'] ?? null;
+    }
+
+    $errors[] = 'حدث خطأ أثناء إنشاء بطاقة الدعاء';
+    return null;
+}
 
 // Rate limiting for edit page access
 if (!checkRateLimit('edit_access', EDIT_RATE_LIMIT, 3600)) {
@@ -30,14 +113,14 @@ if (empty($errors) && !empty($editKey)) {
         try {
             $stmt = $pdo->prepare("SELECT * FROM memorials WHERE edit_key = ?");
             $stmt->execute([$editKey]);
-            $memorial = $stmt->fetch();
-            
+            $memorial = $stmt->fetch(PDO::FETCH_ASSOC);
+
             if (!$memorial) {
                 $errors[] = 'رابط التعديل غير صحيح أو منتهي الصلاحية.';
             }
         } catch (PDOException $e) {
             if (DEBUG_MODE) {
-                $errors[] = 'خطأ في قاعدة البيانات: ' . $e->getMessage();
+                $errors[] = 'Database error: ' . $e->getMessage();
             } else {
                 $errors[] = 'حدث خطأ في النظام. يرجى المحاولة لاحقاً.';
             }
@@ -55,36 +138,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
     if (isset($_POST['action']) && $_POST['action'] === 'delete') {
         if (isset($_POST['confirm_delete']) && $_POST['confirm_delete'] === 'yes') {
             try {
-                // Delete image file if exists
+                // Delete all related images (main, thumb, duaa)
                 if ($memorial['image']) {
-                    $imagePath = UPLOAD_PATH . '/' . $memorial['image'];
-                    if (file_exists($imagePath)) {
-                        unlink($imagePath);
-                    }
-                    
-                    // Delete thumbnail if exists
-                    $ext = pathinfo($memorial['image'], PATHINFO_EXTENSION);
-                    $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $imagePath);
-                    if (file_exists($thumbPath)) {
-                        unlink($thumbPath);
-                    }
-                    
-                    // Delete Duaa card if exists
-                    $duaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $memorial['image'];
-                    if (file_exists($duaaImagePath)) {
-                        unlink($duaaImagePath);
-                    }
+                    deleteAllRelatedImages($memorial['image']);
                 }
-                
+
                 // Delete memorial from database
                 $stmt = $pdo->prepare("DELETE FROM memorials WHERE id = ?");
                 $stmt->execute([$memorial['id']]);
-    
+
                 redirect(site_url('deleted'));
-                
+
             } catch (PDOException $e) {
                 if (DEBUG_MODE) {
-                    $errors[] = 'خطأ في حذف الصفحة: ' . $e->getMessage();
+                    $errors[] = 'Database delete error: ' . $e->getMessage();
                 } else {
                     $errors[] = 'حدث خطأ أثناء حذف الصفحة. يرجى المحاولة لاحقاً.';
                 }
@@ -93,22 +160,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
             $errors[] = 'يجب تأكيد الحذف.';
         }
     } else {
-        // Handle edit action
-        $name = trim($_POST['name'] ?? '');
-        $from_name = trim($_POST['from_name'] ?? '');
+        // Handle edit/update action
+        $name       = trim($_POST['name'] ?? '');
+        $from_name  = trim($_POST['from_name'] ?? '');
 
-        $death_day = trim($_POST['death_day'] ?? '');
+        $death_day   = trim($_POST['death_day'] ?? '');
         $death_month = trim($_POST['death_month'] ?? '');
-        $death_year = trim($_POST['death_year'] ?? '');
-        $death_date = '';
+        $death_year  = trim($_POST['death_year'] ?? '');
+        $death_date  = $memorial['death_date'];
 
-        if (!empty($death_year) && !empty($death_month) && !empty($death_day)) {
+        // Death date logic: set or clear
+        if ($death_year !== '' && $death_month !== '' && $death_day !== '') {
             $death_date = sprintf('%04d-%02d-%02d', $death_year, $death_month, $death_day);
+        } elseif ($death_day === '' && $death_month === '' && $death_year === '') {
+            $death_date = null;
         }
 
-        $gender = trim($_POST['gender'] ?? 'male');
+        $gender   = trim($_POST['gender'] ?? 'male');
         $whatsapp = trim($_POST['whatsapp'] ?? '');
-        $quote = trim($_POST['quote'] ?? '');
+        $quote    = trim($_POST['quote'] ?? '');
+
+        // Duaa image flag (same logic as API)
+        $generateDuaaFlag = getPostBool('generate_duaa_image', 0);
 
         // Validation
         if (!empty($from_name) && mb_strlen($from_name) > 30) {
@@ -125,90 +198,118 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
             $errors[] = 'الرسالة أو الدعاء يجب ألا تتجاوز 300 حرف';
         }
 
-        if (!in_array($gender, ['male', 'female'])) {
+        if (!in_array($gender, ['male', 'female'], true)) {
             $gender = 'male';
         }
 
-        // Process image upload if provided
-        $newImageName = null;
-        $imageChanged = false;
-        if (empty($errors) && isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $uploadResult = processUploadedImage($_FILES['image'], $memorial['id']);
-            if ($uploadResult['success']) {
-                $newImageName = $uploadResult['filename'];
-                $imageChanged = true;
-                
-                // Delete old image
-                if ($memorial['image']) {
-                    $oldImagePath = UPLOAD_PATH . '/' . $memorial['image'];
-                    if (file_exists($oldImagePath)) {
-                        unlink($oldImagePath);
-                    }
-                    
-                    // Delete old thumbnail
-                    $ext = pathinfo($memorial['image'], PATHINFO_EXTENSION);
-                    $oldThumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $oldImagePath);
-                    if (file_exists($oldThumbPath)) {
-                        unlink($oldThumbPath);
-                    }
-                    
-                    // Delete old Duaa card if exists
-                    $oldDuaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $memorial['image'];
-                    if (file_exists($oldDuaaImagePath)) {
-                        unlink($oldDuaaImagePath);
-                    }
-                }
+        // Existing image and duaa handling
+        $imageName     = $memorial['image'];
+        $duaaImageUrl  = null;
+        $imageChanged  = false;
+
+        // Duaa image handling for existing image (before new upload)
+        if ($imageName) {
+            if (!$generateDuaaFlag) {
+                // User turned OFF duaa card => delete existing one
+                deleteDuaaImage($imageName);
             } else {
-                $errors[] = $uploadResult['error'];
+                // User wants duaa card based on current data
+                $imagePath    = UPLOAD_PATH . '/' . $imageName;
+                $duaaImageUrl = createDuaaImage($imageName, $name, $gender, $imagePath, $death_date, $errors);
             }
         }
 
-        // Update memorial if no errors
+        // Process image upload if provided
+        if (empty($errors) && isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            // Remove old image + thumb + duaa
+            if ($imageName) {
+                deleteAllRelatedImages($imageName);
+            }
+
+            // Process new uploaded image
+            $uploadResult = processUploadedImage($_FILES['image'], 0);
+
+            if (!empty($uploadResult['success'])) {
+                $imageName    = $uploadResult['filename'];
+                $imageChanged = true;
+            } else {
+                $errors[] = $uploadResult['error'] ?? 'خطأ في رفع الصورة';
+            }
+
+            // Generate duaa card for new image if requested
+            if (empty($errors)) {
+                if ($generateDuaaFlag && $imageName) {
+                    $imagePath    = UPLOAD_PATH . '/' . $imageName;
+                    $duaaImageUrl = createDuaaImage($imageName, $name, $gender, $imagePath, $death_date, $errors);
+                } elseif ($generateDuaaFlag && !$imageName) {
+                    $errors[] = 'يجب تحميل صورة تذكارية للمتوفي لإنشاء بطاقة دعاء.';
+                }
+            }
+        }
+
+        // If there are any errors from duaa/image logic, stop here
         if (empty($errors)) {
             try {
-                // Get auto approval settings
+                // Auto approval settings
                 $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'auto_approve_messages'");
                 $stmt->execute();
                 $autoApproveMessagesSetting = $stmt->fetchColumn();
-                $autoApproveMessages = ($autoApproveMessagesSetting == '1') ? 1 : 0;
+                $autoApproveMessages        = ($autoApproveMessagesSetting == '1') ? 1 : 0;
 
-                // Determine message status
+                // Message status: reset if quote changed
                 $messageStatus = $memorial['quote_status'];
                 if ($quote !== $memorial['quote']) {
                     $messageStatus = $autoApproveMessages;
                 }
 
-                // Determine image status
+                // Image status: reset if image changed
                 $imageStatus = $memorial['image_status'];
                 if ($imageChanged) {
-                    $imageStatus = 0; // Always require approval for new images
+                    $imageStatus = 0; // require admin approval again
                 }
 
                 // Update query
                 if ($imageChanged) {
                     $stmt = $pdo->prepare("
                         UPDATE memorials 
-                        SET name = ?, from_name = ?, image = ?, death_date = ?, gender = ?, 
-                            whatsapp = ?, quote = ?, quote_status = ?, image_status = ?, updated_at = NOW()
+                        SET name = ?, 
+                            from_name = ?, 
+                            image = ?, 
+                            death_date = ?, 
+                            gender = ?, 
+                            whatsapp = ?, 
+                            quote = ?, 
+                            quote_status = ?, 
+                            image_status = ?,
+                            generate_duaa_image = ?,
+                            updated_at = NOW()
                         WHERE id = ?
                     ");
                     $stmt->execute([
                         $name,
                         $from_name ?: null,
-                        $newImageName,
+                        $imageName,
                         $death_date ?: null,
                         $gender,
                         $whatsapp ?: null,
                         $quote ?: null,
                         $messageStatus,
                         $imageStatus,
+                        $generateDuaaFlag ? 1 : 0,
                         $memorial['id']
                     ]);
                 } else {
                     $stmt = $pdo->prepare("
                         UPDATE memorials 
-                        SET name = ?, from_name = ?, death_date = ?, gender = ?, 
-                            whatsapp = ?, quote = ?, quote_status = ?, updated_at = NOW()
+                        SET name = ?, 
+                            from_name = ?, 
+                            death_date = ?, 
+                            gender = ?, 
+                            whatsapp = ?, 
+                            quote = ?, 
+                            quote_status = ?,
+                            generate_duaa_image = ?,
+                            updated_at = NOW()
                         WHERE id = ?
                     ");
                     $stmt->execute([
@@ -219,20 +320,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
                         $whatsapp ?: null,
                         $quote ?: null,
                         $messageStatus,
+                        $generateDuaaFlag ? 1 : 0,
                         $memorial['id']
                     ]);
                 }
-                
-                // Refresh memorial data
+
+                // Refresh memorial data from DB
                 $stmt = $pdo->prepare("SELECT * FROM memorials WHERE id = ?");
                 $stmt->execute([$memorial['id']]);
-                $memorial = $stmt->fetch();
+                $memorial = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                // Recalculate duaa card URL after update
+                $duaaCardUrl = null;
+                if (!empty($memorial['generate_duaa_image']) && !empty($memorial['image'])) {
+                    $duaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $memorial['image'];
+                    if (is_file($duaaImagePath)) {
+                        $duaaCardUrl = site_url('uploads/duaa_images/' . $memorial['image']);
+                    }
+                }
 
                 $success = true;
 
             } catch (PDOException $e) {
                 if (DEBUG_MODE) {
-                    $errors[] = 'خطأ في قاعدة البيانات: ' . $e->getMessage();
+                    $errors[] = 'Database update error: ' . $e->getMessage();
                 } else {
                     $errors[] = 'حدث خطأ أثناء التحديث. يرجى المحاولة لاحقاً.';
                 }
@@ -241,8 +352,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
     }
 }
 
+// If not POST or on initial load, prepare duaa card URL (if not already set)
+if ($memorial && !isset($duaaCardUrl)) {
+    $duaaCardUrl = null;
+    if (!empty($memorial['generate_duaa_image']) && !empty($memorial['image'])) {
+        $duaaImagePath = PUBLIC_PATH . '/uploads/duaa_images/' . $memorial['image'];
+        if (is_file($duaaImagePath)) {
+            $duaaCardUrl = site_url('uploads/duaa_images/' . $memorial['image']);
+        }
+    }
+}
+
 // Page metadata
-$pageTitle = 'تعديل الصفحة التذكارية — ' . SITE_NAME;
+$pageTitle       = 'تعديل الصفحة التذكارية — ' . SITE_NAME;
 $pageDescription = 'تعديل أو حذف الصفحة التذكارية';
 
 include __DIR__ . '/../includes/header.php';
@@ -253,246 +375,360 @@ include __DIR__ . '/../includes/header.php';
         <div class="col-lg-8 mx-auto">
 
             <?php if (!$memorial && !empty($errors)): ?>
-            <!-- Invalid Link Page -->
-            <div class="text-center mb-5">
-                <div class="display-1 mb-3">❌</div>
-                <h1 class="text-danger">رابط غير صحيح</h1>
-                <p class="lead">
-                    رابط التعديل غير صحيح أو منتهي الصلاحية
-                </p>
-            </div>
-            
-            <div class="alert alert-danger">
-                <h5 class="alert-heading">لا يمكن الوصول للصفحة</h5>
-                <ul class="mb-0">
-                    <?php foreach ($errors as $error): ?>
-                    <li><?= e($error) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-            
-            <div class="text-center">
-                <a href="<?= site_url('') ?>" class="btn btn-primary">
-                    🏠 العودة للرئيسية
-                </a>
-            </div>
+                <!-- Invalid link message -->
+                <div class="text-center mb-5">
+                    <div class="display-1 mb-3">❌</div>
+                    <h1 class="text-danger">رابط غير صحيح</h1>
+                    <p class="lead">
+                        رابط التعديل غير صحيح أو منتهي الصلاحية
+                    </p>
+                </div>
+
+                <div class="alert alert-danger">
+                    <h5 class="alert-heading">لا يمكن الوصول للصفحة</h5>
+                    <ul class="mb-0">
+                        <?php foreach ($errors as $error): ?>
+                            <li><?= e($error) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+
+                <div class="text-center">
+                    <a href="<?= site_url('') ?>" class="btn btn-primary">
+                        🏠 العودة للرئيسية
+                    </a>
+                </div>
 
             <?php else: ?>
-            <!-- Edit Form -->
-            <header class="text-center mb-5">
-                <h1>✏️ تعديل الصفحة التذكارية</h1>
-                <p class="lead text-muted">
-                    تعديل بيانات الصفحة التذكارية لـ <strong><?= e($memorial['name']) ?></strong>
-                </p>
-            </header>
-
-            <!-- Success Message -->
-            <?php if ($success): ?>
-            <div class="alert alert-success" role="alert">
-                <h5 class="alert-heading">✅ تم التحديث بنجاح!</h5>
-                <p class="mb-0">تم حفظ التغييرات على الصفحة التذكارية.</p>
-            </div>
-            <?php endif; ?>
-
-            <!-- Errors Display -->
-            <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger" role="alert">
-                <h5 class="alert-heading">حدثت أخطاء:</h5>
-                <ul class="mb-0">
-                    <?php foreach ($errors as $error): ?>
-                    <li><?= e($error) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-            <?php endif; ?>
-
-            <!-- Memorial Link -->
-            <div class="alert alert-info mb-4">
-                <h6 class="alert-heading">🔗 رابط الصفحة التذكارية</h6>
-                <p class="mb-2">
-                    <a href="<?= site_url('m/' . $memorial['id']) ?>" target="_blank" class="fw-bold">
-                        <?= site_url('m/' . $memorial['id']) ?>
-                    </a>
-                </p>
-                <small class="text-muted">يمكنك مشاركة هذا الرابط مع الآخرين</small>
-            </div>
-
-            <!-- Edit Form -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-4">📝 تعديل البيانات</h5>
-                    
-                    <form method="POST" enctype="multipart/form-data" data-validate>
-                        <?php csrfField(); ?>
-
-                        <!-- From Name -->
-                        <div class="mb-4">
-                            <label for="from_name" class="form-label">
-                                اسم منشئ الصفحة - اختياري
-                            </label>
-                            <input type="text" class="form-control" id="from_name" name="from_name"
-                                placeholder="مثال: عائلة الإمبابي" maxlength="31"
-                                value="<?= e($memorial['from_name'] ?? '') ?>">
-                        </div>
-
-                        <!-- Name (Required) -->
-                        <div class="mb-4">
-                            <label for="name" class="form-label">
-                                اسم المتوفى <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="الاسم الكامل"
-                                required maxlength="31" value="<?= e($memorial['name']) ?>">
-                        </div>
-
-                        <!-- Current Image Display -->
-                        <?php if ($memorial['image']): ?>
-                        <div class="mb-4">
-                            <label class="form-label">الصورة الحالية</label>
-                            <div class="text-center">
-                                <img src="<?= getImageUrl($memorial['image'], true) ?>" 
-                                     alt="<?= e($memorial['name']) ?>" 
-                                     class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
-                                <div class="mt-2">
-                                    <span class="badge <?= $memorial['image_status'] ? 'bg-success' : 'bg-warning' ?>">
-                                        <?= $memorial['image_status'] ? 'معتمدة' : 'قيد المراجعة' ?>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-
-                        <!-- Image Upload -->
-                        <div class="mb-4">
-                            <label for="imageInput" class="form-label">
-                                <?= $memorial['image'] ? 'تغيير الصورة - اختياري' : 'صورة المتوفى - اختياري' ?>
-                            </label>
-                            <input type="file" class="form-control" id="imageInput" name="image"
-                                accept=".jpg,.jpeg,.png">
-                            <small class="form-text text-muted">
-                                الحد الأقصى: 2 ميجابايت | الصيغ المسموحة: JPG, PNG
-                                <?php if ($memorial['image']): ?>
-                                <br><strong>ملاحظة:</strong> رفع صورة جديدة سيحذف الصورة الحالية ويتطلب موافقة الإدارة مرة أخرى.
-                                <?php endif; ?>
-                            </small>
-                            <div id="imagePreview" class="mt-3 text-center"></div>
-                        </div>
-
-                        <!-- Death Date -->
-                        <fieldset class="mb-4">
-                            <legend class="form-label">
-                                يوم الذكرى (تاريخ الوفاة) - اختياري
-                            </legend>
-                            <div class="mb-3">
-                                <input type="text" id="death_date_picker" class="form-control"
-                                    placeholder="اضغط هنا لاختيار التاريخ 📅" readonly>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-4">
-                                    <input type="number" class="form-control text-center" id="death_day"
-                                        name="death_day" placeholder="اليوم" min="1" max="31"
-                                        value="<?= $memorial['death_date'] ? date('j', strtotime($memorial['death_date'])) : '' ?>">
-                                    <small class="form-text text-muted d-block text-center mt-1">اليوم</small>
-                                </div>
-                                <div class="col-4">
-                                    <input type="number" class="form-control text-center" id="death_month"
-                                        name="death_month" placeholder="الشهر" min="1" max="12"
-                                        value="<?= $memorial['death_date'] ? date('n', strtotime($memorial['death_date'])) : '' ?>">
-                                    <small class="form-text text-muted d-block text-center mt-1">الشهر</small>
-                                </div>
-                                <div class="col-4">
-                                    <input type="number" class="form-control text-center" id="death_year"
-                                        name="death_year" placeholder="السنة" min="1900" max="<?= date('Y') ?>"
-                                        value="<?= $memorial['death_date'] ? date('Y', strtotime($memorial['death_date'])) : '' ?>">
-                                    <small class="form-text text-muted d-block text-center mt-1">السنة</small>
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <!-- Gender -->
-                        <div class="mb-4">
-                            <label for="gender" class="form-label">
-                                الجنس <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select" id="gender" name="gender" required>
-                                <option value="male" <?= $memorial['gender'] === 'male' ? 'selected' : '' ?>>
-                                    ذكر
-                                </option>
-                                <option value="female" <?= $memorial['gender'] === 'female' ? 'selected' : '' ?>>
-                                    أنثى
-                                </option>
-                            </select>
-                        </div>
-
-                        <!-- WhatsApp -->
-                        <div class="mb-4">
-                            <label for="whatsapp" class="form-label">
-                                رقم الواتساب - اختياري
-                            </label>
-                            <input type="tel" class="form-control" id="whatsapp" name="whatsapp"
-                                placeholder="+20 123 456 7890" value="<?= e($memorial['whatsapp'] ?? '') ?>">
-                        </div>
-
-                        <!-- Quote/Message -->
-                        <div class="mb-4">
-                            <label for="quote" class="form-label">
-                                رسالة أو دعاء - اختياري
-                                <?php if ($memorial['quote']): ?>
-                                <span class="badge <?= $memorial['quote_status'] ? 'bg-success' : 'bg-warning' ?> ms-2">
-                                    <?= $memorial['quote_status'] ? 'معتمدة' : 'قيد المراجعة' ?>
-                                </span>
-                                <?php endif; ?>
-                            </label>
-                            <textarea class="form-control" id="quote" name="quote" rows="4" maxlength="301"
-                                placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..."><?= e($memorial['quote'] ?? '') ?></textarea>
-                            <small class="form-text text-muted">
-                                تعديل الرسالة قد يتطلب موافقة الإدارة مرة أخرى
-                            </small>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                💾 حفظ التغييرات
-                            </button>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-
-            <!-- Delete Section -->
-            <div class="card shadow-sm border-danger mb-4">
-                <div class="card-body p-4">
-                    <h5 class="card-title text-danger mb-4">🗑️ حذف الصفحة التذكارية</h5>
-                    <p class="text-muted mb-3">
-                        <strong>تحذير:</strong> حذف الصفحة التذكارية عملية لا يمكن التراجع عنها. 
-                        سيتم حذف جميع البيانات والصور نهائياً.
+                <!-- Edit form -->
+                <header class="text-center mb-5">
+                    <h1>✏️ تعديل الصفحة التذكارية</h1>
+                    <p class="lead text-muted">
+                        تعديل بيانات الصفحة التذكارية لـ <strong><?= e($memorial['name']) ?></strong>
                     </p>
-                    
-                    <form method="POST" onsubmit="return confirmDelete()">
-                        <?php csrfField(); ?>
-                        <input type="hidden" name="action" value="delete">
-                        
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="confirm_delete" name="confirm_delete" value="yes" required>
-                            <label class="form-check-label text-danger" for="confirm_delete">
-                                <strong>أؤكد أنني أريد حذف هذه الصفحة التذكارية نهائياً</strong>
-                            </label>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-danger">
-                            🗑️ حذف الصفحة نهائياً
-                        </button>
-                    </form>
-                </div>
-            </div>
+                </header>
 
-            <!-- Back to Memorial -->
-            <div class="text-center">
-                <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-outline-primary">
-                    👁️ عرض الصفحة التذكارية
-                </a>
-            </div>
+                <!-- Success message -->
+                <?php if ($success): ?>
+                    <div class="alert alert-success" role="alert">
+                        <h5 class="alert-heading">✅ تم التحديث بنجاح!</h5>
+                        <p class="mb-0">تم حفظ التغييرات على الصفحة التذكارية.</p>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Error messages -->
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-danger" role="alert">
+                        <h5 class="alert-heading">حدثت أخطاء:</h5>
+                        <ul class="mb-0">
+                            <?php foreach ($errors as $error): ?>
+                                <li><?= e($error) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Memorial link -->
+                <div class="alert alert-info mb-4">
+                    <h6 class="alert-heading">🔗 رابط الصفحة التذكارية</h6>
+                    <p class="mb-2">
+                        <a href="<?= site_url('m/' . $memorial['id']) ?>" target="_blank" class="fw-bold">
+                            <?= site_url('m/' . $memorial['id']) ?>
+                        </a>
+                    </p>
+                    <small class="text-muted">يمكنك مشاركة هذا الرابط مع الآخرين</small>
+                </div>
+
+                <!-- Edit form card -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4">📝 تعديل البيانات</h5>
+
+                        <form method="POST" enctype="multipart/form-data" data-validate>
+                            <?php csrfField(); ?>
+
+                            <!-- From name -->
+                            <div class="mb-4">
+                                <label for="from_name" class="form-label">
+                                    اسم منشئ الصفحة - اختياري
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="from_name"
+                                    name="from_name"
+                                    placeholder="مثال: عائلة الإمبابي"
+                                    maxlength="31"
+                                    value="<?= e($memorial['from_name'] ?? '') ?>"
+                                >
+                            </div>
+
+                            <!-- Name (required) -->
+                            <div class="mb-4">
+                                <label for="name" class="form-label">
+                                    اسم المتوفى <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="name"
+                                    name="name"
+                                    placeholder="الاسم الكامل"
+                                    required
+                                    maxlength="31"
+                                    value="<?= e($memorial['name']) ?>"
+                                >
+                            </div>
+
+                            <!-- Current image -->
+                            <?php if ($memorial['image']): ?>
+                                <div class="mb-4">
+                                    <label class="form-label">الصورة الحالية</label>
+                                    <div class="text-center">
+                                        <img
+                                            src="<?= getImageUrl($memorial['image'], true) ?>"
+                                            alt="<?= e($memorial['name']) ?>"
+                                            class="img-thumbnail"
+                                            style="max-width: 200px; max-height: 200px;"
+                                        >
+                                        <div class="mt-2">
+                                            <span class="badge <?= $memorial['image_status'] ? 'bg-success' : 'bg-warning' ?>">
+                                                <?= $memorial['image_status'] ? 'معتمدة' : 'قيد المراجعة' ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <?php if (!empty($duaaCardUrl)): ?>
+                                      <?php
+    $duaaCardUrlNoCache = $duaaCardUrl . (strpos($duaaCardUrl, '?') !== false ? '&' : '?') . 't=' . time();
+    ?>
+                                    <div class="mb-4">
+                                        <label class="form-label">بطاقة الدعاء الحالية</label>
+                                        <div class="text-center">
+                                            <img
+                                                src="<?= $duaaCardUrlNoCache ?>"
+                                                alt="بطاقة الدعاء لـ <?= e($memorial['name']) ?>"
+                                                class="img-thumbnail"
+                                                style="max-width: 260px; max-height: 260px;"
+                                            >
+                                            <div class="mt-2">
+                                                <a href="<?= $duaaCardUrlNoCache ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                                    🔗 فتح بطاقة الدعاء في تبويب جديد
+                                                </a>
+                                            </div>
+                                            <small class="form-text text-muted d-block mt-2">
+                                                عند تغيير الاسم أو تاريخ الوفاة أو الصورة مع تفعيل خيار بطاقة الدعاء، سيتم إنشاء بطاقة جديدة تلقائياً.
+                                            </small>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            <?php endif; ?>
+
+                            <!-- Image upload -->
+                            <div class="mb-4">
+                                <label for="imageInput" class="form-label">
+                                    <?= $memorial['image'] ? 'تغيير الصورة - اختياري' : 'صورة المتوفى - اختياري' ?>
+                                </label>
+                                <input
+                                    type="file"
+                                    class="form-control"
+                                    id="imageInput"
+                                    name="image"
+                                    accept=".jpg,.jpeg,.png"
+                                >
+                                <small class="form-text text-muted">
+                                    الحد الأقصى: 5 ميجابايت | الصيغ المسموحة: JPG, PNG
+                                    <?php if ($memorial['image']): ?>
+                                        <br><strong>ملاحظة:</strong> رفع صورة جديدة سيحذف الصورة الحالية ويتطلب موافقة الإدارة مرة أخرى.
+                                    <?php endif; ?>
+                                </small>
+                                <div id="imagePreview" class="mt-3 text-center"></div>
+                            </div>
+
+                            <!-- Death date -->
+                            <fieldset class="mb-4">
+                                <legend class="form-label">
+                                    يوم الذكرى (تاريخ الوفاة) - اختياري
+                                </legend>
+                                <div class="mb-3">
+                                    <input
+                                        type="text"
+                                        id="death_date_picker"
+                                        class="form-control"
+                                        placeholder="اضغط هنا لاختيار التاريخ 📅"
+                                        readonly
+                                    >
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <input
+                                            type="number"
+                                            class="form-control text-center"
+                                            id="death_day"
+                                            name="death_day"
+                                            placeholder="اليوم"
+                                            min="1"
+                                            max="31"
+                                            value="<?= $memorial['death_date'] ? date('j', strtotime($memorial['death_date'])) : '' ?>"
+                                        >
+                                        <small class="form-text text-muted d-block text-center mt-1">اليوم</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <input
+                                            type="number"
+                                            class="form-control text-center"
+                                            id="death_month"
+                                            name="death_month"
+                                            placeholder="الشهر"
+                                            min="1"
+                                            max="12"
+                                            value="<?= $memorial['death_date'] ? date('n', strtotime($memorial['death_date'])) : '' ?>"
+                                        >
+                                        <small class="form-text text-muted d-block text-center mt-1">الشهر</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <input
+                                            type="number"
+                                            class="form-control text-center"
+                                            id="death_year"
+                                            name="death_year"
+                                            placeholder="السنة"
+                                            min="1900"
+                                            max="<?= date('Y') ?>"
+                                            value="<?= $memorial['death_date'] ? date('Y', strtotime($memorial['death_date'])) : '' ?>"
+                                        >
+                                        <small class="form-text text-muted d-block text-center mt-1">السنة</small>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Gender -->
+                            <div class="mb-4">
+                                <label for="gender" class="form-label">
+                                    الجنس <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="male" <?= $memorial['gender'] === 'male' ? 'selected' : '' ?>>
+                                        ذكر
+                                    </option>
+                                    <option value="female" <?= $memorial['gender'] === 'female' ? 'selected' : '' ?>>
+                                        أنثى
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- WhatsApp -->
+                            <div class="mb-4">
+                                <label for="whatsapp" class="form-label">
+                                    رقم الواتساب - اختياري
+                                </label>
+                                <input
+                                    type="tel"
+                                    class="form-control"
+                                    id="whatsapp"
+                                    name="whatsapp"
+                                    placeholder="+20 123 456 7890"
+                                    value="<?= e($memorial['whatsapp'] ?? '') ?>"
+                                >
+                            </div>
+
+                            <!-- Duaa card toggle -->
+                            <div class="mb-4">
+                                <label class="form-label d-block">
+                                    بطاقة الدعاء
+                                </label>
+                                <div class="form-check form-switch">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="generate_duaa_image"
+                                        name="generate_duaa_image"
+                                        <?= !empty($memorial['generate_duaa_image']) ? 'checked' : '' ?>
+                                    >
+                                    <label class="form-check-label" for="generate_duaa_image">
+                                        تفعيل إنشاء بطاقة الدعاء تلقائياً
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted d-block mt-1">
+                                    عند التفعيل، سيتم إنشاء أو تحديث بطاقة الدعاء تلقائياً عند تعديل الاسم أو تاريخ الوفاة أو الصورة.
+                                </small>
+                            </div>
+
+                            <!-- Quote / message -->
+                            <div class="mb-4">
+                                <label for="quote" class="form-label">
+                                    رسالة أو دعاء - اختياري
+                                    <?php if ($memorial['quote']): ?>
+                                        <span class="badge <?= $memorial['quote_status'] ? 'bg-success' : 'bg-warning' ?> ms-2">
+                                            <?= $memorial['quote_status'] ? 'معتمدة' : 'قيد المراجعة' ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </label>
+                                <textarea
+                                    class="form-control"
+                                    id="quote"
+                                    name="quote"
+                                    rows="4"
+                                    maxlength="301"
+                                    placeholder="كلمات جميلة عن الفقيد، أو دعاء خاص..."
+                                ><?= e($memorial['quote'] ?? '') ?></textarea>
+                                <small class="form-text text-muted">
+                                    تعديل الرسالة قد يتطلب موافقة الإدارة مرة أخرى
+                                </small>
+                            </div>
+
+                            <!-- Submit button -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    💾 حفظ التغييرات
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Delete section -->
+                <div class="card shadow-sm border-danger mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title text-danger mb-4">🗑️ حذف الصفحة التذكارية</h5>
+                        <p class="text-muted mb-3">
+                            <strong>تحذير:</strong> حذف الصفحة التذكارية عملية لا يمكن التراجع عنها.
+                            سيتم حذف جميع البيانات والصور نهائياً.
+                        </p>
+
+                        <form method="POST" onsubmit="return confirmDelete()">
+                            <?php csrfField(); ?>
+                            <input type="hidden" name="action" value="delete">
+
+                            <div class="form-check mb-3">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="confirm_delete"
+                                    name="confirm_delete"
+                                    value="yes"
+                                    required
+                                >
+                                <label class="form-check-label text-danger" for="confirm_delete">
+                                    <strong>أؤكد أنني أريد حذف هذه الصفحة التذكارية نهائياً</strong>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-danger">
+                                🗑️ حذف الصفحة نهائياً
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Back to memorial -->
+                <div class="text-center">
+                    <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-outline-primary">
+                        👁️ عرض الصفحة التذكارية
+                    </a>
+                </div>
 
             <?php endif; ?>
         </div>
@@ -507,17 +743,17 @@ include __DIR__ . '/../includes/header.php';
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
 
 <script>
-// Confirm delete function
+// Confirm delete action
 function confirmDelete() {
     return confirm('هل أنت متأكد من حذف هذه الصفحة التذكارية نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه!');
 }
 
-// Initialize Flatpickr for date picker
+// Initialize Flatpickr date picker
 (function() {
     const datePickerInput = document.getElementById('death_date_picker');
-    const deathDayInput = document.getElementById('death_day');
+    const deathDayInput   = document.getElementById('death_day');
     const deathMonthInput = document.getElementById('death_month');
-    const deathYearInput = document.getElementById('death_year');
+    const deathYearInput  = document.getElementById('death_year');
 
     if (datePickerInput) {
         const fp = flatpickr(datePickerInput, {
@@ -528,25 +764,25 @@ function confirmDelete() {
             minDate: "1900-01-01",
             allowInput: false,
             clickOpens: true,
-            onChange: function(selectedDates, dateStr, instance) {
+            onChange: function(selectedDates) {
                 if (selectedDates.length > 0) {
-                    const date = selectedDates[0];
-                    const day = date.getDate();
+                    const date  = selectedDates[0];
+                    const day   = date.getDate();
                     const month = date.getMonth() + 1;
-                    const year = date.getFullYear();
+                    const year  = date.getFullYear();
 
-                    if (deathDayInput) deathDayInput.value = day;
+                    if (deathDayInput)   deathDayInput.value   = day;
                     if (deathMonthInput) deathMonthInput.value = month;
-                    if (deathYearInput) deathYearInput.value = year;
+                    if (deathYearInput)  deathYearInput.value  = year;
                 }
             }
         });
 
-        // Populate picker if fields already have values
+        // Pre-fill picker from existing values
         if (deathYearInput && deathMonthInput && deathDayInput) {
-            const year = deathYearInput.value;
+            const year  = deathYearInput.value;
             const month = deathMonthInput.value;
-            const day = deathDayInput.value;
+            const day   = deathDayInput.value;
 
             if (year && month && day) {
                 const dateStr = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
@@ -556,11 +792,11 @@ function confirmDelete() {
     }
 })();
 
-// Character counter for quote, name, and from_name
+// Character counters for quote, name, and from_name
 (function() {
     const fields = [
-        { id: 'quote', max: 300 },
-        { id: 'name', max: 30 },
+        { id: 'quote',     max: 300 },
+        { id: 'name',      max: 30 },
         { id: 'from_name', max: 30 }
     ];
 
@@ -568,68 +804,71 @@ function confirmDelete() {
         const input = document.getElementById(field.id);
         if (!input) return;
 
-        // Create counter container
+        // Create counter element
         const counter = document.createElement('small');
         counter.className = 'form-text text-muted d-block text-end mt-1';
         counter.innerHTML = `<span id="${field.id}_current">0</span>/${field.max}`;
         input.insertAdjacentElement('afterend', counter);
 
         const currentSpan = document.getElementById(`${field.id}_current`);
-        const MAX_LENGTH = field.max;
+        const MAX_LENGTH  = field.max;
 
-        // Function to update character count
         function updateCharCount() {
             const currentLength = input.value.length;
             currentSpan.textContent = currentLength;
 
             if (currentLength > MAX_LENGTH) {
                 input.style.borderColor = '#dc3545';
-                input.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
-                counter.style.color = '#dc3545';
+                input.style.boxShadow   = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+                counter.style.color     = '#dc3545';
                 counter.style.fontWeight = 'bold';
             } else if (currentLength >= MAX_LENGTH - 5) {
                 input.style.borderColor = '#ffc107';
-                input.style.boxShadow = '';
-                counter.style.color = '#ffc107';
+                input.style.boxShadow   = '';
+                counter.style.color     = '#ffc107';
                 counter.style.fontWeight = 'bold';
             } else {
                 input.style.borderColor = '';
-                input.style.boxShadow = '';
-                counter.style.color = '#6c757d';
+                input.style.boxShadow   = '';
+                counter.style.color     = '#6c757d';
                 counter.style.fontWeight = 'normal';
             }
         }
 
-        // Events
-        input.addEventListener('input', updateCharCount);
-        input.addEventListener('keyup', updateCharCount);
+        input.addEventListener('input',  updateCharCount);
+        input.addEventListener('keyup',  updateCharCount);
         input.addEventListener('change', updateCharCount);
 
-        // Initialize
+        // Initialize counter
         updateCharCount();
     });
 })();
 
-// Image preview functionality
-document.getElementById('imageInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
+// Image preview for new upload
+(function() {
+    const input   = document.getElementById('imageInput');
     const preview = document.getElementById('imagePreview');
-    
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.innerHTML = `
-                <div class="mt-3">
-                    <img src="${e.target.result}" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
-                    <div class="mt-2 text-muted">معاينة الصورة الجديدة</div>
-                </div>
-            `;
-        };
-        reader.readAsDataURL(file);
-    } else {
-        preview.innerHTML = '';
-    }
-});
+
+    if (!input || !preview) return;
+
+    input.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                preview.innerHTML = `
+                    <div class="mt-3">
+                        <img src="${ev.target.result}" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                        <div class="mt-2 text-muted">معاينة الصورة الجديدة</div>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '';
+        }
+    });
+})();
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
