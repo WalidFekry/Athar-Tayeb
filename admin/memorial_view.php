@@ -12,51 +12,90 @@ require_once __DIR__ . '/../includes/csrf.php';
 
 requireAdmin();
 
+$success = '';
+$error = '';
+
 $memorialId = (int)($_GET['id'] ?? 0);
 
 if (!$memorialId) {
     redirect(ADMIN_URL . '/memorials.php');
 }
 
-// Handle delete action
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+// Handle actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     checkCSRF();
-    
-    $deleteId = (int)$_POST['memorial_id'];
-    
-    if ($deleteId === $memorialId) {
-        // Get memorial data for file cleanup
-        $stmt = $pdo->prepare("SELECT image FROM memorials WHERE id = ?");
-        $stmt->execute([$deleteId]);
-        $memorialToDelete = $stmt->fetch();
-        
-        if ($memorialToDelete && $memorialToDelete['image']) {
-            // Delete main image
-            $imagePath = UPLOAD_PATH . '/' . $memorialToDelete['image'];
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
+
+    $action = $_POST['action'];
+
+    if ($action === 'delete') {
+        $deleteId = (int)$_POST['memorial_id'];
+
+        if ($deleteId === $memorialId) {
+            // Get memorial data for file cleanup
+            $stmt = $pdo->prepare("SELECT image FROM memorials WHERE id = ?");
+            $stmt->execute([$deleteId]);
+            $memorialToDelete = $stmt->fetch();
+
+            if ($memorialToDelete && $memorialToDelete['image']) {
+                // Delete main image
+                $imagePath = UPLOAD_PATH . '/' . $memorialToDelete['image'];
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+
+                // Delete thumbnail
+                $ext = pathinfo($memorialToDelete['image'], PATHINFO_EXTENSION);
+                $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $imagePath);
+                if (file_exists($thumbPath)) {
+                    unlink($thumbPath);
+                }
+
+                // Delete Duaa card if exists
+                $duaaImagePath = __DIR__ . '/../public/uploads/duaa_images/' . $memorialToDelete['image'];
+                if (file_exists($duaaImagePath)) {
+                    unlink($duaaImagePath);
+                }
             }
-            
-            // Delete thumbnail
-            $ext = pathinfo($memorialToDelete['image'], PATHINFO_EXTENSION);
-            $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $imagePath);
-            if (file_exists($thumbPath)) {
-                unlink($thumbPath);
-            }
-            
-            // Delete Duaa card if exists
-            $duaaImagePath = __DIR__ . '/../public/uploads/duaa_images/' . $memorialToDelete['image'];
-            if (file_exists($duaaImagePath)) {
-                unlink($duaaImagePath);
+
+            // Delete memorial record from database
+            $stmt = $pdo->prepare("DELETE FROM memorials WHERE id = ?");
+            $stmt->execute([$deleteId]);
+
+            // Redirect back to memorials list with success message
+            redirect(ADMIN_URL . '/memorials.php?deleted=1');
+        }
+    } elseif ($action === 'block_ip') {
+        $blockId = (int)$_POST['memorial_id'];
+
+        if ($blockId === $memorialId) {
+            // Get IP address for this memorial
+            $stmt = $pdo->prepare("SELECT ip_address FROM memorials WHERE id = ?");
+            $stmt->execute([$blockId]);
+            $memorialIpRow = $stmt->fetch();
+
+            if ($memorialIpRow && !empty($memorialIpRow['ip_address'])) {
+                $ipToBlock = $memorialIpRow['ip_address'];
+
+                // Check if already blocked
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM blocked_ips WHERE ip_address = ?");
+                $stmt->execute([$ipToBlock]);
+                $alreadyBlocked = (int)$stmt->fetchColumn() > 0;
+
+                if ($alreadyBlocked) {
+                    $error = 'تم حظر هذا العنوان من قبل.';
+                } else {
+                    $reason = 'حظر من الصفحة التذكارية رقم ' . $blockId;
+                    $blockedBy = isset($_SESSION['admin_id']) ? (int)$_SESSION['admin_id'] : null;
+
+                    $stmt = $pdo->prepare("INSERT INTO blocked_ips (ip_address, reason, blocked_by) VALUES (?, ?, ?)");
+                    $stmt->execute([$ipToBlock, $reason, $blockedBy]);
+
+                    $success = 'تم حظر هذا المستخدم بنجاح.';
+                }
+            } else {
+                $error = 'لا يوجد عنوان IP صالح لهذه الصفحة.';
             }
         }
-        
-        // Delete memorial record from database
-        $stmt = $pdo->prepare("DELETE FROM memorials WHERE id = ?");
-        $stmt->execute([$deleteId]);
-        
-        // Redirect back to memorials list with success message
-        redirect(ADMIN_URL . '/memorials.php?deleted=1');
     }
 }
 
@@ -94,6 +133,14 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
     <div class="container my-5">
         
         <h1 class="mb-4">عرض الصفحة التذكارية</h1>
+
+        <?php if ($success): ?>
+            <div class="alert alert-success"><?= e($success) ?></div>
+        <?php endif; ?>
+
+        <?php if ($error): ?>
+            <div class="alert alert-danger"><?= e($error) ?></div>
+        <?php endif; ?>
         
         <!-- Memorial Info Card -->
         <div class="card shadow-sm mb-4">
@@ -127,6 +174,10 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                             <tr>
                                 <th>واتساب:</th>
                                 <td><?= e($memorial['whatsapp'] ?: '—') ?></td>
+                            </tr>
+                            <tr>
+                                <th>عنوان IP:</th>
+                                <td><?= e($memorial['ip_address'] ?: '—') ?></td>
                             </tr>
                         </table>
                     </div>
@@ -180,6 +231,10 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                             <tr>
                                 <th>تاريخ الإنشاء:</th>
                                 <td><?= formatArabicDate($memorial['created_at']) ?></td>
+                            </tr>
+                              <tr>
+                                <th>تاريخ التحديث:</th>
+                                <td><?= $memorial['updated_at'] ?></td>
                             </tr>
                         </table>
                     </div>
@@ -257,6 +312,14 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                        class="btn btn-warning">
                         ✏️ تعديل
                     </a>
+                    <form method="POST" style="display: inline;" onsubmit="return confirm('هل أنت متأكد من حظر هذا المستخدم؟ سيتم منعه من إنشاء صفحات تذكارية جديدة من هذا العنوان.')">
+                        <?php csrfField(); ?>
+                        <input type="hidden" name="action" value="block_ip">
+                        <input type="hidden" name="memorial_id" value="<?= $memorial['id'] ?>">
+                        <button type="submit" class="btn btn-danger">
+                            ☠️ حظر المستخدم 
+                        </button>
+                    </form>
                     <form method="POST" style="display: inline;" onsubmit="return confirm('هل أنت متأكد من حذف هذه الصفحة نهائياً؟ سيتم حذف جميع الصور والبيانات المرتبطة بها. هذا الإجراء لا يمكن التراجع عنه.')">
                         <?php csrfField(); ?>
                         <input type="hidden" name="action" value="delete">

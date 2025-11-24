@@ -39,6 +39,21 @@ try {
         exit;
     }
 
+    // Check if IP is blocked
+    $ip = getUserIp();
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM blocked_ips WHERE ip_address = ?");
+    $stmt->execute([$ip]);
+    $isBlocked = (int) $stmt->fetchColumn() > 0;
+
+    if ($isBlocked) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error' => 'تم حظرك من إنشاء صفحات تذكارية.'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     // Validate inputs
     $name = trim($_POST['name'] ?? '');
     $from_name = trim($_POST['from_name'] ?? '');
@@ -57,11 +72,9 @@ try {
     $quote = trim($_POST['quote'] ?? '');
     $generateDuaaImage = isset($_POST['generate_duaa_image']) ? $_POST['generate_duaa_image'] : 0;
 
-
     $errors = [];
 
     // Check rate limiting
-    $ip = getUserIp();
     $stmt = $pdo->prepare("
         SELECT COUNT(*) 
         FROM memorials 
@@ -108,22 +121,22 @@ try {
 
     $duaaImageUrl = null;
 
-if (empty($errors)) {
-    if ($generateDuaaImage && $imageName) {
-        require_once __DIR__ . '/../../includes/generate_duaa_image.php';
-        $imagePath = $imageName ? UPLOAD_PATH . '/' . $imageName : null;
+    if (empty($errors)) {
+        if ($generateDuaaImage && $imageName) {
+            require_once __DIR__ . '/../../includes/generate_duaa_image.php';
+            $imagePath = $imageName ? UPLOAD_PATH . '/' . $imageName : null;
 
         $result = generateDuaaImage($imageName, $name, $gender, $imagePath, $death_date);
 
-        if ($result['success']) {
-            $duaaImageUrl = $result['url'];
-        } else {
-            $errors[] = 'حدث خطأ أثناء إنشاء بطاقة الدعاء';
+            if ($result['success']) {
+                $duaaImageUrl = $result['url'];
+            } else {
+                $errors[] = 'حدث خطأ أثناء إنشاء بطاقة الدعاء';
+            }
+        } elseif ($generateDuaaImage && !$imageName) {
+            $errors[] = 'يجب تحميل صورة تذكارية للمتوفي لإنشاء بطاقة دعاء.';
         }
-    } elseif ($generateDuaaImage && !$imageName) {
-        $errors[] = 'يجب تحميل صورة تذكارية للمتوفي لإنشاء بطاقة دعاء.';
     }
-}
 
 
     // Return validation errors if any

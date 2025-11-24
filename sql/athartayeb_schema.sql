@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 21, 2025 at 11:22 PM
+-- Generation Time: Nov 24, 2025 at 02:15 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.27
 
@@ -41,6 +41,20 @@ CREATE TABLE `admins` (
 
 INSERT INTO `admins` (`id`, `username`, `password`, `role`, `created_at`) VALUES
 (1, 'admin', '$2y$10$hW01uEGzKOScPnyNeYUjBOvrN47HQ/n0nNNdbNaLUKeKeI3t8QkvW', 'admin', '2025-11-07 15:52:58');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `blocked_ips`
+--
+
+CREATE TABLE `blocked_ips` (
+  `id` int NOT NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `blocked_by` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -108,6 +122,13 @@ ALTER TABLE `admins`
   ADD UNIQUE KEY `username` (`username`);
 
 --
+-- Indexes for table `blocked_ips`
+--
+ALTER TABLE `blocked_ips`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_ip_address` (`ip_address`);
+
+--
 -- Indexes for table `memorials`
 --
 ALTER TABLE `memorials`
@@ -138,6 +159,12 @@ ALTER TABLE `settings`
 --
 ALTER TABLE `admins`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `blocked_ips`
+--
+ALTER TABLE `blocked_ips`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `memorials`
