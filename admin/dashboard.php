@@ -113,6 +113,9 @@ $pageTitle = 'لوحة التحكم';
                     <li class="nav-item">
                         <a class="nav-link" href="<?= ADMIN_URL ?>/settings.php">الإعدادات</a>
                     </li>
+                               <li class="nav-item">
+                        <a class="nav-link" href="<?= ADMIN_URL ?>/blocked_ips.php">المستخدمون المحظورون</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= ADMIN_URL ?>/admins.php">المديرون</a>
                     </li>

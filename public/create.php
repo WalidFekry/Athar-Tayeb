@@ -17,18 +17,28 @@ $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     checkCSRF();
 
-    // Check rate limiting
     $ip = getUserIp();
-    $stmt = $pdo->prepare("
+
+    // Check if IP is blocked
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM blocked_ips WHERE ip_address = ?");
+    $stmt->execute([$ip]);
+    $isBlocked = (int) $stmt->fetchColumn() > 0;
+
+    if ($isBlocked) {
+        $errors[] = 'تم حظرك من إنشاء صفحات تذكارية من هذا الجهاز. إذا كنت تعتقد أن هذا خطأ، يرجى التواصل معنا.';
+    } else {
+        // Check rate limiting
+        $stmt = $pdo->prepare("
         SELECT COUNT(*) 
         FROM memorials 
         WHERE ip_address = ? 
           AND created_at >= (NOW() - INTERVAL 1 HOUR)
     ");
-    $stmt->execute([$ip]);
-    $countLastHour = (int) $stmt->fetchColumn();
-    if ($countLastHour >= 1) {
-        $errors[] = 'يمكنك إنشاء صفحة تذكارية واحدة فقط كل ساعة من هذا الجهاز. يرجى المحاولة لاحقاً.';
+        $stmt->execute([$ip]);
+        $countLastHour = (int) $stmt->fetchColumn();
+        if ($countLastHour >= 1) {
+            $errors[] = 'يمكنك إنشاء صفحة تذكارية واحدة فقط كل ساعة من هذا الجهاز. يرجى المحاولة لاحقاً.';
+        }
     }
 
     // Validate inputs first
