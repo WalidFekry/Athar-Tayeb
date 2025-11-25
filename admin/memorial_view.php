@@ -15,7 +15,7 @@ requireAdmin();
 $success = '';
 $error = '';
 
-$memorialId = (int)($_GET['id'] ?? 0);
+$memorialId = (int) ($_GET['id'] ?? 0);
 
 if (!$memorialId) {
     redirect(ADMIN_URL . '/memorials.php');
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 
     if ($action === 'delete') {
-        $deleteId = (int)$_POST['memorial_id'];
+        $deleteId = (int) $_POST['memorial_id'];
 
         if ($deleteId === $memorialId) {
             // Get memorial data for file cleanup
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             redirect(ADMIN_URL . '/memorials.php?deleted=1');
         }
     } elseif ($action === 'block_ip') {
-        $blockId = (int)$_POST['memorial_id'];
+        $blockId = (int) $_POST['memorial_id'];
 
         if ($blockId === $memorialId) {
             // Get IP address for this memorial
@@ -79,13 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 // Check if already blocked
                 $stmt = $pdo->prepare("SELECT COUNT(*) FROM blocked_ips WHERE ip_address = ?");
                 $stmt->execute([$ipToBlock]);
-                $alreadyBlocked = (int)$stmt->fetchColumn() > 0;
+                $alreadyBlocked = (int) $stmt->fetchColumn() > 0;
 
                 if ($alreadyBlocked) {
                     $error = 'تم حظر هذا العنوان من قبل.';
                 } else {
                     $reason = 'حظر من الصفحة التذكارية رقم ' . $blockId;
-                    $blockedBy = isset($_SESSION['admin_id']) ? (int)$_SESSION['admin_id'] : null;
+                    $blockedBy = isset($_SESSION['admin_id']) ? (int) $_SESSION['admin_id'] : null;
 
                     $stmt = $pdo->prepare("INSERT INTO blocked_ips (ip_address, reason, blocked_by) VALUES (?, ?, ?)");
                     $stmt->execute([$ipToBlock, $reason, $blockedBy]);
@@ -111,6 +111,7 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -120,8 +121,9 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/main.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/admin.css">
 </head>
+
 <body>
-    
+
     <!-- Admin Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
@@ -129,9 +131,9 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
             <a href="<?= ADMIN_URL ?>/memorials.php" class="btn btn-sm btn-light">← العودة للصفحات</a>
         </div>
     </nav>
-    
+
     <div class="container my-5">
-        
+
         <h1 class="mb-4">عرض الصفحة التذكارية</h1>
 
         <?php if ($success): ?>
@@ -141,7 +143,7 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
         <?php if ($error): ?>
             <div class="alert alert-danger"><?= e($error) ?></div>
         <?php endif; ?>
-        
+
         <!-- Memorial Info Card -->
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-primary text-white">
@@ -169,7 +171,8 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                             </tr>
                             <tr>
                                 <th>تاريخ الوفاة:</th>
-                                <td><?= $memorial['death_date'] ? formatArabicDate($memorial['death_date']) : '—' ?></td>
+                                <td><?= $memorial['death_date'] ? formatArabicDate($memorial['death_date']) : '—' ?>
+                                </td>
                             </tr>
                             <tr>
                                 <th>واتساب:</th>
@@ -181,7 +184,7 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                             </tr>
                         </table>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <table class="table table-sm">
                             <tr>
@@ -225,6 +228,20 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                                 </td>
                             </tr>
                             <tr>
+                                <th>حالة بطاقة الدعاء:</th>
+                                <td>
+                                    <?php
+                                    $isDuaaEnabled = !empty($memorial['generate_duaa_image']);
+                                    ?>
+                                    <?php if ($isDuaaEnabled): ?>
+                                        <span class="badge bg-success">مفعّلة ✅</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-danger">غير مفعّلة ❌</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+
+                            <tr>
                                 <th>عدد الزيارات:</th>
                                 <td><?= number_format($memorial['visits']) ?></td>
                             </tr>
@@ -232,7 +249,7 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                                 <th>تاريخ الإنشاء:</th>
                                 <td><?= formatArabicDate($memorial['created_at']) ?></td>
                             </tr>
-                              <tr>
+                            <tr>
                                 <th>تاريخ التحديث:</th>
                                 <td><?= $memorial['updated_at'] ?></td>
                             </tr>
@@ -241,7 +258,7 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                 </div>
             </div>
         </div>
-        
+
         <!-- Image Card -->
         <?php if ($memorial['image']): ?>
             <div class="card shadow-sm mb-4">
@@ -249,16 +266,37 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                     <h5 class="mb-0">🖼️ الصورة</h5>
                 </div>
                 <div class="card-body text-center">
-                    <img 
-                        src="<?= getImageUrl($memorial['image']) ?>" 
-                        alt="<?= e($memorial['name']) ?>"
-                        class="img-fluid rounded"
-                        style="max-width: 400px;"
-                    >
+                    <img src="<?= getImageUrl($memorial['image']) ?>" alt="<?= e($memorial['name']) ?>"
+                        class="img-fluid rounded" style="max-width: 400px;">
                 </div>
             </div>
         <?php endif; ?>
-        
+
+        <?php
+        // Get duaa card URL once
+        $duaaCardUrl = getDuaaCardUrl($memorial['image'] ?? null);
+        $hasDuaaCard = !empty($duaaCardUrl);
+        ?>
+
+        <?php if ($hasDuaaCard): ?>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">
+                        📜 بطاقة الدعاء
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="text-center">
+                        <img src="<?= htmlspecialchars($duaaCardUrl, ENT_QUOTES, 'UTF-8') ?>"
+                            alt="بطاقة الدعاء <?= e($memorial['name']) ?>" class="img-fluid rounded"
+                            style="max-width: 400px;" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+
         <!-- Quote Card -->
         <?php if ($memorial['quote']): ?>
             <div class="card shadow-sm mb-4">
@@ -270,7 +308,7 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                 </div>
             </div>
         <?php endif; ?>
-        
+
         <!-- Tasbeeh Stats -->
         <div class="card shadow-sm mb-4">
             <div class="card-header">
@@ -297,30 +335,30 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                 </div>
             </div>
         </div>
-        
+
         <!-- Actions -->
         <div class="card shadow-sm">
             <div class="card-body">
                 <h5 class="mb-3">⚙️ الإجراءات</h5>
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="<?= BASE_URL ?>/m/<?= $memorial['id'] ?>" 
-                       target="_blank" 
-                       class="btn btn-primary">
+                    <a href="<?= BASE_URL ?>/m/<?= $memorial['id'] ?>" target="_blank" class="btn btn-primary">
                         👁️ عرض الصفحة
                     </a>
-                    <a href="<?= ADMIN_URL ?>/memorials.php?action=edit&id=<?= $memorial['id'] ?>" 
-                       class="btn btn-warning">
+                    <a href="<?= ADMIN_URL ?>/memorials.php?action=edit&id=<?= $memorial['id'] ?>"
+                        class="btn btn-warning">
                         ✏️ تعديل
                     </a>
-                    <form method="POST" style="display: inline;" onsubmit="return confirm('هل أنت متأكد من حظر هذا المستخدم؟ سيتم منعه من إنشاء صفحات تذكارية جديدة من هذا العنوان.')">
+                    <form method="POST" style="display: inline;"
+                        onsubmit="return confirm('هل أنت متأكد من حظر هذا المستخدم؟ سيتم منعه من إنشاء صفحات تذكارية جديدة من هذا العنوان.')">
                         <?php csrfField(); ?>
                         <input type="hidden" name="action" value="block_ip">
                         <input type="hidden" name="memorial_id" value="<?= $memorial['id'] ?>">
                         <button type="submit" class="btn btn-danger">
-                            ☠️ حظر المستخدم 
+                            ☠️ حظر المستخدم
                         </button>
                     </form>
-                    <form method="POST" style="display: inline;" onsubmit="return confirm('هل أنت متأكد من حذف هذه الصفحة نهائياً؟ سيتم حذف جميع الصور والبيانات المرتبطة بها. هذا الإجراء لا يمكن التراجع عنه.')">
+                    <form method="POST" style="display: inline;"
+                        onsubmit="return confirm('هل أنت متأكد من حذف هذه الصفحة نهائياً؟ سيتم حذف جميع الصور والبيانات المرتبطة بها. هذا الإجراء لا يمكن التراجع عنه.')">
                         <?php csrfField(); ?>
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="memorial_id" value="<?= $memorial['id'] ?>">
@@ -328,16 +366,16 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                             🗑️ حذف الصفحة
                         </button>
                     </form>
-                    <a href="<?= ADMIN_URL ?>/memorials.php" 
-                       class="btn btn-secondary">
+                    <a href="<?= ADMIN_URL ?>/memorials.php" class="btn btn-secondary">
                         ← العودة للقائمة
                     </a>
                 </div>
             </div>
         </div>
-        
+
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
