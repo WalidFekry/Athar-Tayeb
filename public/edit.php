@@ -216,6 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $memorial && empty($errors)) {
                 // User wants duaa card based on current data
                 $imagePath    = UPLOAD_PATH . '/' . $imageName;
                 $duaaImageUrl = createDuaaImage($imageName, $name, $gender, $imagePath, $death_date, $errors);
+                purgeCloudflareUrl($duaaImageUrl);
             }
         }
 

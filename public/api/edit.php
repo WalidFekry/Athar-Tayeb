@@ -213,6 +213,7 @@ try {
             // User wants duaa card (re-)generated based on current name/gender/date
             $imagePath   = UPLOAD_PATH . '/' . $imageName;
             $duaaImageUrl = createDuaaImage($imageName, $name, $gender, $imagePath, $deathDate, $errors);
+            purgeCloudflareUrl($duaaImageUrl);
         }
     }
 

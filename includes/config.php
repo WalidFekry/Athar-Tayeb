@@ -32,6 +32,8 @@ define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png']);
 define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png']);
 
 // Cache Settings
+define('CF_API_TOKEN', 'KHKQd-Ap3gkINDVp7YO__0a92hCgdrkcGHAcDJBc'); // Cloudflare API Token
+define('CF_ZONE_ID', '6f9b60bfe9ef837655876eb2383b5359'); // Cloudflare Zone ID
 define('CACHE_ENABLED', true);
 define('CACHE_TTL', 3600); // 1 hour
 

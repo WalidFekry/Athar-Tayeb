@@ -671,5 +671,36 @@ function getMemorialShareText(string $gender, string $name, string $url): string
         . $url;
 }
 
+/**
+ * Purge a specific URL from Cloudflare cache
+ * @param string $url The full URL to purge
+ * @return bool True on success, false on failure
+ */
+function purgeCloudflareUrl(string $url): bool
+{
+    $apiToken = CF_API_TOKEN;
+    $zoneId   = CF_ZONE_ID;
+
+    $ch = curl_init("https://api.cloudflare.com/client/v4/zones/{$zoneId}/purge_cache");
+    curl_setopt_array($ch, [
+        CURLOPT_CUSTOMREQUEST  => 'POST',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => [
+            "Authorization: Bearer {$apiToken}",
+            "Content-Type: application/json",
+        ],
+        CURLOPT_POSTFIELDS     => json_encode([
+            'files' => [$url],
+        ]),
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    return $httpCode === 200;
+}
+
+
 
 
