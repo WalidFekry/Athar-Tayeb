@@ -63,7 +63,7 @@ if (is_dir($uploadsCardsPath)) {
 }
 
 // Latest memorials
-$stmt = $pdo->query("SELECT id, name, created_at, status FROM memorials ORDER BY created_at DESC LIMIT 5");
+$stmt = $pdo->query("SELECT id, name, created_at, status FROM memorials ORDER BY created_at DESC LIMIT 10");
 $latestMemorials = $stmt->fetchAll();
 
 $pageTitle = 'لوحة التحكم';
