@@ -49,7 +49,8 @@ $structuredData = $structuredData ?? '';
     <?= $structuredData ?>
 
     <!-- Favicon -->
-    <link rel="icon" href="<?= BASE_URL ?>/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 
     <!-- Base URL for JavaScript -->
     <script>
