@@ -49,11 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             // Update database: set image to NULL and status to rejected
-            $stmt = $pdo->prepare("UPDATE memorials SET image = NULL, image_status = 2 WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE memorials SET image = NULL, image_status = 2, generate_duaa_image = 0 WHERE id = ?");
             $stmt->execute([$memorialId]);
         } else {
             // No image to delete, just update status
-            $stmt = $pdo->prepare("UPDATE memorials SET image_status = 2 WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE memorials SET image_status = 2, generate_duaa_image = 0 WHERE id = ?");
             $stmt->execute([$memorialId]);
         }
         
