@@ -52,7 +52,7 @@ if (!isBot()) {
 // Generate page metadata
 $pageTitle = 'للمغفور ' . getPronoun($memorial['gender'], 'له') . ' بإذن الله تعالى ' . $memorial['name'] . ' — ' . SITE_NAME;
 $pageDescription = $memorial['quote'] ?? 'صفحة تذكارية للمغفور ' . getPronoun($memorial['gender'], 'له') . ' ' . $memorial['name'];
-$pageImage = $memorial['image'] && $memorial['image_status'] == 1 ? getImageUrl($memorial['image']) : BASE_URL . '/assets/images/placeholder-memorial.png';
+$pageImage = $memorial['image'] ? getImageUrl($memorial['image']) : BASE_URL . '/assets/images/placeholder-memorial.png';
 $memorialUrl = site_url('m/' . $memorial['id']);
 
 // Generate OG tags and structured data
