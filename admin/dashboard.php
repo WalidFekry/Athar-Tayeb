@@ -70,6 +70,7 @@ $pageTitle = 'لوحة التحكم';
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -79,19 +80,20 @@ $pageTitle = 'لوحة التحكم';
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/main.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/admin.css">
 </head>
+
 <body>
-    
+
     <!-- Admin Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" href="<?= ADMIN_URL ?>/dashboard.php">
                 🌿 <?= SITE_NAME ?> — الإدارة
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="adminNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
@@ -102,25 +104,27 @@ $pageTitle = 'لوحة التحكم';
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= ADMIN_URL ?>/images_moderation.php">
-                            الصور <?php if ($pendingImages > 0): ?><span class="badge bg-warning"><?= $pendingImages ?></span><?php endif; ?>
+                            الصور <?php if ($pendingImages > 0): ?><span
+                                    class="badge bg-warning"><?= $pendingImages ?></span><?php endif; ?>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= ADMIN_URL ?>/messages_moderation.php">
-                            الرسائل <?php if ($pendingQuotes > 0): ?><span class="badge bg-warning"><?= $pendingQuotes ?></span><?php endif; ?>
+                            الرسائل <?php if ($pendingQuotes > 0): ?><span
+                                    class="badge bg-warning"><?= $pendingQuotes ?></span><?php endif; ?>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= ADMIN_URL ?>/settings.php">الإعدادات</a>
                     </li>
-                               <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="<?= ADMIN_URL ?>/blocked_ips.php">المستخدمون المحظورون</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= ADMIN_URL ?>/admins.php">المديرون</a>
                     </li>
                 </ul>
-                
+
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" href="<?= BASE_URL ?>" target="_blank">عرض الموقع</a>
@@ -132,11 +136,11 @@ $pageTitle = 'لوحة التحكم';
             </div>
         </div>
     </nav>
-    
+
     <div class="container my-5">
-        
+
         <h1 class="mb-4">مرحباً، <?= e($_SESSION['admin_username']) ?> 👋</h1>
-        
+
         <!-- Statistics Cards -->
         <div class="row g-4 mb-5">
             <!-- First Row -->
@@ -148,7 +152,7 @@ $pageTitle = 'لوحة التحكم';
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
@@ -157,7 +161,7 @@ $pageTitle = 'لوحة التحكم';
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
@@ -166,7 +170,7 @@ $pageTitle = 'لوحة التحكم';
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
@@ -176,7 +180,7 @@ $pageTitle = 'لوحة التحكم';
                 </div>
             </div>
         </div>
-        
+
         <!-- Second Row for Additional Statistics -->
         <div class="row g-4 mb-5">
             <div class="col-md-3">
@@ -187,7 +191,7 @@ $pageTitle = 'لوحة التحكم';
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
@@ -196,7 +200,7 @@ $pageTitle = 'لوحة التحكم';
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
@@ -206,7 +210,7 @@ $pageTitle = 'لوحة التحكم';
                 </div>
             </div>
 
-           <div class="col-md-3">
+            <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
                         <h3 class="text-muted"><?= toArabicNumerals($cardsCount) ?></h3>
@@ -215,10 +219,10 @@ $pageTitle = 'لوحة التحكم';
                 </div>
             </div>
         </div>
-        
+
         <!-- Quick Actions -->
         <div class="row g-4 mb-5">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <a href="<?= ADMIN_URL ?>/images_moderation.php" class="card text-decoration-none h-100">
                     <div class="card-body text-center">
                         <div class="fs-1 mb-3">🖼️</div>
@@ -231,8 +235,8 @@ $pageTitle = 'لوحة التحكم';
                     </div>
                 </a>
             </div>
-            
-            <div class="col-md-4">
+
+            <div class="col-md-3">
                 <a href="<?= ADMIN_URL ?>/messages_moderation.php" class="card text-decoration-none h-100">
                     <div class="card-body text-center">
                         <div class="fs-1 mb-3">💬</div>
@@ -245,8 +249,8 @@ $pageTitle = 'لوحة التحكم';
                     </div>
                 </a>
             </div>
-            
-            <div class="col-md-4">
+
+            <div class="col-md-3">
                 <a href="<?= ADMIN_URL ?>/memorials.php" class="card text-decoration-none h-100">
                     <div class="card-body text-center">
                         <div class="fs-1 mb-3">📄</div>
@@ -255,8 +259,18 @@ $pageTitle = 'لوحة التحكم';
                     </div>
                 </a>
             </div>
+
+            <div class="col-md-3">
+                <a href="<?= ADMIN_URL ?>/duaa_cards.php" class="card text-decoration-none h-100">
+                    <div class="card-body text-center">
+                        <div class="fs-1 mb-3">📜</div>
+                        <h5>بطاقات الدعاء</h5>
+                        <span class="text-muted">عرض بطاقات الدعاء المتاحة</span>
+                    </div>
+                </a>
+            </div>
         </div>
-        
+
         <!-- Latest Memorials -->
         <div class="card">
             <div class="card-header">
@@ -287,7 +301,8 @@ $pageTitle = 'لوحة التحكم';
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <a href="<?= ADMIN_URL ?>/memorial_view.php?id=<?= $memorial['id'] ?>" class="btn btn-sm btn-primary">
+                                            <a href="<?= ADMIN_URL ?>/memorial_view.php?id=<?= $memorial['id'] ?>"
+                                                class="btn btn-sm btn-primary">
                                                 عرض
                                             </a>
                                         </td>
@@ -301,9 +316,10 @@ $pageTitle = 'لوحة التحكم';
                 <?php endif; ?>
             </div>
         </div>
-        
+
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
