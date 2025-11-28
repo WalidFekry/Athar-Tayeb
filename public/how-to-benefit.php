@@ -12,7 +12,7 @@ require_once __DIR__ . '/../includes/maintenance_check.php';
 
 // Page metadata
 $pageTitle = 'كيف تستفيد من أثر طيب؟ — ' . SITE_NAME;
-$pageDescription = 'تعلم كيفية الاستفادة من منصة أثر طيب لإنشاء صفحات تذكارية ومشاركة الخير والأجر مع أحبائك المتوفين.';
+$pageDescription = 'اكتشف كيف تستفيد من منصة أثر طيب لإنشاء صفحات تذكارية للمتوفين، ومشاركة الدعاء والتسبيح والقرآن عبر الصدقة الجارية الرقمية — ابدأ الرحلة الآن.';
 
 include __DIR__ . '/../includes/header.php';
 ?>

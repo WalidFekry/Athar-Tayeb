@@ -37,20 +37,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         // Static pages with priorities
         $staticPages = [
-            '' => ['priority' => '1.00'], // Home page
-            'create' => ['priority' => '0.90'],
-            'all' => ['priority' => '0.80'],
-            'how-to-benefit' => ['priority' => '0.70'],
-            'guide' => ['priority' => '0.70'],
-            'contact' => ['priority' => '0.60'],
+            '' => ['priority' => '1.00'],
+            'create' => ['priority' => '0.95'],
+            'all' => ['priority' => '0.85'],
+            'how-to-benefit' => ['priority' => '0.75'],
+            'guide' => ['priority' => '0.75'],
+            'contact' => ['priority' => '0.65'],
+            'share-guide' => ['priority' => '0.60'],
+            'mobile-guide' => ['priority' => '0.60'],
+            'memorial-guide' => ['priority' => '0.60'],
+            'duaa-etiquette' => ['priority' => '0.50'],
             'search' => ['priority' => '0.50'],
-            'developer' => ['priority' => '0.30'],
-            'share-guide' => ['priority' => '0.55'],
-            'mobile-guide' => ['priority' => '0.55'],
-            'memorial-guide' => ['priority' => '0.55'],
-            'faq' => ['priority' => '0.40'],
-            'duaa-etiquette' => ['priority' => '0.45'],
-            'athar-pages' => ['priority' => '0.35'],
+            'faq' => ['priority' => '0.45'],
+            'athar-pages' => ['priority' => '0.40'],
+            'privacy' => ['priority' => '0.35'],
+            'terms' => ['priority' => '0.35'],
+            'developer' => ['priority' => '0.20'],
         ];
 
         // Add static pages to sitemap
