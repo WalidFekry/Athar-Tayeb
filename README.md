@@ -26,7 +26,7 @@
 ## 📁 هيكل المشروع
 
 ```
-athartayeb/
+athar-tayeb/
 ├── public/                # Web root
 │   ├── index.php          # Home page
 │   ├── create.php         # Create memorial
