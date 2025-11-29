@@ -23,6 +23,9 @@ $pendingImages = $stmt->fetchColumn();
 $stmt = $pdo->query("SELECT COUNT(*) FROM memorials WHERE quote_status = 0 AND quote IS NOT NULL");
 $pendingQuotes = $stmt->fetchColumn();
 
+$stmt = $pdo->query("SELECT COUNT(*) FROM contact_messages WHERE is_read = 0");
+$unreadContactMessages = $stmt->fetchColumn();
+
 $stmt = $pdo->query("SELECT SUM(visits) FROM memorials");
 $totalVisits = $stmt->fetchColumn();
 
@@ -112,6 +115,12 @@ $pageTitle = 'لوحة التحكم';
                         <a class="nav-link" href="<?= ADMIN_URL ?>/messages_moderation.php">
                             الرسائل <?php if ($pendingQuotes > 0): ?><span
                                     class="badge bg-warning"><?= $pendingQuotes ?></span><?php endif; ?>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= ADMIN_URL ?>/contact_messages.php">
+                            البريد <?php if ($unreadContactMessages > 0): ?><span
+                                    class="badge bg-warning"><?= $unreadContactMessages ?></span><?php endif; ?>
                         </a>
                     </li>
                     <li class="nav-item">

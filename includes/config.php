@@ -40,6 +40,7 @@ define('CACHE_TTL', 3600); // 1 hour
 // Rate Limiting
 define('TASBEEH_RATE_LIMIT', 100); // max clicks per minute per field
 define('EDIT_RATE_LIMIT', 10); // max edits per hour per IP
+define('CONTACT_RATE_LIMIT', 3); // max contacts per hour per IP
 
 // Session Settings
 define('SESSION_LIFETIME', 7200); // 2 hours
@@ -68,7 +69,7 @@ define('SUPPORT_EMAIL', 'walid_fekry@hotmail.com');
 if (DEBUG_MODE) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
-} 
+}
 
 // Timezone
 date_default_timezone_set('Africa/Cairo');

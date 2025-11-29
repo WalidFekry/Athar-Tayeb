@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 24, 2025 at 02:15 PM
+-- Generation Time: Nov 29, 2025 at 01:51 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.27
 
@@ -54,6 +54,23 @@ CREATE TABLE `blocked_ips` (
   `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `blocked_by` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contact_messages`
+--
+
+CREATE TABLE `contact_messages` (
+  `id` int NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `whatsapp` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_read` tinyint(1) DEFAULT '0' COMMENT '0=unread, 1=read',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -129,6 +146,14 @@ ALTER TABLE `blocked_ips`
   ADD UNIQUE KEY `uniq_ip_address` (`ip_address`);
 
 --
+-- Indexes for table `contact_messages`
+--
+ALTER TABLE `contact_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_is_read` (`is_read`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
 -- Indexes for table `memorials`
 --
 ALTER TABLE `memorials`
@@ -164,7 +189,13 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `blocked_ips`
 --
 ALTER TABLE `blocked_ips`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `contact_messages`
+--
+ALTER TABLE `contact_messages`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `memorials`
