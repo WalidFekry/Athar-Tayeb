@@ -14,10 +14,10 @@ requireAdmin();
 // Handle moderation
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     checkCSRF();
-    
-    $memorialId = (int)$_POST['memorial_id'];
+
+    $memorialId = (int) $_POST['memorial_id'];
     $action = $_POST['action'];
-    
+
     if ($action === 'approve') {
         $stmt = $pdo->prepare("UPDATE memorials SET image_status = 1 WHERE id = ?");
         $stmt->execute([$memorialId]);
@@ -27,27 +27,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("SELECT image FROM memorials WHERE id = ?");
         $stmt->execute([$memorialId]);
         $memorial = $stmt->fetch();
-        
+
         if ($memorial && $memorial['image']) {
             // Delete original image
             $imagePath = UPLOAD_PATH . '/' . $memorial['image'];
             if (file_exists($imagePath)) {
                 unlink($imagePath);
             }
-            
+
             // Delete thumbnail if exists
             $ext = pathinfo($memorial['image'], PATHINFO_EXTENSION);
             $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $imagePath);
             if (file_exists($thumbPath)) {
                 unlink($thumbPath);
             }
-            
+
             // Delete Duaa card if exists
             $duaaImagePath = __DIR__ . '/../public/uploads/duaa_images/' . $memorial['image'];
             if (file_exists($duaaImagePath)) {
                 unlink($duaaImagePath);
             }
-            
+
             // Update database: set image to NULL and status to rejected
             $stmt = $pdo->prepare("UPDATE memorials SET image = NULL, image_status = 2, generate_duaa_image = 0 WHERE id = ?");
             $stmt->execute([$memorialId]);
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("UPDATE memorials SET image_status = 2, generate_duaa_image = 0 WHERE id = ?");
             $stmt->execute([$memorialId]);
         }
-        
+
         $success = 'تم رفض الصورة وحذفها من الخادم';
     }
 }
@@ -72,6 +72,7 @@ $pendingImages = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -81,23 +82,24 @@ $pendingImages = $stmt->fetchAll();
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/main.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/admin.css">
 </head>
+
 <body>
-    
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" href="<?= ADMIN_URL ?>/dashboard.php">🌿 <?= SITE_NAME ?> — الإدارة</a>
             <a href="<?= ADMIN_URL ?>/dashboard.php" class="btn btn-sm btn-light">← العودة</a>
         </div>
     </nav>
-    
+
     <div class="container my-5">
-        
+
         <h1 class="mb-4">مراجعة الصور (<?= count($pendingImages) ?>)</h1>
-        
+
         <?php if (isset($success)): ?>
             <div class="alert alert-success"><?= e($success) ?></div>
         <?php endif; ?>
-        
+
         <?php if (count($pendingImages) > 0): ?>
             <div class="row g-4">
                 <?php foreach ($pendingImages as $memorial): ?>
@@ -112,7 +114,7 @@ $pendingImages = $stmt->fetchAll();
                                 <p class="text-muted small">
                                     <?= date('Y-m-d H:i', strtotime($memorial['created_at'])) ?>
                                 </p>
-                                
+
                                 <div class="d-grid gap-2">
                                     <form method="POST">
                                         <?php csrfField(); ?>
@@ -120,13 +122,17 @@ $pendingImages = $stmt->fetchAll();
                                         <input type="hidden" name="action" value="approve">
                                         <button type="submit" class="btn btn-success w-100">✓ موافقة</button>
                                     </form>
-                                    
+
                                     <form method="POST">
                                         <?php csrfField(); ?>
                                         <input type="hidden" name="memorial_id" value="<?= $memorial['id'] ?>">
                                         <input type="hidden" name="action" value="reject">
-                                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('رفض هذه الصورة؟')">✗ رفض</button>
+                                        <button type="submit" class="btn btn-danger w-100"
+                                            onclick="return confirm('رفض هذه الصورة؟')">✗ رفض</button>
                                     </form>
+
+                                    <a href="<?= ADMIN_URL ?>/memorial_view.php?id=<?= $memorial['id'] ?>"
+                                        class="btn btn-primary w-100" target="_blank" rel="noopener noreferrer">عرض الصفحة</a>
                                 </div>
                             </div>
                         </div>
@@ -138,9 +144,10 @@ $pendingImages = $stmt->fetchAll();
                 <p class="mb-0">لا توجد صور قيد المراجعة 🎉</p>
             </div>
         <?php endif; ?>
-        
+
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
