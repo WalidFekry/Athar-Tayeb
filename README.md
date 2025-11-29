@@ -13,10 +13,11 @@
 - 🕌 أذكار الصباح والمساء
 - ✨ أسماء الله الحسنى
 - 📤 أزرار مشاركة على وسائل التواصل
+- 📱 أدلة إرشادية للمستخدمين (آداب الدعاء، كيفية الانتفاع، إلخ)
 
 ## 🛠️ التقنيات المستخدمة
 
-- **Backend:** PHP 7.4+ (vanilla), PDO, MySQL
+- **Backend:** PHP 8.0+ (vanilla), PDO, MySQL
 - **Frontend:** HTML5, CSS3, JavaScript (vanilla)
 - **Framework:** Bootstrap 5 RTL
 - **Database:** MySQL with utf8mb4 (full Arabic support)
@@ -25,63 +26,70 @@
 ## 📁 هيكل المشروع
 
 ```
-athar-tayeb/
+athartayeb/
 ├── public/                # Web root
 │   ├── index.php          # Home page
 │   ├── create.php         # Create memorial
-│   ├── success.php        # Success page
-│   ├── 404.php            # 404 page
-│   ├── unpublished.php    # Unpublished memorial
-│   ├── maintenance.php    # Maintenance page
 │   ├── memorial.php       # Memorial view (by ID)
 │   ├── search.php         # Search page
 │   ├── all.php            # All memorials listing
 │   ├── contact.php        # Contact page
+│   ├── guide.php          # General guide
+│   ├── duaa-etiquette.php # Duaa etiquette guide
+│   ├── how-to-benefit.php # How to benefit guide
+│   ├── mobile-guide.php   # Mobile usage guide
+│   ├── share-guide.php    # Sharing guide
+│   ├── developer.php      # Developer info
 │   ├── assets/            # CSS, JS, images
 │   ├── uploads/           # User-uploaded images
 │   └── api/               # API endpoints
 ├── admin/                 # Admin panel
-│   ├── login.php
-│   ├── dashboard.php
-│   ├── memorials.php
-│   ├── images_moderation.php
-│   ├── messages_moderation.php
-│   └── ...
+│   ├── dashboard.php      # Main dashboard
+│   ├── memorials.php      # Manage memorials
+│   ├── contact_messages.php # View contact messages
+│   ├── admins.php         # Manage admins
+│   ├── blocked_ips.php    # Manage blocked IPs
+│   ├── settings.php       # Site settings
+│   ├── images_moderation.php # Moderate images
+│   └── messages_moderation.php # Moderate messages
 ├── includes/              # Core PHP files
-│   ├── config.php
-│   ├── db.php
-│   ├── session.php
-│   ├── functions.php
-│   ├── csrf.php
-│   ├── header.php
-│   └── footer.php
+│   ├── config.php         # Configuration
+│   ├── db.php             # Database connection
+│   ├── functions.php      # Helper functions
+│   ├── session.php        # Session management
+│   ├── csrf.php           # Security
+│   ├── generate_duaa_image.php # Image generation logic
+│   ├── yaseen_modal.php   # Yaseen surah modal
+│   └── header.php / footer.php
 ├── sql/                   # Database schema
 │   └── athartayeb_schema.sql
+├── setup.php              # Installation wizard
 ├── .htaccess             # Apache rewrite rules
-├── README.md
-└── LICENSE
+└── README.md
 ```
 
 ## ✨ الميزات الرئيسية
 
 ### للمستخدمين:
 - إنشاء صفحات تذكارية مجاناً
-- رفع صور المتوفين
+- رفع صور المتوفين (مع نظام موافقة)
 - إضافة رسائل ودعاء مخصص
 - مشاركة الصفحات عبر WhatsApp, Facebook, Telegram
 - عدادات تسبيح تفاعلية مع حفظ الإحصائيات
 - قرآن وأذكار بالصوت
 - واجهة عربية كاملة RTL
 - وضع ليلي (Dark Mode)
-- SEO-friendly URLs
+- أدلة إرشادية شاملة
+- نموذج تواصل مع الإدارة
 
 ### للإدارة:
-- لوحة تحكم شاملة
+- لوحة تحكم شاملة للإحصائيات
 - مراجعة الصور والرسائل قبل النشر
-- إحصائيات الزيارات والتسبيحات
-- إدارة الصفحات (نشر/إلغاء نشر/حذف)
-- نظام مديرين متعدد
-- سجلات تسجيل الدخول
+- إدارة رسائل التواصل (Contact Messages)
+- حظر عناوين IP المسيئة
+- إعدادات الموقع العامة (تفعيل/تعطيل الصيانة، الموافقة التلقائية)
+- إدارة المديرين والصلاحيات
+- سجلات الأنشطة
 
 ## 🔒 الأمان
 
@@ -89,40 +97,44 @@ athar-tayeb/
 - ✅ CSRF token protection
 - ✅ XSS prevention (htmlspecialchars)
 - ✅ Secure file upload validation
-- ✅ Rate limiting للتسبيح والإنشاء
+- ✅ Rate limiting (للتسبيح، التعديل، ونموذج التواصل)
 - ✅ Session security (httponly, secure cookies)
 - ✅ Password hashing (bcrypt)
-- ✅ .htaccess security rules
+- ✅ IP Blocking system
 
-## 🚀 التثبيت السريع
+## 🚀 التثبيت
 
-```bash
-# 1. استيراد قاعدة البيانات
-mysql -u root -p < sql/athartayeb_schema.sql
+### الطريقة الأولى: معالج الإعداد (موصى به)
 
-# 2. تحديث إعدادات قاعدة البيانات
-# عدّل includes/config.php
+1. قم برفع الملفات إلى الخادم.
+2. أنشئ قاعدة بيانات فارغة.
+3. قم باستيراد ملف `sql/athartayeb_schema.sql` إلى قاعدة البيانات.
+4. افتح المتصفح واذهب إلى `http://your-domain.com/setup.php`.
+5. اتبع التعليمات للتحقق من المتطلبات وإنشاء حساب المدير.
+6. **هام:** احذف ملف `setup.php` بعد الانتهاء.
 
-# 3. إنشاء مجلدات الرفع
-mkdir -p public/uploads/memorials
-chmod 755 public/uploads/memorials
+### الطريقة الثانية: التثبيت اليدوي
 
-# 4. تفعيل mod_rewrite في Apache
-# تأكد من تفعيل mod_rewrite
+1. **استيراد قاعدة البيانات:**
+   ```bash
+   mysql -u root -p < sql/athartayeb_schema.sql
+   ```
 
-# 5. تسجيل الدخول للإدارة
-# Username: admin
-# Password: admin123
-```
+2. **تحديث الإعدادات:**
+   - انسخ `includes/config.php` وعدّل إعدادات قاعدة البيانات (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`).
 
-## 📝 بيانات الدخول الافتراضية
+3. **إنشاء المجلدات:**
+   ```bash
+   mkdir -p public/uploads/memorials
+   chmod 755 public/uploads/memorials
+   ```
 
-**لوحة التحكم:**
-- الرابط: `https://athar.walid-fekry.com/admin/login.php`
-- اسم المستخدم: `admin`
-- كلمة المرور: `admin123`
+4. **بيانات الدخول الافتراضية:**
+   - **الرابط:** `admin/login.php`
+   - **اسم المستخدم:** `admin`
+   - **كلمة المرور:** `admin123`
 
-⚠️ **مهم:** غيّر كلمة المرور فوراً بعد التثبيت!
+   ⚠️ **مهم:** غيّر كلمة المرور فوراً من لوحة التحكم!
 
 ## 🎨 التخصيص
 
@@ -144,29 +156,8 @@ chmod 755 public/uploads/memorials
 ```php
 define('SITE_NAME', 'أثر طيب');
 define('SITE_TAGLINE', 'لكي يبقى الأثر طيبًا بعد الرحيل 🌿');
-define('BASE_URL', 'https://athar.walid-fekry.com');
+define('BASE_URL', 'https://your-domain.com');
 ```
-
-## 📊 قاعدة البيانات
-
-### الجداول الرئيسية:
-
-- **memorials:** الصفحات التذكارية
-- **admins:** المديرون
-- **settings:** إعدادات الموقع
-
-## 🔧 المتطلبات
-
-- PHP 7.4 أو أحدث
-- MySQL 5.7 أو أحدث
-- Apache مع mod_rewrite (أو Nginx)
-- GD Library (لمعالجة الصور)
-- 50MB مساحة قرص على الأقل
-
-## 📱 التطبيقات المرتبطة
-
-- [تطبيق مكتبتي](https://play.google.com/store/apps/details?id=com.walid.maktbti)
-- [مكتبتي بلس](https://play.google.com/store/apps/details?id=com.maktbti.plus)
 
 ## 🤝 المساهمة
 
@@ -174,7 +165,6 @@ define('BASE_URL', 'https://athar.walid-fekry.com');
 - الإبلاغ عن الأخطاء
 - اقتراح ميزات جديدة
 - تحسين الكود
-- ترجمة الواجهة
 
 ## 📄 الترخيص
 
