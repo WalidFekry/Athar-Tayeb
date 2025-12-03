@@ -51,14 +51,14 @@
 
   // Global Loading System
   const globalLoader = document.getElementById('globalLoader');
-  
+
   // Show loader on page load
   function showLoader() {
     if (globalLoader) {
       globalLoader.classList.remove('hidden');
     }
   }
-  
+
   // Hide loader when page is ready
   function hideLoader() {
     if (globalLoader) {
@@ -71,39 +71,39 @@
       }, 500);
     }
   }
-  
+
   // Hide loader when page is fully loaded
   window.addEventListener('load', () => {
     setTimeout(hideLoader, 300); // Small delay for better UX
   });
-  
+
   // Show loader when navigating away (for internal links)
   document.addEventListener('click', (e) => {
     const link = e.target.closest('a');
-    if (link && 
-        link.href && 
-        !link.href.startsWith('mailto:') && 
-        !link.href.startsWith('tel:') && 
-        !link.href.startsWith('#') &&
-        !link.target === '_blank' &&
-        link.hostname === window.location.hostname) {
-      
+    if (link &&
+      link.href &&
+      !link.href.startsWith('mailto:') &&
+      !link.href.startsWith('tel:') &&
+      !link.href.startsWith('#') &&
+      !link.target === '_blank' &&
+      link.hostname === window.location.hostname) {
+
       // Only show loader for page navigation, not for downloads or external links
-      if (!link.href.includes('.pdf') && 
-          !link.href.includes('.zip') && 
-          !link.href.includes('.doc')) {
+      if (!link.href.includes('.pdf') &&
+        !link.href.includes('.zip') &&
+        !link.href.includes('.doc')) {
         showLoader();
       }
     }
   });
-  
+
   // Fallback: Hide loader if it's been showing too long
   setTimeout(() => {
     if (globalLoader && !globalLoader.classList.contains('hidden')) {
       hideLoader();
     }
   }, 10000); // 10 second timeout
-  
+
   // Tasbeeh Counter Management
   const tasbeehButtons = document.querySelectorAll(".tasbeeh-card");
 
@@ -138,7 +138,7 @@
   document.querySelectorAll(".tasbeeh-card.local-only").forEach((card) => {
     const tasbeehId = card.dataset.tasbeehId;
     const maxCount = 33;
-    
+
     // Load saved progress from localStorage
     const savedCount = parseInt(localStorage.getItem(`tasbeeh_${tasbeehId}_${getMemorialId()}`) || "0");
     if (savedCount > 0) {
@@ -147,22 +147,22 @@
         handleTasbeehCompletion(card);
       }
     }
-    
+
     card.addEventListener("click", () => {
       // Check if already completed
       if (card.classList.contains('completed')) {
         return;
       }
-      
+
       const localCountSpan = card.querySelector(".tasbeeh-count");
       if (!localCountSpan) return;
 
       let count = parseInt(localCountSpan.textContent) || 0;
       count++;
-      
+
       // Update display and progress
       updateTasbeehProgress(card, count, maxCount);
-      
+
       // Save to localStorage
       localStorage.setItem(`tasbeeh_${tasbeehId}_${getMemorialId()}`, count.toString());
 
@@ -173,36 +173,36 @@
           card.style.transform = "";
         }
       }, 100);
-      
+
       // Check for completion
       if (count >= maxCount) {
         handleTasbeehCompletion(card);
       }
     });
   });
-  
+
   function updateTasbeehProgress(card, count, maxCount) {
     const localCountSpan = card.querySelector(".tasbeeh-count");
     const progressBar = card.querySelector(".progress-bar");
-    
+
     if (localCountSpan) {
       localCountSpan.textContent = count;
     }
-    
+
     if (progressBar) {
       const percentage = Math.min((count / maxCount) * 100, 100);
       progressBar.style.width = percentage + "%";
-      
+
       if (count >= maxCount) {
         progressBar.classList.add('complete');
       }
     }
   }
-  
+
   function handleTasbeehCompletion(card) {
     // Add completed class for styling
     card.classList.add('completed');
-    
+
     // Show completion message
     const completionMessage = card.querySelector(".completion-message");
     if (completionMessage) {
@@ -213,22 +213,22 @@
         completionMessage.classList.add('show');
       }, 50);
     }
-    
+
     // Add visual completion effect to the card
     card.style.background = 'linear-gradient(135deg, var(--success) 0%, #4a7c59 100%)';
     card.style.color = 'white';
     card.style.transform = 'scale(1.02)';
     card.style.boxShadow = '0 8px 25px rgba(90, 125, 78, 0.3)';
-    
+
     // Disable further clicks temporarily
     card.style.pointerEvents = 'none';
-    
+
     // Re-enable after showing the message
     setTimeout(() => {
       card.style.pointerEvents = 'auto';
     }, 4000);
   }
-  
+
   function getMemorialId() {
     // Extract memorial ID from URL or page context
     const pathParts = window.location.pathname.split('/');
@@ -236,7 +236,7 @@
     if (memorialIndex !== -1 && pathParts[memorialIndex + 1]) {
       return pathParts[memorialIndex + 1];
     }
-    
+
     // Fallback: try to get from memorial data or URL params
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('id') || 'default';
@@ -343,13 +343,12 @@
                     <div class="d-flex align-items-center">
                         <div class="flex-grow-1">
                             <div class="fw-bold">${escapeHtml(
-                              result.name
-                            )}</div>
-                            ${
-                              result.death_date
-                                ? `<small class="text-muted">${result.death_date}</small>`
-                                : ""
-                            }
+        result.name
+      )}</div>
+                            ${result.death_date
+          ? `<small class="text-muted">${result.death_date}</small>`
+          : ""
+        }
                         </div>
                     </div>
                 </a>
@@ -714,11 +713,13 @@ document.addEventListener("DOMContentLoaded", function () {
   // Global variables for duaa image modal
   let currentDuaaImageUrl = "";
   let currentDuaaImageName = "";
+  let currentDuaaGender = "";
 
   // Open duaa image modal
-  window.openDuaaImageModal = function (imageUrl, name) {
+  window.openDuaaImageModal = function (imageUrl, name, gender) {
     currentDuaaImageUrl = imageUrl;
     currentDuaaImageName = name;
+    currentDuaaGender = gender;
 
     const modalImage = document.getElementById("duaaModalImage");
     const downloadBtn = document.getElementById("duaaDownloadBtn");
@@ -759,39 +760,43 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   // Share duaa image
-  window.shareDuaaImage = function (imageUrl, name) {
-    const shareText = `بطاقة دعاء للفقيد/ة ${name} – شارك الأجر وادع له/لها بالرحمة.`;
-    const shareUrl = imageUrl;
+  window.shareDuaaImage = function (imageUrl, name, gender) {
+
+    let word = gender === "female" ? "الفقيدة" : "الفقيد";
+    let pronoun = gender === "female" ? "لها" : "له";
+    let qabr = gender === "female" ? "قبرها" : "قبره";
+    let about = gender === "female" ? "عنها" : "عنه";
+
+    const shareText =
+      `بطاقة دعاء عن روح ${word} ${name} 🤍\n\n` +
+      `اللهم اغفر ${pronoun}` +
+      `واجعل ${qabr} روضةً من رياض الجنة،\n` +
+      `هذه البطاقة صدقة جارية ${about}.\n`;
 
     if (navigator.share) {
-      navigator
-        .share({
-          title: `بطاقة دعاء عن روح ${name}`,
-          text: shareText,
-          url: shareUrl,
-        })
-        .catch(console.error);
+      navigator.share({
+        title: `بطاقة دعاء عن روح ${word} ${name}`,
+        text: shareText,
+        url: imageUrl,
+      }).catch(console.error);
     } else {
-      const whatsappText = `🌿 بطاقة دعاء عن روح ${name}\n\n${shareText}\n\n📷 الصورة:\n${shareUrl}`;
-      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-        whatsappText
-      )}`;
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + "\n" + imageUrl)}`;
       window.open(whatsappUrl, "_blank");
     }
   };
 
+
   // Share duaa image from modal
   window.shareDuaaImageFromModal = function () {
     if (!currentDuaaImageUrl) return;
-    shareDuaaImage(currentDuaaImageUrl, currentDuaaImageName);
+    shareDuaaImage(currentDuaaImageUrl, currentDuaaImageName, currentDuaaGender);
   };
 
   // Toast notification function
   window.showToast = function (message, type = "info") {
     const toast = document.createElement("div");
-    toast.className = `toast align-items-center text-white bg-${
-      type === "success" ? "success" : "primary"
-    } border-0`;
+    toast.className = `toast align-items-center text-white bg-${type === "success" ? "success" : "primary"
+      } border-0`;
     toast.setAttribute("role", "alert");
     toast.setAttribute("aria-live", "assertive");
     toast.setAttribute("aria-atomic", "true");
