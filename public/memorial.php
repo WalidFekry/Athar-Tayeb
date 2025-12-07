@@ -905,24 +905,88 @@ include __DIR__ . '/../includes/header.php';
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
+    document.addEventListener('DOMContentLoaded', () => {
+
+        /* ============================================================
+         * Variables & Initial Setup
+         * ============================================================ */
+        let visitTracked = false;
+        let hasScrolled = false;
+        let timeOnPage = 0;
+
+        const memorialId = <?= $memorialId ?>;
         const csrfToken = document.querySelector('input[name="csrf_token"]').value;
-        
-        fetch('<?= site_url('api/track_visit') ?>', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': csrfToken
-            },
-            body: JSON.stringify({
-                memorial_id: <?= $memorialId ?>,
-                csrf_token: csrfToken
-            })
+        const startTime = Date.now();
+
+        /* ============================================================
+         * Detect Real User Scroll (Not Bot)
+         * ============================================================ */
+        window.addEventListener('scroll', () => {
+            if (!hasScrolled && window.scrollY > 100) {
+                hasScrolled = true;
+            }
+        }, { passive: true });
+
+        /* ============================================================
+         * Time Tracking While User on Page
+         * ============================================================ */
+        const interactionWatcher = setInterval(() => {
+
+            if (!document.hidden) {
+                timeOnPage = Math.floor((Date.now() - startTime) / 1000);
+
+                if (hasScrolled && timeOnPage >= 5 && !visitTracked) {
+                    clearInterval(interactionWatcher);
+                    sendVisit();
+                }
+            }
+
+        }, 1000);
+
+        /* ============================================================
+         * Function: Send Visit to Backend
+         * ============================================================ */
+        function sendVisit() {
+            if (visitTracked) return;
+
+            visitTracked = true;
+
+            fetch('<?= site_url('api/track_visit') ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken
+                },
+                body: JSON.stringify({
+                    memorial_id: memorialId,
+                    csrf_token: csrfToken,
+                    has_scrolled: hasScrolled,
+                    time_spent: timeOnPage
+                }),
+                keepalive: true
+            });
+        }
+
+        /* ============================================================
+         * Backup Trigger
+         * ============================================================ */
+        window.addEventListener('beforeunload', () => {
+            if (!visitTracked && hasScrolled && timeOnPage >= 3) {
+                sendVisit();
+            }
         });
-    }, 3000); // 3 Seconds
-});
+
+        /* ============================================================
+         * Bot Detection Helper
+         * ============================================================ */
+        setTimeout(() => {
+            clearInterval(interactionWatcher);
+        }, 60000);
+
+    });
 </script>
+
+
 
 <?php include __DIR__ . '/../includes/yaseen_modal.php'; ?>
 <?php include __DIR__ . '/../includes/footer.php'; ?>
