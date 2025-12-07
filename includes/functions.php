@@ -616,38 +616,6 @@ function getGlobalStatistics()
 }
 
 /**
- * Check if the visitor is a bot/crawler
- * @return bool True if bot, false otherwise
- */
-function isBot()
-{
-    $bots = [
-        'Googlebot',
-        'Bingbot',
-        'Slurp',
-        'DuckDuckBot',
-        'Baiduspider',
-        'YandexBot',
-        'Sogou',
-        'Exabot',
-        'facebot',
-        'ia_archiver'
-    ];
-
-    if (empty($_SERVER['HTTP_USER_AGENT'])) {
-        return true; // No user agent, likely a bot
-    }
-
-    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-    foreach ($bots as $bot) {
-        if (stripos($userAgent, $bot) !== false) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
  * Get memorial share text based on gender
  * @param string $gender The gender of the memorial
  * @param string $name The name of the memorial

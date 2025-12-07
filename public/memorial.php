@@ -38,17 +38,6 @@ if ($memorial['status'] != 1) {
     exit;
 }
 
-// Update visit count and last visit time if not a bot
-if (!isBot()) {
-    $visitKey = 'visited_' . $memorialId;
-    if (!isset($_SESSION[$visitKey]) || (time() - $_SESSION[$visitKey]) > 300) {
-        $stmt = $pdo->prepare("UPDATE memorials SET visits = visits + 1 , last_visit = current_timestamp() WHERE id = ?");
-        $stmt->execute([$memorialId]);
-        $_SESSION[$visitKey] = time();
-        $memorial['visits']++;
-    }
-}
-
 // Generate page metadata
 $pageTitle = 'للمغفور ' . getPronoun($memorial['gender'], 'له') . ' بإذن الله تعالى ' . $memorial['name'] . ' — ' . SITE_NAME;
 $pageDescription = $memorial['quote'] ?? 'صفحة تذكارية للمغفور ' . getPronoun($memorial['gender'], 'له') . ' ' . $memorial['name'];
@@ -913,7 +902,25 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
-
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+        
+        fetch('<?= site_url('api/track_visit') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({
+                memorial_id: <?= $memorialId ?>,
+                csrf_token: csrfToken
+            })
+        });
+    }, 3000); // 3 Seconds
+});
+</script>
 
 <?php include __DIR__ . '/../includes/yaseen_modal.php'; ?>
 <?php include __DIR__ . '/../includes/footer.php'; ?>
