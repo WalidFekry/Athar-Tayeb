@@ -312,13 +312,19 @@ include __DIR__ . '/../includes/header.php';
                 <div class="text-center mb-4">
                     <img src="<?= $duaaImageUrl ?>" alt="بطاقة دعاء <?= e($memorial['name']) ?>"
                         class="img-fluid rounded shadow duaa-card-image"
-                        style="width: 100%; max-width: 500px; height: auto; cursor: pointer;"
-                        onclick="openDuaaImageModal('<?= $duaaImageUrl ?>', '<?= e($memorial['name']) ?>')">
+                        style="width: 100%; max-width: 500px; height: auto; cursor: pointer;" onclick="openDuaaImageModal(
+    '<?= $duaaImageUrl ?>', 
+    '<?= e($memorial['name']) ?>',
+    '<?= e($memorial['gender']) ?>'
+)">
                 </div>
 
                 <div class="d-flex gap-2 justify-content-center flex-wrap">
-                    <button class="btn btn-success"
-                        onclick="openDuaaImageModal('<?= $duaaImageUrl ?>', '<?= e($memorial['name']) ?>')">
+                    <button class="btn btn-success" onclick="openDuaaImageModal(
+    '<?= $duaaImageUrl ?>', 
+    '<?= e($memorial['name']) ?>',
+    '<?= e($memorial['gender']) ?>'
+)">
                         👁️ عرض بالحجم الكامل
                     </button>
                     <a href="<?= $duaaImageUrl ?>" download="duaa_<?= e($memorial['name']) ?>.png"
@@ -622,48 +628,44 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
-<!-- Share Section -->
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <h4 class="text-center mb-4">شارك الخير وكن سببًا في صدقة جارية 📤</h4>
-        <p class="text-center text-muted mb-4">
-            بمشاركتك هذه الصفحة، تساهم في نشر الخير والدعاء <?= getPronoun($memorial['gender'], 'للمرحوم') ?>
-            <strong><?= htmlspecialchars($memorial['name']) ?></strong>.<br>
-            كل مشاركة هي صدقة جارية لك وله، تزيد من أجر الدعاء وتُذكر الجميع بفضل الدعاء للمتوفى.<br>
-            شارك الرابط مع أصدقائك وعائلتك ليكونوا جزءًا من هذا الأجر العظيم.
-        </p>
+    <!-- Share Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="text-center mb-4">شارك الخير وكن سببًا في صدقة جارية 📤</h4>
+            <p class="text-center text-muted mb-4">
+                بمشاركتك هذه الصفحة، تساهم في نشر الخير والدعاء <?= getPronoun($memorial['gender'], 'للمرحوم') ?>
+                <strong><?= htmlspecialchars($memorial['name']) ?></strong>.<br>
+                كل مشاركة هي صدقة جارية لك وله، تزيد من أجر الدعاء وتُذكر الجميع بفضل الدعاء للمتوفى.<br>
+                شارك الرابط مع أصدقائك وعائلتك ليكونوا جزءًا من هذا الأجر العظيم.
+            </p>
 
-        <div class="text-center mb-3 text-secondary fst-italic">
-            نسأل الله أن يجزيك خير الجزاء على مشاركتك الطيبة ويثقل بها ميزان حسناتك.
-        </div>
+            <div class="text-center mb-3 text-secondary fst-italic">
+                نسأل الله أن يجزيك خير الجزاء على مشاركتك الطيبة ويثقل بها ميزان حسناتك.
+            </div>
 
-        <div class="share-buttons d-flex justify-content-center gap-3 flex-wrap">
-            <a href="https://wa.me/?text=<?= urlencode($shareText) ?>"
-               target="_blank" rel="noopener" class="share-btn share-whatsapp"
-               aria-label="شارك عبر واتساب">
-                📱 واتساب
-            </a>
+            <div class="share-buttons d-flex justify-content-center gap-3 flex-wrap">
+                <a href="https://wa.me/?text=<?= urlencode($shareText) ?>" target="_blank" rel="noopener"
+                    class="share-btn share-whatsapp" aria-label="شارك عبر واتساب">
+                    📱 واتساب
+                </a>
 
-            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>"
-               target="_blank" rel="noopener" class="share-btn share-facebook"
-               aria-label="شارك عبر فيسبوك">
-                📘 فيسبوك
-            </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>" target="_blank"
+                    rel="noopener" class="share-btn share-facebook" aria-label="شارك عبر فيسبوك">
+                    📘 فيسبوك
+                </a>
 
-            <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode($shareText) ?>"
-               target="_blank" rel="noopener" class="share-btn share-telegram"
-               aria-label="شارك عبر تيليجرام">
-                ✈️ تيليجرام
-            </a>
+                <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode($shareText) ?>"
+                    target="_blank" rel="noopener" class="share-btn share-telegram" aria-label="شارك عبر تيليجرام">
+                    ✈️ تيليجرام
+                </a>
 
-            <button class="share-btn share-copy copy-link-btn"
-                    data-url="<?= e($memorialUrl) ?>"
+                <button class="share-btn share-copy copy-link-btn" data-url="<?= e($memorialUrl) ?>"
                     aria-label="نسخ رابط المشاركة">
-                📋 نسخ الرابط
-            </button>
+                    📋 نسخ الرابط
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Create Your Own Memorial CTA Section -->
     <div class="card shadow-sm mb-4 memorial-cta-section">
