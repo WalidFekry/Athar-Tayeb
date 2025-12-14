@@ -32,6 +32,19 @@ $totalVisits = $stmt->fetchColumn();
 $stmt = $pdo->query("SELECT SUM(tasbeeh_subhan + tasbeeh_alham + tasbeeh_lailaha + tasbeeh_allahu) FROM memorials");
 $totalTasbeeh = $stmt->fetchColumn();
 
+// Pages learned statistics
+$stmt = $pdo->query("SELECT COUNT(*) FROM memorials WHERE DATE(created_at) = CURDATE()");
+$pagesLearnedToday = $stmt->fetchColumn();
+
+$stmt = $pdo->query("SELECT COUNT(*) FROM memorials WHERE DATE(created_at) = CURDATE() - INTERVAL 1 DAY");
+$pagesLearnedYesterday = $stmt->fetchColumn();
+
+$stmt = $pdo->query("SELECT COUNT(*) FROM memorials WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
+$pagesLearnedWeek = $stmt->fetchColumn();
+
+$stmt = $pdo->query("SELECT COUNT(*) FROM memorials WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+$pagesLearnedMonth = $stmt->fetchColumn();
+
 // Count actual image files on server
 $uploadsPath = __DIR__ . '/../public/uploads/memorials/';
 $uploadsCardsPath = __DIR__ . '/../public/uploads/duaa_images/';
@@ -224,6 +237,45 @@ $pageTitle = 'لوحة التحكم';
                     <div class="card-body">
                         <h3 class="text-muted"><?= toArabicNumerals($cardsCount) ?></h3>
                         <p class="text-muted mb-0">📜 بطاقات الدعاء</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Third Row for Learning Statistics -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="text-primary"><?= toArabicNumerals($pagesLearnedToday) ?></h3>
+                        <p class="text-muted mb-0">📚 اليوم</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="text-warning"><?= toArabicNumerals($pagesLearnedYesterday) ?></h3>
+                        <p class="text-muted mb-0">🕐 أمس</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="text-success"><?= toArabicNumerals($pagesLearnedWeek) ?></h3>
+                        <p class="text-muted mb-0">📖 الأسبوع</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="text-info"><?= toArabicNumerals($pagesLearnedMonth) ?></h3>
+                        <p class="text-muted mb-0">📅 الشهر</p>
                     </div>
                 </div>
             </div>
