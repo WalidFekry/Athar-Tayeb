@@ -246,6 +246,10 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                                 <td><?= number_format($memorial['visits']) ?></td>
                             </tr>
                             <tr>
+                                <th>آخر زيارة:</th>
+                                <td><?= $memorial['last_visit'] ? timeAgoInArabic($memorial['last_visit']) : '—' ?></td>
+                            </tr>
+                            <tr>
                                 <th>تاريخ الإنشاء:</th>
                                 <td><?= formatArabicDate($memorial['created_at']) ?></td>
                             </tr>
