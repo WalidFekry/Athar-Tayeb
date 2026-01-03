@@ -64,6 +64,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             // Redirect back to memorials list with success message
             redirect(ADMIN_URL . '/memorials.php?deleted=1');
         }
+    } elseif ($action === 'delete_image') {
+        $deleteImageId = (int) $_POST['memorial_id'];
+
+        if ($deleteImageId === $memorialId) {
+            // Get memorial data for file cleanup
+            $stmt = $pdo->prepare("SELECT image FROM memorials WHERE id = ?");
+            $stmt->execute([$deleteImageId]);
+            $memorialData = $stmt->fetch();
+
+            if ($memorialData && $memorialData['image']) {
+                // Delete main image
+                $imagePath = UPLOAD_PATH . '/' . $memorialData['image'];
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+
+                // Delete thumbnail
+                $ext = pathinfo($memorialData['image'], PATHINFO_EXTENSION);
+                $thumbPath = str_replace('.' . $ext, '_thumb.' . $ext, $imagePath);
+                if (file_exists($thumbPath)) {
+                    unlink($thumbPath);
+                }
+
+                // Delete Duaa card if exists
+                $duaaImagePath = __DIR__ . '/../public/uploads/duaa_images/' . $memorialData['image'];
+                if (file_exists($duaaImagePath)) {
+                    unlink($duaaImagePath);
+                }
+
+                // Update database: set image to NULL and image_status to 0
+                $stmt = $pdo->prepare("UPDATE memorials SET image = NULL, image_status = 0 WHERE id = ?");
+                $stmt->execute([$deleteImageId]);
+
+                $success = 'تم حذف الصورة وبطاقة الدعاء بنجاح.';
+
+                // Refresh memorial data
+                $stmt = $pdo->prepare("SELECT * FROM memorials WHERE id = ?");
+                $stmt->execute([$memorialId]);
+                $memorial = $stmt->fetch();
+            } else {
+                $error = 'لا توجد صورة لحذفها.';
+            }
+        }
     } elseif ($action === 'block_ip') {
         $blockId = (int) $_POST['memorial_id'];
 
@@ -361,6 +404,17 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                             ☠️ حظر المستخدم
                         </button>
                     </form>
+                    <?php if ($memorial['image']): ?>
+                        <form method="POST" style="display: inline;"
+                            onsubmit="return confirm('هل أنت متأكد من حذف الصورة وبطاقة الدعاء؟ سيتم حذف الصورة الأصلية والمصغرة وبطاقة الدعاء إن وجدت. الصفحة التذكارية ستبقى موجودة بدون صورة.')">
+                            <?php csrfField(); ?>
+                            <input type="hidden" name="action" value="delete_image">
+                            <input type="hidden" name="memorial_id" value="<?= $memorial['id'] ?>">
+                            <button type="submit" class="btn btn-warning">
+                                🖼️ حذف الصورة فقط
+                            </button>
+                        </form>
+                    <?php endif; ?>
                     <form method="POST" style="display: inline;"
                         onsubmit="return confirm('هل أنت متأكد من حذف هذه الصفحة نهائياً؟ سيتم حذف جميع الصور والبيانات المرتبطة بها. هذا الإجراء لا يمكن التراجع عنه.')">
                         <?php csrfField(); ?>
