@@ -225,6 +225,24 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
                                 <th>عنوان IP:</th>
                                 <td><?= e($memorial['ip_address'] ?: '—') ?></td>
                             </tr>
+                            <tr>
+                                <th>رابط التعديل:</th>
+                                <td>
+                                    <?php if ($memorial['edit_key']): ?>
+                                        <?php $editUrl = BASE_URL . '/edit?key=' . $memorial['edit_key']; ?>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" class="form-control" id="editLinkInput"
+                                                value="<?= e($editUrl) ?>" readonly>
+                                            <button class="btn btn-outline-primary" type="button"
+                                                onclick="copyEditLink(event)">
+                                                📋 نسخ
+                                            </button>
+                                        </div>
+                                    <?php else: ?>
+                                        <span class="text-muted">—</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
                         </table>
                     </div>
 
@@ -434,6 +452,30 @@ $pageTitle = 'عرض الصفحة: ' . $memorial['name'];
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function copyEditLink(event) {
+            const input = document.getElementById('editLinkInput');
+            input.select();
+            input.setSelectionRange(0, 99999); // For mobile devices
+
+            navigator.clipboard.writeText(input.value).then(function () {
+                // Change button text temporarily
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ تم النسخ';
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-success');
+
+                setTimeout(function () {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-primary');
+                }, 2000);
+            }).catch(function (err) {
+                alert('فشل نسخ الرابط: ' + err);
+            });
+        }
+    </script>
 </body>
 
 </html>
