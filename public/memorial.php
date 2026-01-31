@@ -391,9 +391,6 @@ include __DIR__ . '/../includes/header.php';
                 <div class="col-md-6">
                     <div class="audio-player">
                         <label class="form-label fw-bold">سورة يس</label>
-                        <p class="text-muted small mb-2">قراءة سورة يس تُسهل على المتوفى قبره، وتُخفّف عنه عذاب القبر،
-                            وتكون له نورًا يوم القيامة. عن النبي صلى الله عليه وسلم قال: "إن لكل شيء قلبًا، وقلب القرآن
-                            يس"، وقراءتها تُعتبر صدقة جارية تُثقل حسنات المتوفى.</p>
                         <div class="d-flex gap-2 mb-2">
                             <button class="btn btn-primary btn-sm flex-grow-1" id="readYaseenBtn">
                                 📖 قراءة
@@ -412,9 +409,6 @@ include __DIR__ . '/../includes/header.php';
                 <div class="col-md-6">
                     <div class="audio-player">
                         <label class="form-label fw-bold">سورة الفاتحة</label>
-                        <p class="text-muted small mb-2">سورة الفاتحة سبب في رحمة الله ومغفرته للميت، وتفتح له أبواب
-                            الجنة وتُيسر حسابه يوم القيامة. قراءتها والدعاء بها من الأعمال التي تنفع المتوفى، فهي شفاعة
-                            له يوم العرض على الله.</p>
                         <div class="d-flex gap-2 mb-2">
                             <button class="btn btn-primary btn-sm flex-grow-1" id="readFatihaDirectBtn">
                                 📖 قراءة
