@@ -280,7 +280,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!isset($_POST['action']) || ($_POS
     $settings = [
         'auto_approval' => isset($_POST['auto_approval']) && $_POST['auto_approval'] === '1' ? '1' : '0',
         'maintenance_mode' => isset($_POST['maintenance_mode']) && $_POST['maintenance_mode'] === '1' ? '1' : '0',
-        'auto_approve_messages' => isset($_POST['auto_approve_messages']) && $_POST['auto_approve_messages'] === '1' ? '1' : '0'
+        'auto_approve_messages' => isset($_POST['auto_approve_messages']) && $_POST['auto_approve_messages'] === '1' ? '1' : '0',
+        'auto_approve_images' => isset($_POST['auto_approve_images']) && $_POST['auto_approve_images'] === '1' ? '1' : '0',
     ];
 
     foreach ($settings as $key => $value) {
@@ -299,6 +300,7 @@ $settingsData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 $autoApproval = isset($settingsData['auto_approval']) ? (int) $settingsData['auto_approval'] : 0;
 $maintenanceMode = isset($settingsData['maintenance_mode']) ? (int) $settingsData['maintenance_mode'] : 0;
 $autoApproveMessages = isset($settingsData['auto_approve_messages']) ? (int) $settingsData['auto_approve_messages'] : 0;
+$autoApproveImages = isset($settingsData['auto_approve_images']) ? (int) $settingsData['auto_approve_images'] : 0;
 
 
 // Get statistics
@@ -441,6 +443,14 @@ $totalTasbeeh = $stmt->fetchColumn();
                             name="auto_approve_messages" value="1" <?= $autoApproveMessages === 1 ? 'checked' : '' ?>>
                         <label class="form-check-label" for="auto_approve_messages">
                             السماح بالموافقة التلقائية على الرسائل الجديدة
+                        </label>
+                    </div>
+
+                    <div class="mb-3 form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="auto_approve_images"
+                            name="auto_approve_images" value="1" <?= $autoApproveImages === 1 ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="auto_approve_images">
+                            الموافقة التلقائية على <strong>صور</strong> الصفحات الجديدة
                         </label>
                     </div>
 

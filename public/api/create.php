@@ -126,7 +126,7 @@ try {
             require_once __DIR__ . '/../../includes/generate_duaa_image.php';
             $imagePath = $imageName ? UPLOAD_PATH . '/' . $imageName : null;
 
-        $result = generateDuaaImage($imageName, $name, $gender, $imagePath, $death_date);
+            $result = generateDuaaImage($imageName, $name, $gender, $imagePath, $death_date);
 
             if ($result['success']) {
                 $duaaImageUrl = $result['url'];
@@ -162,12 +162,18 @@ try {
     $autoApproveMessagesSetting = $stmt->fetchColumn();
     $autoApproveMessages = ($autoApproveMessagesSetting == '1') ? 1 : 0;
 
+    // Get auto approval setting for images
+    $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'auto_approve_images'");
+    $stmt->execute();
+    $autoApproveImagesSetting = $stmt->fetchColumn();
+    $autoApproveImages = ($autoApproveImagesSetting == '1') ? 1 : 0;
+
     // Generate unique edit key
     $editKey = generateEditKey();
 
     $stmt = $pdo->prepare("
                 INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status, edit_key, generate_duaa_image, ip_address)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
 
     $stmt->execute([
@@ -178,6 +184,7 @@ try {
         $gender,
         $whatsapp ?: null,
         $quote ?: null,
+        $autoApproveImages,
         $autoApproveMessages,
         $autoApproval,
         $editKey,
@@ -197,7 +204,7 @@ try {
         'quote' => $quote ?: null,
         'quote_status' => $autoApproveMessages ?: 0,
         'image_url' => $imageName ? getImageUrl($imageName) : null,
-        'generate_duaa_image'=> $generateDuaaImage ? true : false,
+        'generate_duaa_image' => $generateDuaaImage ? true : false,
         'duaa_card_url' => $duaaImageUrl,
         'page_url' => site_url('m/' . $memorialId),
         'status' => $autoApproval ? 'approved' : 'pending',

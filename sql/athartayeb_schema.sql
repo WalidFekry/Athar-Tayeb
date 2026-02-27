@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 29, 2025 at 01:51 PM
+-- Generation Time: Feb 27, 2026 at 07:16 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.27
 
@@ -125,7 +125,20 @@ CREATE TABLE `settings` (
 INSERT INTO `settings` (`id`, `setting_key`, `setting_value`, `created_at`, `updated_at`) VALUES
 (22, 'auto_approval', '1', '2025-11-07 12:01:14', '2025-11-15 15:14:22'),
 (47, 'maintenance_mode', '0', '2025-11-07 13:21:27', '2025-11-07 13:35:04'),
-(60, 'auto_approve_messages', '0', '2025-11-12 15:00:42', '2025-11-15 15:14:18');
+(60, 'auto_approve_messages', '0', '2025-11-12 15:00:42', '2025-11-15 15:14:18'),
+(79, 'auto_approve_images', '0', '2026-02-27 18:59:59', '2026-02-27 19:15:51');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `visit_stats`
+--
+
+CREATE TABLE `visit_stats` (
+  `id` int NOT NULL,
+  `visit_date` date NOT NULL COMMENT 'The date of the recorded visits',
+  `visit_count` int NOT NULL DEFAULT '0' COMMENT 'Total visits on this date'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Daily visit statistics for analytics';
 
 --
 -- Indexes for dumped tables
@@ -176,6 +189,14 @@ ALTER TABLE `settings`
   ADD KEY `idx_key` (`setting_key`);
 
 --
+-- Indexes for table `visit_stats`
+--
+ALTER TABLE `visit_stats`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_visit_date` (`visit_date`),
+  ADD KEY `idx_visit_date` (`visit_date`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -207,7 +228,13 @@ ALTER TABLE `memorials`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+
+--
+-- AUTO_INCREMENT for table `visit_stats`
+--
+ALTER TABLE `visit_stats`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

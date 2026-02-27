@@ -119,12 +119,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $autoApproveMessagesSetting = $stmt->fetchColumn();
             $autoApproveMessages = ($autoApproveMessagesSetting == '1') ? 1 : 0;
 
+            // Get auto approval setting for images
+            $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'auto_approve_images'");
+            $stmt->execute();
+            $autoApproveImagesSetting = $stmt->fetchColumn();
+            $autoApproveImages = ($autoApproveImagesSetting == '1') ? 1 : 0;
+
             // Generate unique edit key
             $editKey = generateEditKey();
 
             $stmt = $pdo->prepare("
                 INSERT INTO memorials (name, from_name, image, death_date, gender, whatsapp, quote, image_status, quote_status, status, edit_key, generate_duaa_image, ip_address)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
 
             $stmt->execute([
@@ -135,6 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $gender,
                 $whatsapp ?: null,
                 $quote ?: null,
+                $autoApproveImages,
                 $autoApproveMessages,
                 $autoApproval,
                 $editKey,
@@ -351,7 +358,8 @@ include __DIR__ . '/../includes/header.php';
                             <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
                                 <span class="btn-text">إنشاء الصفحة التذكارية 💚</span>
                                 <span class="btn-loading d-none">
-                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"
+                                        aria-hidden="true"></span>
                                     جاري الإنشاء..
                                 </span>
                             </button>
@@ -500,19 +508,19 @@ include __DIR__ . '/../includes/header.php';
     })();
 
     // Form submission loading state
-    (function() {
+    (function () {
         const form = document.querySelector('form[data-validate]');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = submitBtn.querySelector('.btn-text');
         const btnLoading = submitBtn.querySelector('.btn-loading');
 
         if (form && submitBtn) {
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', function (e) {
                 // Show loading state
                 btnText.classList.add('d-none');
                 btnLoading.classList.remove('d-none');
                 submitBtn.disabled = true;
-                
+
                 // Add visual feedback
                 submitBtn.style.opacity = '0.8';
             });

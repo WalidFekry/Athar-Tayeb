@@ -33,10 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
  * ----------------------------------------------------------- */
 $input = json_decode(file_get_contents('php://input'), true);
 
-$memorialId  = (int)($input['memorial_id'] ?? 0);
-$csrfToken   = $input['csrf_token'] ?? '';
-$hasScrolled = (bool)($input['has_scrolled'] ?? false);
-$timeSpent   = (int)($input['time_spent'] ?? 0);
+$memorialId = (int) ($input['memorial_id'] ?? 0);
+$csrfToken = $input['csrf_token'] ?? '';
+$hasScrolled = (bool) ($input['has_scrolled'] ?? false);
+$timeSpent = (int) ($input['time_spent'] ?? 0);
 
 /* -----------------------------------------------------------
  * CSRF Protection
@@ -61,10 +61,10 @@ if ($memorialId <= 0) {
  * ----------------------------------------------------------- */
 if (!$hasScrolled || $timeSpent < 3) {
     exit(json_encode([
-        'status'       => 'rejected',
-        'reason'       => 'No real user interaction detected',
+        'status' => 'rejected',
+        'reason' => 'No real user interaction detected',
         'has_scrolled' => $hasScrolled,
-        'time_spent'   => $timeSpent
+        'time_spent' => $timeSpent
     ]));
 }
 
@@ -73,8 +73,15 @@ if (!$hasScrolled || $timeSpent < 3) {
  * ----------------------------------------------------------- */
 $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $botKeywords = [
-    'bot', 'crawl', 'crawler', 'spider', 'lighthouse', 'headless',
-    'phantomjs', 'curl', 'wget'
+    'bot',
+    'crawl',
+    'crawler',
+    'spider',
+    'lighthouse',
+    'headless',
+    'phantomjs',
+    'curl',
+    'wget'
 ];
 
 foreach ($botKeywords as $keyword) {
@@ -93,7 +100,7 @@ $visitKey = 'visited_' . $memorialId;
 
 if (isset($_SESSION[$visitKey]) && (time() - $_SESSION[$visitKey]) < 300) {
     exit(json_encode([
-        'status'  => 'already_counted',
+        'status' => 'already_counted',
         'message' => 'Visit already recorded in this session'
     ]));
 }
@@ -117,6 +124,13 @@ try {
         throw new Exception('Memorial not found or unpublished');
     }
 
+    /* Update daily visit stats */
+    $pdo->prepare("
+        INSERT INTO visit_stats (visit_date, visit_count)
+        VALUES (CURDATE(), 1)
+        ON DUPLICATE KEY UPDATE visit_count = visit_count + 1
+    ")->execute();
+
     /* Save session timestamp to prevent repeat counting */
     $_SESSION[$visitKey] = time();
 
@@ -124,9 +138,9 @@ try {
      * Success Response
      * ----------------------------------------------------------- */
     echo json_encode([
-        'status'      => 'success',
-        'time_spent'  => $timeSpent,
-        'message'     => 'Visit tracked successfully'
+        'status' => 'success',
+        'time_spent' => $timeSpent,
+        'message' => 'Visit tracked successfully'
     ]);
 
 } catch (Exception $e) {
@@ -136,7 +150,7 @@ try {
 
     http_response_code(500);
     echo json_encode([
-        'error'   => 'Failed to track visit',
+        'error' => 'Failed to track visit',
         'message' => $e->getMessage()
     ]);
 }

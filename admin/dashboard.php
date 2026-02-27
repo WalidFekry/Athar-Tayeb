@@ -32,6 +32,19 @@ $totalVisits = $stmt->fetchColumn();
 $stmt = $pdo->query("SELECT SUM(tasbeeh_subhan + tasbeeh_alham + tasbeeh_lailaha + tasbeeh_allahu) FROM memorials");
 $totalTasbeeh = $stmt->fetchColumn();
 
+// Daily/Yesterday/Monthly traffic from visit_stats
+$stmt = $pdo->query("SELECT COALESCE(visit_count, 0) FROM visit_stats WHERE visit_date = CURDATE()");
+$visitsToday = (int) ($stmt->fetchColumn() ?: 0);
+
+$stmt = $pdo->query("SELECT COALESCE(visit_count, 0) FROM visit_stats WHERE visit_date = CURDATE() - INTERVAL 1 DAY");
+$visitsYesterday = (int) ($stmt->fetchColumn() ?: 0);
+
+$stmt = $pdo->query("SELECT COALESCE(SUM(visit_count), 0) FROM visit_stats WHERE visit_date >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)");
+$visitsMonth = (int) ($stmt->fetchColumn() ?: 0);
+
+$stmt = $pdo->query("SELECT COALESCE(SUM(visit_count), 0) FROM visit_stats");
+$visitsTotal = (int) ($stmt->fetchColumn() ?: 0);
+
 // Pages learned statistics
 $stmt = $pdo->query("SELECT COUNT(*) FROM memorials WHERE DATE(created_at) = CURDATE()");
 $pagesLearnedToday = $stmt->fetchColumn();
@@ -197,7 +210,7 @@ $pageTitle = 'لوحة التحكم';
                 <div class="card text-center">
                     <div class="card-body">
                         <h3 class="text-info"><?= toArabicNumerals($totalVisits) ?></h3>
-                        <p class="text-muted mb-0">إجمالي الزيارات</p>
+                        <p class="text-muted mb-0">إجمالي الزيارات النشطة</p>
                     </div>
                 </div>
             </div>
@@ -276,6 +289,45 @@ $pageTitle = 'لوحة التحكم';
                     <div class="card-body">
                         <h3 class="text-info"><?= toArabicNumerals($pagesLearnedMonth) ?></h3>
                         <p class="text-muted mb-0">📅 الشهر</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Traffic Statistics Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card text-center border-info">
+                    <div class="card-body">
+                        <h3 class="text-info"><?= toArabicNumerals($visitsToday) ?></h3>
+                        <p class="text-muted mb-0">📊 زيارات اليوم</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center border-primary">
+                    <div class="card-body">
+                        <h3 class="text-primary"><?= toArabicNumerals($visitsYesterday) ?></h3>
+                        <p class="text-muted mb-0">📈 زيارات الأمس</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center border-success">
+                    <div class="card-body">
+                        <h3 class="text-success"><?= toArabicNumerals($visitsMonth) ?></h3>
+                        <p class="text-muted mb-0">📅 زيارات الشهر</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="text-dark"><?= toArabicNumerals($visitsTotal) ?></h3>
+                        <p class="text-muted mb-0">🌐 إجمالي الزيارات</p>
                     </div>
                 </div>
             </div>
