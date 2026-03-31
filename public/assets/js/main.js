@@ -104,7 +104,19 @@
     }
   }, 10000); // 10 second timeout
 
-  // Tasbeeh Counter Management
+  // =============================================
+  // Tasbeeh Counter Management (Batch Sync)
+  // =============================================
+
+  // pendingCounts: { memorialId: { subhan: N, alham: N, ... } }
+  const pendingCounts = {};
+
+  // Timer references per memorial
+  const flushTimers = {};
+
+  // Delay in ms before flushing to server
+  const FLUSH_DELAY = 5000; // 5 seconds
+
   const tasbeehButtons = document.querySelectorAll(".tasbeeh-card");
 
   tasbeehButtons.forEach((button) => {
@@ -116,21 +128,36 @@
 
       if (!field || !memorialId) return;
 
-      // Increment local counter immediately
+      // --- 1. Update local display immediately (UX responsive) ---
       let localCount = parseInt(localCountElement?.textContent || "0");
       localCount++;
       if (localCountElement) {
         localCountElement.textContent = localCount;
       }
 
-      // Add animation
+      // Click animation
       this.style.transform = "scale(0.95)";
       setTimeout(() => {
         this.style.transform = "";
       }, 100);
 
-      // Send to server
-      incrementTasbeeh(memorialId, field, countElement);
+      // --- 2. Accumulate count in pendingCounts ---
+      if (!pendingCounts[memorialId]) {
+        pendingCounts[memorialId] = { subhan: 0, alham: 0, lailaha: 0, allahu: 0 };
+      }
+      pendingCounts[memorialId][field]++;
+
+      // Store reference to count element so we can update display after flush
+      if (!pendingCounts[memorialId]._elements) {
+        pendingCounts[memorialId]._elements = {};
+      }
+      pendingCounts[memorialId]._elements[field] = countElement;
+
+      // --- 3. Reset the debounce timer ---
+      clearTimeout(flushTimers[memorialId]);
+      flushTimers[memorialId] = setTimeout(() => {
+        flushTasbeeh(memorialId);
+      }, FLUSH_DELAY);
     });
   });
 
@@ -242,33 +269,101 @@
     return urlParams.get('id') || 'default';
   }
 
-  function incrementTasbeeh(memorialId, field, countElement) {
+  // Send tasbeeh counts to server
+  function flushTasbeeh(memorialId) {
+    const data = pendingCounts[memorialId];
+    if (!data) return;
+
+    // Check if there's anything to send
+    const hasData = ['subhan', 'alham', 'lailaha', 'allahu']
+      .some(f => data[f] > 0);
+    if (!hasData) return;
+
     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    const elements = data._elements || {};
+
+    // Build the counts payload (only non-zero fields)
+    const counts = {
+      subhan: data.subhan,
+      alham: data.alham,
+      lailaha: data.lailaha,
+      allahu: data.allahu
+    };
+
+    // Clear pending data immediately to avoid double-send
+    pendingCounts[memorialId] = { subhan: 0, alham: 0, lailaha: 0, allahu: 0, _elements: elements };
 
     fetch(BASEURL + "/api/tasbeeh", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: `id=${memorialId}&field=${field}&csrf_token=${encodeURIComponent(
-        csrfToken
-      )}`,
+      body:
+        `id=${memorialId}` +
+        `&counts=${encodeURIComponent(JSON.stringify(counts))}` +
+        `&csrf_token=${encodeURIComponent(csrfToken)}`,
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.success && data.counts) {
-          // Update total count
-          if (countElement && data.counts[field]) {
-            countElement.textContent = formatNumber(data.counts[field]);
-          }
+          // Update displayed totals from server response
+          ['subhan', 'alham', 'lailaha', 'allahu'].forEach(field => {
+            const el = elements[field];
+            if (el && data.counts[field] !== undefined) {
+              el.textContent = formatNumber(data.counts[field]);
+            }
+          });
         } else if (data.error) {
-          console.error("Tasbeeh error:", data.error);
+          console.error("Tasbeeh flush error:", data.error);
         }
       })
       .catch((error) => {
-        console.error("Network error:", error);
+        console.error("Tasbeeh network error:", error);
       });
   }
+
+  // Send all pending tasbeeh counts to server
+  function flushAllPending() {
+    Object.keys(pendingCounts).forEach(memorialId => {
+      const data = pendingCounts[memorialId];
+      const hasData = ['subhan', 'alham', 'lailaha', 'allahu'].some(f => data[f] > 0);
+      if (!hasData) return;
+
+      clearTimeout(flushTimers[memorialId]);
+
+      const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+      const counts = {
+        subhan: data.subhan,
+        alham: data.alham,
+        lailaha: data.lailaha,
+        allahu: data.allahu
+      };
+
+      // Use sendBeacon for reliable delivery on page unload
+      const payload = new FormData();
+      payload.append('id', memorialId);
+      payload.append('counts', JSON.stringify(counts));
+      payload.append('csrf_token', csrfToken || '');
+
+      const beaconSent = navigator.sendBeacon(BASEURL + "/api/tasbeeh", payload);
+      if (!beaconSent) {
+        // Fallback to synchronous fetch if sendBeacon fails
+        flushTasbeeh(memorialId);
+      }
+
+      // Clear pending
+      pendingCounts[memorialId] = { subhan: 0, alham: 0, lailaha: 0, allahu: 0 };
+    });
+  }
+
+  // Flush before user leaves the page
+  window.addEventListener('beforeunload', flushAllPending);
+  // Also flush on visibility change (e.g. switch tabs on mobile)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      flushAllPending();
+    }
+  });
 
   function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
