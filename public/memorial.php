@@ -159,11 +159,17 @@ $asmaAllah = [
 // Generate prayers for the memorial
 $prayers = getPrayers($memorial['gender'], htmlspecialchars($memorial['name']));
 
-// Generate memorial share text
+// Generate memorial share text (with URL - for WhatsApp)
 $shareText = getMemorialShareText(
     $memorial['gender'],
     $memorial['name'],
     $memorialUrl
+);
+
+// Generate memorial share text without URL (for Telegram - Telegram auto-appends URL)
+$shareTelegramText = getMemorialShareTextNoUrl(
+    $memorial['gender'],
+    $memorial['name']
 );
 
 include __DIR__ . '/../includes/header.php';
@@ -638,21 +644,34 @@ include __DIR__ . '/../includes/header.php';
             </div>
 
             <div class="share-buttons d-flex justify-content-center gap-3 flex-wrap">
+
+                <!-- WhatsApp: works perfectly on mobile & desktop -->
                 <a href="https://wa.me/?text=<?= urlencode($shareText) ?>" target="_blank" rel="noopener"
                     class="share-btn share-whatsapp" aria-label="شارك عبر واتساب">
                     📱 واتساب
                 </a>
 
-                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($memorialUrl) ?>" target="_blank"
-                    rel="noopener" class="share-btn share-facebook" aria-label="شارك عبر فيسبوك">
+                <!-- Facebook: JS popup for desktop, direct URL for mobile (avoids blank app open) -->
+                <a href="#" onclick="shareFacebook('<?= e($memorialUrl) ?>'); return false;"
+                    class="share-btn share-facebook" aria-label="شارك عبر فيسبوك" rel="noopener">
                     📘 فيسبوك
                 </a>
 
-                <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode($shareText) ?>"
+                <!-- Telegram: text WITHOUT URL (Telegram auto-appends the url param, so no duplication) -->
+                <a href="https://t.me/share/url?url=<?= urlencode($memorialUrl) ?>&text=<?= urlencode($shareTelegramText) ?>"
                     target="_blank" rel="noopener" class="share-btn share-telegram" aria-label="شارك عبر تيليجرام">
                     ✈️ تيليجرام
                 </a>
 
+                <!-- Native Web Share API button (shows on mobile automatically, hidden on desktop) -->
+                <button class="share-btn share-native" id="nativeShareBtn" style="display: none;"
+                    aria-label="مشاركة عبر تطبيقات الموبايل" data-title="<?= e($pageTitle) ?>"
+                    data-text="<?= e(getMemorialShareTextNoUrl($memorial['gender'], $memorial['name'])) ?>"
+                    data-url="<?= e($memorialUrl) ?>">
+                    📲 مشاركة
+                </button>
+
+                <!-- Copy Link -->
                 <button class="share-btn share-copy copy-link-btn" data-url="<?= e($memorialUrl) ?>"
                     aria-label="نسخ رابط المشاركة">
                     📋 نسخ الرابط
@@ -978,6 +997,63 @@ include __DIR__ . '/../includes/header.php';
         }, 60000);
 
     });
+
+    /* ============================================================
+     * Share Functions
+     * ============================================================ */
+
+    /**
+     * Facebook Share:
+     * - Desktop: opens a popup window (best UX on desktop)
+     * - Mobile: navigates to FB share URL directly (lets the OS/FB app handle it)
+     */
+    function shareFacebook(url) {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            // On mobile, use m.facebook.com to avoid the iOS Universal Links bug
+            // where the FB app opens but drops the share parameter.
+            window.location.href = 'https://m.facebook.com/sharer.php?u=' + encodeURIComponent(url);
+        } else {
+            const fbShareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+            // On desktop, open a centered popup for the Facebook share dialog
+            const popupWidth = 600;
+            const popupHeight = 500;
+            const left = Math.round((screen.width / 2) - (popupWidth / 2));
+            const top = Math.round((screen.height / 2) - (popupHeight / 2));
+            window.open(
+                fbShareUrl,
+                'facebook-share-dialog',
+                'width=' + popupWidth + ',height=' + popupHeight +
+                ',left=' + left + ',top=' + top +
+                ',toolbar=0,menubar=0,status=0'
+            );
+        }
+    }
+
+    /**
+     * Web Share API — native share sheet
+     * Only shown when navigator.share is supported
+     */
+    const nativeShareBtn = document.getElementById('nativeShareBtn');
+    if (nativeShareBtn && navigator.share) {
+        nativeShareBtn.style.display = 'inline-flex';
+
+        nativeShareBtn.addEventListener('click', async () => {
+            try {
+                await navigator.share({
+                    title: nativeShareBtn.dataset.title,
+                    text: nativeShareBtn.dataset.text,
+                    url: nativeShareBtn.dataset.url,
+                });
+            } catch (err) {
+                // AbortError = user dismissed the sheet, that's fine
+                if (err.name !== 'AbortError') {
+                    console.warn('Native share failed:', err);
+                }
+            }
+        });
+    }
 </script>
 
 

@@ -477,6 +477,20 @@ textarea.form-control {
     color: white;
 }
 
+.share-native {
+    background-color: var(--primary);
+    color: white;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border: none;
+}
+
+.share-native:hover {
+    background-color: var(--primary-hover);
+    color: white;
+}
+
 /* Badges */
 .badge {
     padding: 0.4rem 0.8rem;

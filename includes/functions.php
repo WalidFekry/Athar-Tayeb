@@ -60,28 +60,40 @@ function toArabicNumerals($number)
 
 /**
  * Generate Open Graph meta tags
+ * Includes all required tags for WhatsApp, Facebook, Telegram, Twitter previews
  */
 function generateOGTags($title, $description, $image = null, $url = null)
 {
     $tags = [];
+
+    // Basic OG tags
     $tags[] = '<meta property="og:title" content="' . e($title) . '">';
     $tags[] = '<meta property="og:description" content="' . e($description) . '">';
     $tags[] = '<meta property="og:type" content="website">';
+    $tags[] = '<meta property="og:site_name" content="' . e(SITE_NAME) . '">';
+    $tags[] = '<meta property="og:locale" content="ar_AR">';
 
     if ($image) {
         $tags[] = '<meta property="og:image" content="' . e($image) . '">';
+        // Required by WhatsApp and Facebook for proper preview display
+        $tags[] = '<meta property="og:image:width" content="1200">';
+        $tags[] = '<meta property="og:image:height" content="630">';
+        $tags[] = '<meta property="og:image:type" content="image/jpeg">';
+        $tags[] = '<meta property="og:image:alt" content="' . e($title) . '">';
     }
 
     if ($url) {
         $tags[] = '<meta property="og:url" content="' . e($url) . '">';
     }
 
+    // Twitter Card tags
     $tags[] = '<meta name="twitter:card" content="summary_large_image">';
     $tags[] = '<meta name="twitter:title" content="' . e($title) . '">';
     $tags[] = '<meta name="twitter:description" content="' . e($description) . '">';
 
     if ($image) {
         $tags[] = '<meta name="twitter:image" content="' . e($image) . '">';
+        $tags[] = '<meta name="twitter:image:alt" content="' . e($title) . '">';
     }
 
     return implode("\n    ", $tags);
@@ -313,12 +325,12 @@ function getDuaaCardUrl($filename)
     }
 
     $duaaImagesDir = dirname(UPLOAD_PATH) . '/duaa_images/';
-    $duaaCardPath  = $duaaImagesDir . $filename;
+    $duaaCardPath = $duaaImagesDir . $filename;
 
     if (file_exists($duaaCardPath)) {
         return BASE_URL . '/uploads/duaa_images/' . $filename;
     }
-    
+
     return null;
 }
 
@@ -616,11 +628,12 @@ function getGlobalStatistics()
 }
 
 /**
- * Get memorial share text based on gender
+ * Get memorial share text based on gender (includes URL at the end)
+ * Used for WhatsApp sharing
  * @param string $gender The gender of the memorial
  * @param string $name The name of the memorial
  * @param string $url The URL of the memorial page
- * @return string The share text
+ * @return string The share text with URL
  */
 function getMemorialShareText(string $gender, string $name, string $url): string
 {
@@ -640,6 +653,28 @@ function getMemorialShareText(string $gender, string $name, string $url): string
 }
 
 /**
+ * Get memorial share text WITHOUT URL at the end
+ * Used for Telegram sharing (Telegram auto-appends the URL, so we avoid duplication)
+ * @param string $gender The gender of the memorial
+ * @param string $name The name of the memorial
+ * @return string The share text without URL
+ */
+function getMemorialShareTextNoUrl(string $gender, string $name): string
+{
+    if ($gender === 'male') {
+        return "🌿 دعاء وصدقة جارية للمرحوم «{$name}» 🌿\n\n"
+            . "لا تنسوه من صالح دعائكم؛ اقرأوا له الفاتحة وادعوا له بالرحمة والمغفرة، "
+            . "ولكم مثل أجره بإذن الله.\n\n"
+            . "يمكنكم زيارة صفحته التذكارية والمشاركة في نشرها ليصل الأجر لعدد أكبر";
+    }
+
+    return "🌿 دعاء وصدقة جارية للمرحومة «{$name}» 🌿\n\n"
+        . "لا تنسوها من صالح دعائكم؛ اقرأوا لها الفاتحة وادعوا لها بالرحمة والمغفرة، "
+        . "ولكم مثل أجرها بإذن الله.\n\n"
+        . "يمكنكم زيارة صفحتها التذكارية والمشاركة في نشرها ليصل الأجر لعدد أكبر";
+}
+
+/**
  * Purge a specific URL from Cloudflare cache
  * @param string $url The full URL to purge
  * @return bool True on success, false on failure
@@ -647,17 +682,17 @@ function getMemorialShareText(string $gender, string $name, string $url): string
 function purgeCloudflareUrl(string $url): bool
 {
     $apiToken = CF_API_TOKEN;
-    $zoneId   = CF_ZONE_ID;
+    $zoneId = CF_ZONE_ID;
 
     $ch = curl_init("https://api.cloudflare.com/client/v4/zones/{$zoneId}/purge_cache");
     curl_setopt_array($ch, [
-        CURLOPT_CUSTOMREQUEST  => 'POST',
+        CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER     => [
+        CURLOPT_HTTPHEADER => [
             "Authorization: Bearer {$apiToken}",
             "Content-Type: application/json",
         ],
-        CURLOPT_POSTFIELDS     => json_encode([
+        CURLOPT_POSTFIELDS => json_encode([
             'files' => [$url],
         ]),
     ]);
