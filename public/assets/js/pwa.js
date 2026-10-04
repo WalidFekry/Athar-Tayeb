@@ -38,15 +38,49 @@
     const isWindows = /Win/.test(platform) || /Windows/.test(ua);
     const isLinux = /Linux/.test(platform) && !isAndroid;
 
-    const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua) && !/Chromium/.test(ua) && !/CriOS/.test(ua);
-    const isChrome = /Chrome/.test(ua) && !/Chromium/.test(ua) && !/EdgA/.test(ua) && !/OPR/.test(ua);
+    // isSafari: real Safari only — NOT Chrome/Chromium/CriOS/Edge/Samsung
+    const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua) && !/Chromium/.test(ua) &&
+                     !/CriOS/.test(ua) && !/SamsungBrowser/.test(ua) && !/FBAN/.test(ua) &&
+                     !/FBAV/.test(ua) && !/Instagram/.test(ua);
+    const isChrome = /Chrome/.test(ua) && !/Chromium/.test(ua) && !/Edg\//.test(ua) &&
+                     !/EdgA/.test(ua) && !/OPR/.test(ua) && !/SamsungBrowser/.test(ua);
     const isEdge = /Edg\//.test(ua) || /EdgA/.test(ua);
     const isFirefox = /Firefox/.test(ua) && !/Seamonkey/.test(ua);
     const isOpera = /OPR\//.test(ua) || /Opera/.test(ua);
-    const isChromeiOS = /CriOS/.test(ua);
-    const isFirefoxiOS = /FxiOS/.test(ua);
-    const isEdgeiOS = /EdgA/.test(ua);
+    const isChromeiOS = /CriOS/.test(ua);          // Chrome on iOS
+    const isFirefoxiOS = /FxiOS/.test(ua);         // Firefox on iOS
+    const isEdgeiOS = /EdgA/.test(ua);             // Edge on iOS
     const isSamsungBrowser = /SamsungBrowser/.test(ua);
+
+    // ================================================
+    // In-App Browser Detection
+    // ================================================
+
+    // Known in-app browsers by UA pattern
+    const IN_APP_PATTERNS = /FBAN|FBAV|Instagram|Twitter|Snapchat|LinkedInApp|WhatsApp|MicroMessenger|Line\/|musical_ly|BytedanceWebview|TikTok|GSA\/|DuckDuckGo|brave|YaBrowser/i;
+
+    // Android WebView: has 'wv' in UA and is NOT a real Chrome
+    const isAndroidWebView = isAndroid && /; wv\)/.test(ua);
+
+    // iOS WebView: not Safari, not Chrome/FF/Edge for iOS — likely in-app
+    const isIOSWebView = isAnyIOS && !isSafari && !isChromeiOS && !isFirefoxiOS && !isEdgeiOS;
+
+    const isInAppBrowser = IN_APP_PATTERNS.test(ua) || isAndroidWebView || isIOSWebView;
+
+    function getInAppBrowserName() {
+        if (/FBAN|FBAV/i.test(ua)) return 'Facebook';
+        if (/Instagram/i.test(ua)) return 'Instagram';
+        if (/Twitter/i.test(ua)) return 'Twitter (X)';
+        if (/Snapchat/i.test(ua)) return 'Snapchat';
+        if (/LinkedInApp/i.test(ua)) return 'LinkedIn';
+        if (/WhatsApp/i.test(ua)) return 'WhatsApp';
+        if (/MicroMessenger/i.test(ua)) return 'WeChat';
+        if (/Line\//i.test(ua)) return 'Line';
+        if (/musical_ly|BytedanceWebview|TikTok/i.test(ua)) return 'TikTok';
+        if (/GSA\//i.test(ua)) return 'تطبيق Google';
+        return null; // unknown in-app or plain WebView
+    }
+
 
     // ================================================
     // Check if Already Running as Installed PWA
@@ -88,13 +122,22 @@
             return 'installable';
         }
 
-        // iOS devices
+        // iOS devices — order matters: check in-app first, then Safari, then other browsers
         if (isAnyIOS) {
-            // Safari on iOS (not Chrome/Firefox/Edge for iOS)
-            if (isSafari || (!isChromeiOS && !isFirefoxiOS && !isEdgeiOS)) {
-                return 'ios-safari';
-            }
-            return 'ios-other';
+            // In-app browser WebViews (Facebook, Instagram, WhatsApp, etc.)
+            // Must be checked BEFORE isSafari because some in-app browsers spoof Safari UA
+            if (isInAppBrowser) return 'ios-inapp';
+            // Real Safari (no known 3rd-party browser markers)
+            if (isSafari) return 'ios-safari';
+            // Chrome/Firefox/Edge for iOS
+            if (isChromeiOS || isFirefoxiOS || isEdgeiOS) return 'ios-other';
+            // Unknown iOS browser — treat like Safari (safest default)
+            return 'ios-safari';
+        }
+
+        // Android in-app browsers (Facebook, WhatsApp WebView…)
+        if (isAndroid && isInAppBrowser) {
+            return 'android-inapp';
         }
 
         // Desktop browsers that support beforeinstallprompt (Chrome/Edge on Windows/macOS/Linux)
@@ -194,6 +237,38 @@
             };
         }
 
+        if (state === 'ios-inapp') {
+            const appName = getInAppBrowserName();
+            const appLabel = appName ? `تطبيق ${appName}` : 'تطبيق آخر';
+            return {
+                title: 'افتح أثر طيب في Safari أولاً',
+                body: `
+                    <p class="pwa-inapp-desc mb-3">
+                        أنت تتصفح من داخل <strong>${appLabel}</strong>، والتثبيت يعمل من Safari فقط.
+                        بعد الفتح ستظهر لك خطوات التثبيت مباشرة.
+                    </p>`,
+                hintText: 'لم يفتح؟ اضغط <strong>⋯</strong> أو <strong>⋮</strong> أعلى الشاشة ثم «فتح في المتصفح» أو «Open in Browser»',
+                primaryBtn: { id: 'pwaBtnOpenBrowser', text: '🧭 افتح في Safari', action: 'open-in-browser' },
+                secondaryBtn: { id: 'pwaBtnCopyLink', text: '🔗 انسخ الرابط', action: 'copy' }
+            };
+        }
+
+        if (state === 'android-inapp') {
+            const appName = getInAppBrowserName();
+            const appLabel = appName ? `تطبيق ${appName}` : 'تطبيق آخر';
+            return {
+                title: 'افتح أثر طيب في المتصفح أولاً',
+                body: `
+                    <p class="pwa-inapp-desc mb-3">
+                        أنت تتصفح من داخل <strong>${appLabel}</strong>، والتثبيت يعمل من Chrome أو متصفحك الافتراضي فقط.
+                        بعد الفتح ستظهر لك خطوات التثبيت مباشرة.
+                    </p>`,
+                hintText: 'لم يفتح؟ اضغط <strong>⋮</strong> أو <strong>⋯</strong> في الزاوية ثم «فتح في المتصفح» أو «Open in Browser»',
+                primaryBtn: { id: 'pwaBtnOpenBrowser', text: '🌐 افتح في المتصفح', action: 'open-in-browser' },
+                secondaryBtn: { id: 'pwaBtnCopyLink', text: '🔗 انسخ الرابط', action: 'copy' }
+            };
+        }
+
         if (state === 'ios-other') {
             let browserName = 'متصفحك الحالي';
             if (isChromeiOS) browserName = 'Chrome';
@@ -207,12 +282,11 @@
                         <span class="pwa-note-icon">⚠️</span>
                         <span>ميزة إضافة الموقع للشاشة الرئيسية على iPhone وiPad تعمل عبر <strong>Safari</strong> فقط، وليس عبر ${browserName}.</span>
                     </div>
-                    <p class="mb-3">للإضافة، افتح هذا الرابط في Safari:</p>
                     <div class="pwa-url-box" id="pwaUrlDisplay">${window.location.origin}</div>
                     <ol class="pwa-steps-list mt-3">
                         <li><span class="step-num">١</span><span>افتح Safari على جهازك</span></li>
                         <li><span class="step-num">٢</span><span>انتقل إلى <strong>${window.location.origin}</strong></span></li>
-                        <li><span class="step-num">٣</span><span>اضغط على زر المشاركة ⬆️ ثم «إضافة إلى الشاشة الرئيسية»</span></li>
+                        <li><span class="step-num">٣</span><span>اضغط زر المشاركة ⬆️ ثم «إضافة إلى الشاشة الرئيسية»</span></li>
                     </ol>`,
                 primaryBtn: { id: 'pwaBtnCopyLink', text: '🔗 نسخ رابط الموقع', action: 'copy' },
                 secondaryBtn: { id: 'pwaBtnClose', text: 'إغلاق', action: 'close' }
@@ -316,6 +390,7 @@
             <div class="modal-body pwa-modal-body pt-2">
                 <h2 class="pwa-modal-title" id="pwaInstallModalLabel"></h2>
                 <div id="pwaModalContent"></div>
+                <div id="pwaModalHint" class="pwa-open-hint" style="display:none"></div>
             </div>
             <div class="modal-footer pwa-modal-footer border-0 pt-0 gap-2">
                 <div id="pwaModalButtons" class="d-flex flex-column flex-sm-row gap-2 w-100 justify-content-end"></div>
@@ -336,10 +411,21 @@
         const content = getInstructionsHTML();
         const titleEl = document.getElementById('pwaInstallModalLabel');
         const bodyEl = document.getElementById('pwaModalContent');
+        const hintEl = document.getElementById('pwaModalHint');
         const buttonsEl = document.getElementById('pwaModalButtons');
 
         if (titleEl) titleEl.textContent = content.title;
         if (bodyEl) bodyEl.innerHTML = content.body;
+
+        // Hint text (shown inside modal body, below content)
+        if (hintEl) {
+            if (content.hintText) {
+                hintEl.innerHTML = content.hintText;
+                hintEl.style.display = '';
+            } else {
+                hintEl.style.display = 'none';
+            }
+        }
 
         // Build buttons
         if (buttonsEl) {
@@ -371,8 +457,9 @@
         // Show modal via Bootstrap
         const modalEl = document.getElementById('pwaInstallModal');
         if (modalEl && typeof bootstrap !== 'undefined') {
-            if (!modalInstance) {
-                modalInstance = new bootstrap.Modal(modalEl);
+            // Always create a fresh instance reference in case it was disposed
+            if (!modalInstance || !modalEl._bsModal) {
+                modalInstance = new bootstrap.Modal(modalEl, { keyboard: true, backdrop: true });
             }
             modalInstance.show();
         }
@@ -389,6 +476,8 @@
             triggerNativeInstall();
         } else if (action === 'copy') {
             copyPageLink();
+        } else if (action === 'open-in-browser') {
+            openInNativeBrowser(this);
         } else if (action === 'close') {
             if (modalInstance) modalInstance.hide();
         }
@@ -425,6 +514,95 @@
 
         // Prompt can only be used once
         deferredPrompt = null;
+    }
+
+    // ================================================
+    // Open in Native Browser (for in-app WebViews)
+    // ================================================
+
+    function openInNativeBrowser(btn) {
+        const currentUrl = window.location.href;
+
+        // Change button to loading state (preserve inner structure)
+        if (btn) {
+            btn.disabled = true;
+            const origHTML = btn.innerHTML;
+            btn.innerHTML = '<span aria-hidden="true">⏳</span> جاري الفتح...';
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = origHTML;
+            }, 3000);
+        }
+
+        // --- iOS: x-safari-https:// URL scheme ---
+        if (isAnyIOS) {
+            const safariUrl = currentUrl.replace(/^https?:\/\//, 'x-safari-https://');
+
+            // Watch for page visibility — if page goes hidden, Safari opened successfully
+            let safariOpened = false;
+            const onVisibilityChange = () => {
+                if (document.visibilityState === 'hidden') {
+                    safariOpened = true;
+                }
+            };
+            document.addEventListener('visibilitychange', onVisibilityChange, { once: true });
+
+            // Attempt to open Safari
+            window.location.href = safariUrl;
+
+            // After 2s: if page is still visible, scheme didn't work — show hint
+            setTimeout(() => {
+                document.removeEventListener('visibilitychange', onVisibilityChange);
+                if (!safariOpened) {
+                    const hintEl = document.getElementById('pwaModalHint');
+                    if (hintEl) {
+                        hintEl.style.display = '';
+                        hintEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+            }, 2000);
+
+            return;
+        }
+
+        // --- Android: intent URL to open in default browser / Chrome ---
+        if (isAndroid) {
+            const intentUrl = 'intent://' +
+                currentUrl.replace(/^https?:\/\//, '') +
+                '#Intent;scheme=https;action=android.intent.action.VIEW;end';
+
+            // Track if app left (intent worked)
+            let browserOpened = false;
+            const onVisibilityChange = () => {
+                if (document.visibilityState === 'hidden') {
+                    browserOpened = true;
+                }
+            };
+            document.addEventListener('visibilitychange', onVisibilityChange, { once: true });
+
+            window.location.href = intentUrl;
+
+            // After 2s: if still here, show hint
+            setTimeout(() => {
+                document.removeEventListener('visibilitychange', onVisibilityChange);
+                if (!browserOpened) {
+                    const hintEl = document.getElementById('pwaModalHint');
+                    if (hintEl) {
+                        hintEl.style.display = '';
+                        hintEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+            }, 2000);
+
+            return;
+        }
+
+        // --- Fallback for other platforms ---
+        try {
+            window.open(currentUrl, '_blank');
+        } catch (e) {
+            copyPageLink();
+        }
     }
 
     // ================================================
@@ -554,6 +732,7 @@
 
         // Detect current state and configure button
         const state = detectInstallState();
+        installState = state; // Keep module-level state in sync
 
         if (state === 'installed') {
             btn.style.display = 'none';
@@ -561,10 +740,20 @@
         }
 
         btn.style.display = '';
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
+
+        // Prevent duplicate listeners if init is called more than once
+        btn.removeEventListener('click', onInstallBtnClick);
+        btn.addEventListener('click', onInstallBtnClick);
+    }
+
+    function onInstallBtnClick(e) {
+        e.preventDefault();
+        // Re-evaluate state each click — deferredPrompt may have arrived since init
+        if (deferredPrompt) {
+            openInstallModal(); // Will show 'installable' state with native prompt button
+        } else {
             openInstallModal();
-        });
+        }
     }
 
     // ================================================

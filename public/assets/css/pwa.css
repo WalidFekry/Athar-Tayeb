@@ -128,7 +128,54 @@
     text-align: center;
 }
 
+/* In-app browser description */
+.pwa-inapp-desc {
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0.75rem 1rem;
+    background: var(--muted-bg);
+    border-radius: 10px;
+    border-right: 3px solid var(--primary);
+}
+
+/* Open-in-browser hint (shown after tap if didn't open) */
+.pwa-open-hint {
+    margin-top: 1rem;
+    padding: 0.65rem 1rem;
+    background: #fff8e1;
+    border-radius: 10px;
+    border-right: 3px solid #f9c846;
+    font-size: 0.825rem;
+    color: #5a4c2a;
+    line-height: 1.6;
+    animation: fadeInHint 0.4s ease;
+}
+
+[data-theme="dark"] .pwa-open-hint {
+    background: #2a2410;
+    border-right-color: #c4a020;
+    color: #d4b84a;
+}
+
+@keyframes fadeInHint {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Open-in-browser primary button — slightly different shade */
+#pwaBtnOpenBrowser.pwa-btn-primary {
+    background-color: #4a7c59 !important;
+    border-color: #4a7c59 !important;
+    letter-spacing: 0.01em;
+}
+
+#pwaBtnOpenBrowser.pwa-btn-primary:hover {
+    background-color: #3a6647 !important;
+}
+
 /* Steps list (iOS/macOS instructions) */
+
 .pwa-steps-list {
     list-style: none;
     padding: 0;

@@ -19,7 +19,9 @@ const DYNAMIC_CACHE = 'athar-tayeb-dynamic-' + CACHE_VERSION;
 const STATIC_ASSETS = [
     '/assets/css/main.css',
     '/assets/css/footer-styles.css',
+    '/assets/css/pwa.css',
     '/assets/js/main.js',
+    '/assets/js/pwa.js',
     '/assets/images/icon-192.png',
     '/assets/images/icon-512.png',
     '/assets/images/placeholder-memorial.png',
@@ -186,14 +188,11 @@ function cacheFirst(request) {
 // For page navigation only — never serves stale user data
 // ==========================================
 function networkFirstWithOfflineFallback(request, url) {
-    // For paths that must be fresh, always use network-only with offline fallback
-    const needsFreshData = NETWORK_FIRST_PATHS.some(path => url.pathname.startsWith(path));
-
     return fetch(request)
         .then((response) => {
             // Only cache successful, non-sensitive public pages
             if (response && response.status === 200) {
-                // Cache the home page for offline use
+                // Cache the home page for offline use only
                 if (url.pathname === '/' || url.pathname === '/index') {
                     const responseToCache = response.clone();
                     caches.open(DYNAMIC_CACHE).then(cache => {
