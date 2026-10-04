@@ -145,6 +145,9 @@
 
 <!-- Custom JS -->
 <script src="<?= BASE_URL ?>/assets/js/main.js"></script>
+
+<!-- PWA Install Manager -->
+<script src="<?= BASE_URL ?>/assets/js/pwa.js" defer></script>
 </body>
 
 </html>

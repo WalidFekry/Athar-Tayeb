@@ -8,6 +8,18 @@
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+    # Service Worker must not be cached by browser (so updates are detected)
+    <FilesMatch "sw\.js$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+</IfModule>
+
+# MIME Types for PWA
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
 </IfModule>
 
 RewriteEngine On
@@ -39,7 +51,13 @@ RewriteRule ^api/([a-zA-Z0-9_-]+)/?$ public/api/$1.php [QSA,L]
 RewriteRule ^m/([0-9]+)/?$ public/memorial.php?id=$1 [QSA,L]
 
 # Public pages without .php
-RewriteRule ^(index|create|all|contact|search|success|unpublished|404|maintenance|developer|memorial|edit|deleted|how-to-benefit|share-guide|mobile-guide|memorial-guide|faq|duaa-etiquette|athar-pages|guide|privacy|terms)/?$ public/$1.php [QSA,L]
+RewriteRule ^(index|create|all|contact|search|success|unpublished|404|maintenance|developer|memorial|edit|deleted|how-to-benefit|share-guide|mobile-guide|memorial-guide|faq|duaa-etiquette|athar-pages|guide|privacy|terms|offline)/?$ public/$1.php [QSA,L]
+
+# PWA Service Worker (must be served from root scope)
+RewriteRule ^sw\.js$ public/sw.js [QSA,L]
+
+# PWA Manifest
+RewriteRule ^manifest\.webmanifest$ public/manifest.webmanifest [QSA,L]
 
 # Canonicalize .php (avoid admin and avoid public/404.php)
 RewriteCond %{REQUEST_URI} !^/admin/

@@ -51,6 +51,18 @@ $structuredData = $structuredData ?? '';
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="<?= BASE_URL ?>/assets/images/icon-192.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#5A7D4E">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="أثر طيب">
+
+    <!-- PWA Styles -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/pwa.css">
 
     <!-- Base URL for JavaScript -->
     <script>
@@ -104,9 +116,18 @@ $structuredData = $structuredData ?? '';
                     </li>
                 </ul>
 
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <!-- PWA Install Button -->
+                    <button id="pwaInstallBtn"
+                        type="button"
+                        aria-label="تثبيت تطبيق أثر طيب"
+                        title="ثبّت التطبيق على جهازك">
+                        <span class="pwa-btn-icon" aria-hidden="true">📲</span>
+                        <span class="pwa-btn-text">ثبّت التطبيق</span>
+                    </button>
+
                     <!-- Theme Toggle -->
-                    <button id="themeToggle" class="btn btn-outline-secondary btn-sm me-2"
+                    <button id="themeToggle" class="btn btn-outline-secondary btn-sm"
                         aria-label="تبديل بين الوضع الليلي والنهاري" aria-pressed="false">
                         <span class="theme-icon" aria-hidden="true">🌙</span>
                     </button>

@@ -1,0 +1,372 @@
+/**
+ * Athar Tayeb - PWA Styles
+ * Install modal, install button, and update notification styles
+ * RTL-ready, Bootstrap 5 RTL compatible
+ */
+
+/* ================================================
+   Install Button in Navbar
+   ================================================ */
+
+#pwaInstallBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    background: transparent;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    font-family: var(--font-ar);
+    line-height: 1.4;
+}
+
+#pwaInstallBtn:hover {
+    background-color: var(--primary);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(90, 125, 78, 0.3);
+}
+
+#pwaInstallBtn:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+#pwaInstallBtn .pwa-btn-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* ================================================
+   PWA Modal
+   ================================================ */
+
+.pwa-modal-content {
+    border-radius: 16px !important;
+    border: none !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+    overflow: hidden;
+    background-color: var(--card-bg) !important;
+    color: var(--text) !important;
+}
+
+.pwa-modal-header {
+    padding: 1.25rem 1.5rem 0.75rem !important;
+    background: linear-gradient(135deg, #f0f7ed 0%, #e8f4e3 100%);
+}
+
+[data-theme="dark"] .pwa-modal-header {
+    background: linear-gradient(135deg, #1d2b1a 0%, #1a2718 100%);
+}
+
+.pwa-modal-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pwa-brand-icon {
+    font-size: 1.5rem;
+}
+
+.pwa-brand-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.pwa-modal-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.pwa-modal-body {
+    padding: 1rem 1.5rem !important;
+}
+
+.pwa-modal-footer {
+    padding: 0.75rem 1.5rem 1.25rem !important;
+    background-color: var(--muted-bg);
+}
+
+/* Feature rows (for installable state) */
+.pwa-install-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.pwa-feature-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    background: var(--muted-bg);
+    border-radius: 10px;
+    font-size: 0.925rem;
+    color: var(--text);
+    transition: var(--transition);
+}
+
+.pwa-feature-row:hover {
+    background: var(--bg);
+}
+
+.pwa-feature-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    width: 2rem;
+    text-align: center;
+}
+
+/* Steps list (iOS/macOS instructions) */
+.pwa-steps-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.pwa-steps-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    background: var(--muted-bg);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.6rem;
+    height: 1.6rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+/* Note box */
+.pwa-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #fff8e1;
+    border-radius: 10px;
+    border-right: 3px solid #f9c846;
+    font-size: 0.875rem;
+    color: #5a4c2a;
+    line-height: 1.6;
+}
+
+[data-theme="dark"] .pwa-note {
+    background: #2a2410;
+    border-right-color: #c4a020;
+    color: #d4b84a;
+}
+
+.pwa-note-icon {
+    flex-shrink: 0;
+    font-size: 1rem;
+    margin-top: 0.05rem;
+}
+
+/* Subtitle */
+.pwa-subtitle {
+    color: var(--muted-text);
+    font-size: 0.925rem;
+}
+
+/* URL display box */
+.pwa-url-box {
+    background: var(--muted-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.875rem;
+    color: var(--primary);
+    font-weight: 600;
+    word-break: break-all;
+    direction: ltr;
+    text-align: left;
+}
+
+/* Installed state */
+.pwa-installed-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pwa-check-icon {
+    font-size: 3rem;
+}
+
+/* Buttons */
+.pwa-btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: white !important;
+    font-weight: 600;
+    border-radius: 10px !important;
+    padding: 0.6rem 1.25rem !important;
+    font-family: var(--font-ar);
+    font-size: 0.9rem !important;
+    transition: var(--transition) !important;
+}
+
+.pwa-btn-primary:hover {
+    background-color: var(--primary-hover) !important;
+    transform: translateY(-1px);
+}
+
+.pwa-btn-secondary {
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+    font-weight: 600;
+    border-radius: 10px !important;
+    padding: 0.6rem 1.25rem !important;
+    font-family: var(--font-ar);
+    font-size: 0.9rem !important;
+    background: transparent !important;
+    transition: var(--transition) !important;
+}
+
+.pwa-btn-secondary:hover {
+    background-color: var(--muted-bg) !important;
+}
+
+/* ================================================
+   Update Notification Toast
+   ================================================ */
+
+#pwaUpdateToast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    left: 1.5rem;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.pwa-update-toast {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.85rem 1.25rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    font-size: 0.9rem;
+    color: var(--text);
+    max-width: 480px;
+    flex-wrap: wrap;
+}
+
+.pwa-update-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-ar);
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.pwa-update-btn:hover {
+    background: var(--primary-hover);
+}
+
+.pwa-update-dismiss {
+    background: none;
+    border: none;
+    color: var(--muted-text);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    line-height: 1;
+    margin-right: auto;
+    transition: var(--transition);
+}
+
+.pwa-update-dismiss:hover {
+    color: var(--text);
+}
+
+/* ================================================
+   Responsive adjustments
+   ================================================ */
+
+@media (max-width: 576px) {
+    #pwaInstallBtn .pwa-btn-text {
+        display: none; /* Show icon only on very small screens */
+    }
+
+    #pwaInstallBtn {
+        padding: 0.45rem 0.6rem;
+    }
+
+    .pwa-modal-content {
+        margin: 0.5rem;
+    }
+
+    .pwa-modal-body {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .pwa-modal-header {
+        padding: 1rem 1rem 0.75rem !important;
+    }
+
+    .pwa-modal-footer {
+        padding: 0.75rem 1rem 1rem !important;
+    }
+
+    #pwaUpdateToast {
+        bottom: 1rem;
+        right: 0.75rem;
+        left: 0.75rem;
+    }
+
+    #pwaModalButtons {
+        flex-direction: column !important;
+    }
+
+    .pwa-btn-primary,
+    .pwa-btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+}
