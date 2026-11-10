@@ -433,6 +433,37 @@ function generateStructuredData($memorial)
 }
 
 /**
+ * Generate Structured Data (JSON-LD) for Athar Tayeb Explanatory Video (SEO)
+ */
+function getVideoStructuredData($pageUrl = '')
+{
+    $data = [
+        "@context" => "https://schema.org",
+        "@type" => "VideoObject",
+        "name" => "فيديو تعريفي: ما هي منصة أثر طيب وكيف تعمل؟",
+        "description" => "فيديو تعريفي مدته دقيقة واحدة يشرح فكرة منصة أثر طيب لإنشاء صفحات تذكارية للمتوفين تجمع بين الدعاء والتسبيح وقراءة القرآن صدقة جارية تبقى بعد الرحيل.",
+        "thumbnailUrl" => [
+            BASE_URL . "/assets/images/video-poster.png"
+        ],
+        "uploadDate" => "2026-11-10T02:12:00+02:00",
+        "duration" => "PT58S",
+        "contentUrl" => BASE_URL . "/assets/videos/athar-tayeb.mp4",
+        "embedUrl" => !empty($pageUrl) ? $pageUrl : BASE_URL . "/",
+        "publisher" => [
+            "@type" => "Organization",
+            "name" => SITE_NAME,
+            "url" => BASE_URL,
+            "logo" => [
+                "@type" => "ImageObject",
+                "url" => BASE_URL . "/assets/images/icon-512.png"
+            ]
+        ]
+    ];
+
+    return '<script type="application/ld+json">' . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>';
+}
+
+/**
  * Redirect helper
  */
 function redirect($url)

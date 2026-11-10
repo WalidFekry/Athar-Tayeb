@@ -757,49 +757,52 @@ document.addEventListener("DOMContentLoaded", function () {
   // Ruqyah Single Audio Player with Random Track
   const roqiaPlayBtn = document.querySelector(".ruqyah-play-btn");
   const audioElement = document.getElementById("ruqyahAudio");
-  const playIcon = roqiaPlayBtn.querySelector(".play-icon");
-  const pauseIcon = roqiaPlayBtn.querySelector(".pause-icon");
 
-  let currentTrack = null;
-  const tracks = [
-    "https://post.walid-fekry.com/audios/roqia/1.mp3",
-    "https://post.walid-fekry.com/audios/roqia/2.mp3",
-    "https://post.walid-fekry.com/audios/roqia/3.mp3",
-    "https://post.walid-fekry.com/audios/roqia/4.mp3",
-    "https://post.walid-fekry.com/audios/roqia/5.mp3",
-  ];
+  if (roqiaPlayBtn && audioElement) {
+    const playIcon = roqiaPlayBtn.querySelector(".play-icon");
+    const pauseIcon = roqiaPlayBtn.querySelector(".pause-icon");
 
-  function getRandomTrack() {
-    const index = Math.floor(Math.random() * tracks.length);
-    return tracks[index];
-  }
+    let currentTrack = null;
+    const tracks = [
+      "https://post.walid-fekry.com/audios/roqia/1.mp3",
+      "https://post.walid-fekry.com/audios/roqia/2.mp3",
+      "https://post.walid-fekry.com/audios/roqia/3.mp3",
+      "https://post.walid-fekry.com/audios/roqia/4.mp3",
+      "https://post.walid-fekry.com/audios/roqia/5.mp3",
+    ];
 
-  roqiaPlayBtn.addEventListener("click", () => {
-    if (!audioElement.paused) {
-      // pause
-      audioElement.pause();
-      playIcon.style.display = "inline";
-      pauseIcon.style.display = "none";
-      roqiaPlayBtn.classList.remove("playing");
-    } else {
-      // choose random if not playing or ended
-      if (!currentTrack || audioElement.ended) {
-        const randomSrc = getRandomTrack();
-        currentTrack = randomSrc;
-        audioElement.src = randomSrc;
-      }
-      audioElement.play();
-      playIcon.style.display = "none";
-      pauseIcon.style.display = "inline";
-      roqiaPlayBtn.classList.add("playing");
+    function getRandomTrack() {
+      const index = Math.floor(Math.random() * tracks.length);
+      return tracks[index];
     }
-  });
 
-  audioElement.addEventListener("ended", () => {
-    playIcon.style.display = "inline";
-    pauseIcon.style.display = "none";
-    roqiaPlayBtn.classList.remove("playing");
-  });
+    roqiaPlayBtn.addEventListener("click", () => {
+      if (!audioElement.paused) {
+        // pause
+        audioElement.pause();
+        if (playIcon) playIcon.style.display = "inline";
+        if (pauseIcon) pauseIcon.style.display = "none";
+        roqiaPlayBtn.classList.remove("playing");
+      } else {
+        // choose random if not playing or ended
+        if (!currentTrack || audioElement.ended) {
+          const randomSrc = getRandomTrack();
+          currentTrack = randomSrc;
+          audioElement.src = randomSrc;
+        }
+        audioElement.play();
+        if (playIcon) playIcon.style.display = "none";
+        if (pauseIcon) pauseIcon.style.display = "inline";
+        roqiaPlayBtn.classList.add("playing");
+      }
+    });
+
+    audioElement.addEventListener("ended", () => {
+      if (playIcon) playIcon.style.display = "inline";
+      if (pauseIcon) pauseIcon.style.display = "none";
+      roqiaPlayBtn.classList.remove("playing");
+    });
+  }
 
   // =====================
   // Duaa Image Modal Logic
@@ -943,4 +946,62 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.body.removeChild(textArea);
   };
+
+  // =============================================
+  // Athar Tayeb - Vertical Video Player (Facade)
+  // =============================================
+  function initAtharVideoPlayers() {
+    const containers = document.querySelectorAll(".athar-video-player-container");
+    containers.forEach((container) => {
+      const facade = container.querySelector(".athar-video-facade");
+      const video = container.querySelector(".athar-video-element");
+      const spinner = container.querySelector(".athar-video-spinner");
+      if (!facade || !video) return;
+
+      function playVideo() {
+        if (facade.classList.contains("is-playing")) return;
+
+        if (spinner) spinner.classList.add("is-visible");
+
+        // Attach video source on-demand if not already loaded
+        const videoSrc = video.getAttribute("data-src");
+        if (videoSrc && !video.getAttribute("src")) {
+          video.setAttribute("src", videoSrc);
+        }
+
+        video.classList.add("is-active");
+        facade.classList.add("is-playing");
+
+        // Start playback immediately on user gesture
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              if (spinner) spinner.classList.remove("is-visible");
+            })
+            .catch((err) => {
+              console.warn("Video play error/interrupted:", err);
+              if (spinner) spinner.classList.remove("is-visible");
+            });
+        } else {
+          if (spinner) spinner.classList.remove("is-visible");
+        }
+      }
+
+      facade.addEventListener("click", playVideo);
+      facade.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          playVideo();
+        }
+      });
+    });
+  }
+
+  // Initialize video players safely
+  try {
+    initAtharVideoPlayers();
+  } catch (err) {
+    console.error("Error initializing Athar video player:", err);
+  }
 });

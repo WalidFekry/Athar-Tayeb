@@ -26,6 +26,9 @@ $stmt = $pdo->prepare("
 $stmt->execute();
 $latestMemorials = $stmt->fetchAll();
 
+// SEO Structured Data for Video
+$structuredData = getVideoStructuredData(site_url(''));
+
 // Fetch most recently visited memorials (by last_visit)
 $stmt = $pdo->prepare("
     SELECT id, name, death_date, image, visits, gender, created_at,
@@ -57,11 +60,12 @@ include __DIR__ . '/../includes/header.php';
                     صالح يدعو له"</strong>
             </p>
         </div>
-        <a href="<?= site_url('create') ?>" class="btn btn-light btn-lg px-5 py-3" aria-label="انتقل إلى صفحة إنشاء صفحة تذكارية جديدة">
+        <a href="<?= site_url('create') ?>" class="btn btn-light btn-lg px-5 py-3"
+            aria-label="انتقل إلى صفحة إنشاء صفحة تذكارية جديدة">
             أنشئ صفحة تذكارية الآن 💚
         </a>
         <p class="text-white-50 mt-3 mb-0 small fst-italic">
-             تستغرق أقل من دقيقتين — بدون تسجيل دخول ⏱️
+            تستغرق أقل من دقيقتين — بدون تسجيل دخول ⏱️
         </p>
     </div>
 </section>
@@ -93,6 +97,15 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </section>
 
+    <!-- Video Showcase Section -->
+    <?php
+    $videoTitle = 'شاهد كيف تعمل منصة «أثر طيب» في دقيقة واحدة 🌿';
+    $videoSubtitle = 'تعرّف على فكرة الصفحات التذكارية وكيف تجمع الأجر والدعاء والتسبيح والقرآن لمن تحب.';
+    $videoShowCta = true;
+    $videoSectionId = 'home-video';
+    include __DIR__ . '/../includes/video_showcase.php';
+    ?>
+
     <!-- Search Section -->
     <section class="row mb-5" aria-labelledby="search-heading">
         <div class="col-lg-8 mx-auto">
@@ -102,11 +115,13 @@ include __DIR__ . '/../includes/header.php';
                     <div class="input-group input-group-lg">
                         <label for="searchInput" class="visually-hidden">ابحث عن اسم المتوفى</label>
                         <input type="text" name="q" id="searchInput" class="form-control"
-                            placeholder="🔍 ابحث عن شخص تحبه لتتذكره بالدعاء..." autocomplete="off" aria-label="حقل البحث عن اسم المتوفى">
+                            placeholder="🔍 ابحث عن شخص تحبه لتتذكره بالدعاء..." autocomplete="off"
+                            aria-label="حقل البحث عن اسم المتوفى">
                         <button class="btn btn-primary px-4" type="submit">بحث</button>
                     </div>
                 </form>
-                <div id="searchResults" class="search-results" style="display: none;" role="region" aria-live="polite" aria-atomic="true"></div>
+                <div id="searchResults" class="search-results" style="display: none;" role="region" aria-live="polite"
+                    aria-atomic="true"></div>
             </div>
         </div>
     </section>
@@ -142,7 +157,8 @@ include __DIR__ . '/../includes/header.php';
                                 <p class="memorial-visits">
                                     👁️ زارها <?= toArabicNumerals($memorial['visits']) ?> شخصاً
                                 </p>
-                                <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100" aria-label="عرض الصفحة التذكارية للمرحوم <?= e($memorial['name']) ?>">
+                                <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100"
+                                    aria-label="عرض الصفحة التذكارية للمرحوم <?= e($memorial['name']) ?>">
                                     عرض الصفحة
                                 </a>
                             </div>
@@ -161,9 +177,9 @@ include __DIR__ . '/../includes/header.php';
             </div>
             <div class="row g-4 mb-4">
                 <?php foreach ($recentlyVisitedMemorials as $memorial): ?>
-                    <?php 
-                        $totalTasbeeh = $memorial['tasbeeh_allahu'] + $memorial['tasbeeh_lailaha'] + 
-                                       $memorial['tasbeeh_alham'] + $memorial['tasbeeh_subhan'];
+                    <?php
+                    $totalTasbeeh = $memorial['tasbeeh_allahu'] + $memorial['tasbeeh_lailaha'] +
+                        $memorial['tasbeeh_alham'] + $memorial['tasbeeh_subhan'];
                     ?>
                     <div class="col-md-6 col-lg-4">
                         <div class="card memorial-card h-100">
@@ -185,7 +201,8 @@ include __DIR__ . '/../includes/header.php';
                                 <p class="memorial-tasbeeh text-success small fw-bold">
                                     📿 إجمالي التسبيح: <?= toArabicNumerals(number_format($totalTasbeeh)) ?>
                                 </p>
-                                <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100" aria-label="عرض الصفحة التذكارية للمرحوم <?= e($memorial['name']) ?>">
+                                <a href="<?= site_url('m/' . $memorial['id']) ?>" class="btn btn-primary w-100"
+                                    aria-label="عرض الصفحة التذكارية للمرحوم <?= e($memorial['name']) ?>">
                                     عرض الصفحة
                                 </a>
                             </div>
@@ -198,7 +215,8 @@ include __DIR__ . '/../includes/header.php';
         <!-- View More Button -->
         <?php if (count($latestMemorials) > 0 || count($recentlyVisitedMemorials) > 0): ?>
             <div class="text-center">
-                <a href="<?= site_url('all') ?>" class="btn btn-outline-primary btn-lg" aria-label="انتقل إلى صفحة جميع الصفحات التذكارية">
+                <a href="<?= site_url('all') ?>" class="btn btn-outline-primary btn-lg"
+                    aria-label="انتقل إلى صفحة جميع الصفحات التذكارية">
                     عرض المزيد من الصفحات
                 </a>
             </div>
@@ -211,39 +229,39 @@ include __DIR__ . '/../includes/header.php';
 
     <!-- Features Section -->
     <section class="row mt-5 g-4" aria-labelledby="features-heading">
-            <div class="col-12">
-                <h2 id="features-heading" class="text-center mb-4"> مميزات الصفحة التذكارية ✨</h2>
-            </div>
+        <div class="col-12">
+            <h2 id="features-heading" class="text-center mb-4">مميزات الصفحة التذكارية</h2>
+        </div>
 
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <div class="fs-1 mb-3" aria-hidden="true">📿</div>
-                        <h3 class="h5">تسبيح إلكتروني</h3>
-                        <p class="text-muted">عدادات تسبيح تفاعلية للزوار للمشاركة في الأجر</p>
-                    </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3" aria-hidden="true">📿</div>
+                    <h3 class="h5">تسبيح إلكتروني</h3>
+                    <p class="text-muted">عدادات تسبيح تفاعلية للزوار للمشاركة في الأجر</p>
                 </div>
             </div>
+        </div>
 
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <div class="fs-1 mb-3" aria-hidden="true">📖</div>
-                        <h3 class="h5">قرآن وأذكار</h3>
-                        <p class="text-muted">صفحة قرآن عشوائية وأذكار الصباح والمساء مع الصوت</p>
-                    </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3" aria-hidden="true">📖</div>
+                    <h3 class="h5">قرآن وأذكار</h3>
+                    <p class="text-muted">صفحة قرآن عشوائية وأذكار الصباح والمساء مع الصوت</p>
                 </div>
             </div>
+        </div>
 
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <div class="fs-1 mb-3" aria-hidden="true">🤲</div>
-                        <h3 class="h5">أدعية مخصصة</h3>
-                        <p class="text-muted">أدعية للميت مع إمكانية الاستماع للصوت</p>
-                    </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3" aria-hidden="true">🤲</div>
+                    <h3 class="h5">أدعية مخصصة</h3>
+                    <p class="text-muted">أدعية للميت مع إمكانية الاستماع للصوت</p>
                 </div>
             </div>
+        </div>
     </section>
 
 </div>
