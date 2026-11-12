@@ -17,9 +17,10 @@
     </FilesMatch>
 </IfModule>
 
-# MIME Types for PWA
+# MIME Types for PWA & Media
 <IfModule mod_mime.c>
     AddType application/manifest+json .webmanifest
+    AddType video/mp4 .mp4
 </IfModule>
 
 RewriteEngine On
